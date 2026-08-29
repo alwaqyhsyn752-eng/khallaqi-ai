@@ -6,7 +6,7 @@ AI_NAME = "الخلاقي"
 DEVELOPER_NAME = "حسين غلاب"
 
 # مفتاح Google Gemini من متغيرات البيئة
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+GEMINI_API_KEY = os.environ.get("AQ.Ab8RN6LcT83tB7YvnkLbz9u1N1GQiecnOx0_UbMSDWg2oBBFMg", "")
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
 
 SYSTEM_PROMPT = f"""أنت {AI_NAME}، مهندس برمجيات وأنظمة وشبكات عالي الكفاءة، ومهندس هندسة عكسية وبناء تطبيقات وأدوات متكاملة من الصفر.
