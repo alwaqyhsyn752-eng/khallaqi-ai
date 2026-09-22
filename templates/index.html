@@ -20,11 +20,7 @@
             --assistant-bubble: #1a1a2e;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Segoe UI', Tahoma, 'Noto Sans Arabic', sans-serif;
@@ -36,13 +32,11 @@
             overflow: hidden;
         }
 
-        /* ===== الشعار الأرجواني المتبلور ===== */
         .logo-container {
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px 0 10px;
-            background: transparent;
         }
 
         .crystal-logo {
@@ -65,27 +59,18 @@
             animation: shimmer 4s ease-in-out infinite;
         }
 
-        .crystal-logo::before {
-            transform: rotate(0deg);
-        }
-
-        .crystal-logo::after {
-            transform: rotate(30deg);
-            opacity: 0.7;
-            animation-delay: 0.5s;
-        }
+        .crystal-logo::before { transform: rotate(0deg); }
+        .crystal-logo::after { transform: rotate(30deg); opacity: 0.7; animation-delay: 0.5s; }
 
         @keyframes shimmer {
             0%, 100% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
         }
-
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.05); }
         }
 
-        /* ===== الترويسة ===== */
         .header {
             background: var(--surface);
             border-bottom: 1px solid var(--border);
@@ -104,15 +89,8 @@
             font-weight: bold;
         }
 
-        .header .subtitle {
-            font-size: 0.85em;
-            color: var(--text-secondary);
-        }
-
-        .actions {
-            display: flex;
-            gap: 10px;
-        }
+        .header .subtitle { font-size: 0.85em; color: var(--text-secondary); }
+        .actions { display: flex; gap: 10px; }
 
         .btn-clear {
             background: var(--surface2);
@@ -124,12 +102,8 @@
             font-size: 0.9em;
             transition: background 0.2s;
         }
+        .btn-clear:hover { background: #2a2a44; }
 
-        .btn-clear:hover {
-            background: #2a2a44;
-        }
-
-        /* ===== منطقة المحادثة ===== */
         .chat-container {
             flex: 1;
             overflow-y: auto;
@@ -169,7 +143,6 @@
             opacity: 0.8;
         }
 
-        /* ===== تنسيق الأكواد ===== */
         .message pre {
             background: var(--code-bg);
             border: 1px solid var(--code-border);
@@ -182,10 +155,6 @@
             font-family: 'Cascadia Code', 'Fira Code', 'Courier New', monospace;
             font-size: 0.85em;
             position: relative;
-        }
-
-        .message code {
-            font-family: inherit;
         }
 
         .copy-btn {
@@ -202,13 +171,8 @@
             z-index: 2;
             transition: all 0.2s;
         }
+        .copy-btn:hover { background: var(--accent); color: white; }
 
-        .copy-btn:hover {
-            background: var(--accent);
-            color: white;
-        }
-
-        /* ===== منطقة الإدخال ===== */
         .input-area {
             background: var(--surface);
             border-top: 1px solid var(--border);
@@ -231,10 +195,7 @@
             min-height: 40px;
         }
 
-        .input-area textarea:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
+        .input-area textarea:focus { outline: none; border-color: var(--accent); }
 
         .input-area button {
             background: var(--accent);
@@ -246,17 +207,9 @@
             font-weight: bold;
             transition: opacity 0.2s;
         }
+        .input-area button:hover { opacity: 0.9; }
+        .input-area button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        .input-area button:hover {
-            opacity: 0.9;
-        }
-
-        .input-area button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        /* ===== مؤشر الكتابة ===== */
         .typing-indicator {
             align-self: flex-start;
             background: var(--assistant-bubble);
@@ -273,7 +226,6 @@
             border-radius: 50%;
             animation: typing 1.4s infinite;
         }
-
         .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
         .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
 
@@ -282,7 +234,6 @@
             30% { transform: translateY(-8px); }
         }
 
-        /* ===== استجابة ===== */
         @media (max-width: 600px) {
             .message { max-width: 95%; }
             .input-area { flex-direction: column; }
@@ -292,12 +243,7 @@
     </style>
 </head>
 <body>
-    <!-- الشعار -->
-    <div class="logo-container">
-        <div class="crystal-logo"></div>
-    </div>
-
-    <!-- الترويسة -->
+    <div class="logo-container"><div class="crystal-logo"></div></div>
     <div class="header">
         <div>
             <div class="title">{{ ai_name }} للذكاء والبرمجة</div>
@@ -308,31 +254,25 @@
         </div>
     </div>
 
-    <!-- منطقة المحادثة -->
     <div class="chat-container" id="chatContainer"></div>
 
-    <!-- منطقة الإدخال -->
     <div class="input-area">
         <textarea id="userInput" placeholder="اكتب سؤالك أو طلبك هنا..." rows="1"></textarea>
         <button id="sendBtn" onclick="sendMessage()">إرسال</button>
     </div>
 
     <script>
-        // ===== التهيئة =====
         const chatContainer = document.getElementById('chatContainer');
         const userInput = document.getElementById('userInput');
         const sendBtn = document.getElementById('sendBtn');
         const STORAGE_KEY = 'khallaqi_chat_history';
 
-        // تحميل المحادثة من localStorage عند فتح الصفحة
         function loadConversation() {
             const saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
                 try {
                     const messages = JSON.parse(saved);
-                    messages.forEach(msg => {
-                        addMessage(msg.content, msg.sender, false);
-                    });
+                    messages.forEach(msg => addMessage(msg.content, msg.sender, false));
                 } catch (e) {
                     console.error('فشل تحميل المحادثة:', e);
                 }
@@ -341,11 +281,9 @@
             }
         }
 
-        // حفظ المحادثة إلى localStorage
         function saveConversation() {
             const messages = [];
-            const messageDivs = chatContainer.querySelectorAll('.message');
-            messageDivs.forEach(div => {
+            chatContainer.querySelectorAll('.message').forEach(div => {
                 const sender = div.classList.contains('user') ? 'user' : 'assistant';
                 const content = div.querySelector('.content')?.innerText || '';
                 messages.push({ sender, content });
@@ -353,11 +291,9 @@
             localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
         }
 
-        // إضافة رسالة إلى واجهة الدردشة
         function addMessage(content, sender, save = true) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}`;
-
             const senderLabel = document.createElement('div');
             senderLabel.className = 'sender';
             senderLabel.textContent = sender === 'user' ? 'أنت:' : 'الخلاقي:';
@@ -378,7 +314,6 @@
                         const code = document.createElement('code');
                         code.textContent = parts[i].replace(/^\w+\n/, '');
                         pre.appendChild(code);
-
                         const copyBtn = document.createElement('button');
                         copyBtn.className = 'copy-btn';
                         copyBtn.textContent = 'نسخ';
@@ -399,7 +334,6 @@
             messageDiv.appendChild(contentDiv);
             chatContainer.appendChild(messageDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
-
             if (save) saveConversation();
             return messageDiv;
         }
@@ -423,33 +357,28 @@
         }
 
         function hideTypingIndicator() {
-            const indicator = document.getElementById('typingIndicator');
-            if (indicator) indicator.remove();
+            const ind = document.getElementById('typingIndicator');
+            if (ind) ind.remove();
         }
 
         async function sendMessage() {
             const message = userInput.value.trim();
             if (!message) return;
-
             addMessage(message, 'user');
             userInput.value = '';
             userInput.style.height = 'auto';
             sendBtn.disabled = true;
-
             showTypingIndicator();
-
             try {
                 const response = await fetch('/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: message })
+                    body: JSON.stringify({ message })
                 });
-
                 const data = await response.json();
                 hideTypingIndicator();
-
                 if (!response.ok) {
-                    addMessage(data.error || 'حدث خطأ غير معروف', 'assistant');
+                    addMessage(data.error || 'حدث خطأ', 'assistant');
                 } else {
                     addMessage(data.response, 'assistant');
                 }
@@ -462,14 +391,8 @@
         }
 
         async function clearChat() {
-            if (!confirm('هل تريد مسح المحادثة نهائياً؟')) return;
-
-            try {
-                await fetch('/clear', { method: 'POST' });
-            } catch (e) {
-                console.error('فشل مسح المحادثة على الخادم:', e);
-            }
-
+            if (!confirm('هل تريد مسح المحادثة نهائيًا؟')) return;
+            try { await fetch('/clear', { method: 'POST' }); } catch (e) {}
             localStorage.removeItem(STORAGE_KEY);
             chatContainer.innerHTML = '';
             addMessage('تم مسح المحادثة. كيف يمكنني مساعدتك؟', 'assistant', false);
