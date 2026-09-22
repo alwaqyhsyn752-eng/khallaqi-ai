@@ -1,13 +1,23 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+الخلاقي للذكاء والبرمجة
+المطور: حسين غلاب
+يدعم مفاتيح Gemini الجديدة (تبدأ بـ AIza أو AQ.)
+"""
+
 import os
 from flask import Flask, request, jsonify, render_template
 import requests
 
+# ========== الإعدادات ==========
 AI_NAME = "الخلاقي"
 DEVELOPER_NAME = "حسين غلاب"
 
-# مفتاح Google Gemini من متغيرات البيئة
-GEMINI_API_KEY = os.environ.get("AQ.Ab8RN6LcT83tB7YvnkLbz9u1N1GQiecnOx0_UbMSDWg2oBBFMg", "")
-GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+GEMINI_MODEL = "gemini-1.5-flash"
+GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent"
 
 SYSTEM_PROMPT = f"""أنت {AI_NAME}، مهندس برمجيات وأنظمة وشبكات عالي الكفاءة، ومهندس هندسة عكسية وبناء تطبيقات وأدوات متكاملة من الصفر.
 
@@ -23,19 +33,20 @@ SYSTEM_PROMPT = f"""أنت {AI_NAME}، مهندس برمجيات وأنظمة و
 المطور: {DEVELOPER_NAME}
 """
 
+# ========== تهيئة Flask ==========
 app = Flask(__name__)
 
-# تخزين المحادثة في الذاكرة
 conversation_history = [
     {"role": "system", "content": SYSTEM_PROMPT}
 ]
 
+# ========== دالة استدعاء Gemini ==========
 def call_gemini(messages):
-    """استدعاء Gemini API وإرجاع الرد"""
+    """استدعاء Gemini API مع دعم المفاتيح الجديدة (ترويسة x-goog-api-key)"""
     if not GEMINI_API_KEY:
         return "❌ خطأ: لم يتم تعيين مفتاح GEMINI_API_KEY في متغيرات البيئة."
 
-    # تحويل تنسيق messages إلى تنسيق Gemini
+    # تحويل الرسائل إلى تنسيق Gemini
     contents = []
     for msg in messages:
         role = "user" if msg["role"] == "user" else "model"
@@ -48,19 +59,23 @@ def call_gemini(messages):
             "maxOutputTokens": 2048,
         }
     }
-    headers = {"Content-Type": "application/json"}
-    url = f"{GEMINI_URL}?key={GEMINI_API_KEY}"
+
+    # ✅ إرسال المفتاح في الترويسة (يدعم AIza و AQ.)
+    headers = {
+        "Content-Type": "application/json",
+        "x-goog-api-key": GEMINI_API_KEY
+    }
 
     try:
-        response = requests.post(url, headers=headers, json=payload, timeout=60)
+        response = requests.post(GEMINI_URL, headers=headers, json=payload, timeout=60)
         if response.status_code != 200:
             return f"❌ خطأ من Gemini ({response.status_code}): {response.text}"
         result = response.json()
-        # استخراج النص من الاستجابة
         return result["candidates"][0]["content"]["parts"][0]["text"].strip()
     except Exception as e:
         return f"❌ استثناء: {str(e)}"
 
+# ========== المسارات ==========
 @app.route('/')
 def index():
     return render_template('index.html', ai_name=AI_NAME, developer_name=DEVELOPER_NAME)
@@ -68,8 +83,9 @@ def index():
 @app.route('/chat', methods=['POST'])
 def chat():
     global conversation_history
+
     if not GEMINI_API_KEY:
-        return jsonify({"error": "❌ لم يتم تعيين GEMINI_API_KEY"}), 400
+        return jsonify({"error": "❌ لم يتم تعيين GEMINI_API_KEY في متغيرات البيئة"}), 400
 
     data = request.get_json()
     if not data or 'message' not in data:
@@ -89,8 +105,16 @@ def chat():
 def clear_history():
     global conversation_history
     conversation_history = [{"role": "system", "content": SYSTEM_PROMPT}]
-    return jsonify({"status": "تم المسح"})
+    return jsonify({"status": "تم مسح المحادثة"})
 
+@app.route('/status', methods=['GET'])
+def status():
+    return jsonify({
+        "api_key_set": bool(GEMINI_API_KEY),
+        "model": GEMINI_MODEL
+    })
+
+# ========== التشغيل ==========
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
