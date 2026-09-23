@@ -364,32 +364,58 @@
         }
 
         async function sendMessage() {
-            const message = userInput.value.trim();
-            if (!message) return;
-            addMessage(message, 'user');
-            userInput.value = '';
-            userInput.style.height = 'auto';
-            sendBtn.disabled = true;
+    const message = userInput.value.trim();
+    if (!message) return;
+    addMessage(message, 'user');
+    userInput.value = '';
+    userInput.style.height = 'auto';
+    sendBtn.disabled = true;
+    showTypingIndicator();
+
+    try {
+        let response;
+        try {
+            response = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message })
+            });
+        } catch (e) {
+            // السيرفر نائم — انتظر ثم أعد المحاولة
+            hideTypingIndicator();
+            addMessage('⏳ السيرفر يستيقظ، انتظر 30 ثانية...', 'assistant');
+            await new Promise(r => setTimeout(r, 30000));
             showTypingIndicator();
-            try {
-                const response = await fetch('/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message })
-                });
-                const data = await response.json();
-                hideTypingIndicator();
-                if (!response.ok) {
-                    addMessage(data.error || 'حدث خطأ', 'assistant');
-                } else {
-                    addMessage(data.response, 'assistant');
-                }
-            } catch (error) {
-                hideTypingIndicator();
-                addMessage('❌ فشل الاتصال بالخادم: ' + error.message, 'assistant');
-            } finally {
-                sendBtn.disabled = false;
-            }
+            response = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message })
+            });
+        }
+
+        const rawText = await response.text();
+        let data;
+        try {
+            data = JSON.parse(rawText);
+        } catch (e) {
+            hideTypingIndicator();
+            addMessage('رد غير متوقع من السيرفر', 'assistant');
+            sendBtn.disabled = false;
+            return;
+        }
+
+        hideTypingIndicator();
+        if (!response.ok) {
+            addMessage(data.error || 'خطأ', 'assistant');
+        } else {
+            addMessage(data.response, 'assistant');
+        }
+    } catch (error) {
+        hideTypingIndicator();
+        addMessage('❌ ' + error.message, 'assistant');
+    } finally {
+        sendBtn.disabled = false;
+    }
         }
 
         async function clearChat() {
