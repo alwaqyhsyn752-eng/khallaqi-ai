@@ -2,65 +2,63 @@
 # -*- coding: utf-8 -*-
 
 """
-الخلاقي - مساعد برمجي متعدد المزودين مع نظام محادثات
+الخلاقي - مساعد برمجي متعدد الوسائط
 المطور: حسين غلاب
-الإصدار: 7.0-Final
+الإصدار: 8.0-Multimodal
+يدعم: نص، صوت، صور، فيديو + قاعدة بيانات هجينة + نظام محادثات
 """
 
 import os
 import sqlite3
 import uuid
+import base64
 import traceback
 from contextlib import closing
 from flask import Flask, request, jsonify, render_template
 import requests
 
 # ═══════════════════════════════════════════════════════
-# الإعدادات
+# الإعدادات العامة
 # ═══════════════════════════════════════════════════════
 AI_NAME = "الخلاقي"
 DEVELOPER_NAME = "حسين غلاب"
-VERSION = "7.0-Final"
+VERSION = "8.0-Multimodal"
 
-# المفاتيح من متغيرات البيئة
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "").strip()
+# ─── مفاتيح API ───
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "").strip()
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "").strip()
-CF_ACCOUNT_ID = os.environ.get("CF_ACCOUNT_ID", "").strip()
-CF_API_TOKEN = os.environ.get("CF_API_TOKEN", "").strip()
 
-# قاعدة البيانات: SQLite محلياً / PostgreSQL على Render
+# ─── قاعدة البيانات ───
 DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
 USE_POSTGRES = DATABASE_URL.startswith("postgres")
 SQLITE_PATH = "/tmp/khallaqi.db"
 
 LAST_DB_ERROR = ""
 
-# النماذج لكل مزود
-GROQ_MODELS = [
-    "llama-3.1-8b-instant",
-    "llama-3.3-70b-versatile",
-    "openai/gpt-oss-120b",
-    "openai/gpt-oss-20b",
-    "meta-llama/llama-4-scout-17b-16e-instruct",
-    "qwen/qwen3-32b",
-]
-
-CF_MODELS = [
-    "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "@cf/meta/llama-3.1-8b-instruct",
-]
-
-GEMINI_MODELS = [
+# ─── النماذج (أسماء حقيقية فقط) ───
+GEMINI_TEXT_MODELS = [
     "gemini-2.5-flash",
+    "gemini-2.0-flash",
     "gemini-flash-latest",
     "gemini-2.5-flash-lite",
 ]
 
-OPENROUTER_MODELS = [
-    "meta-llama/llama-3.1-8b-instruct:free",
-    "google/gemma-2-9b-it:free",
-    "mistralai/mistral-7b-instruct:free",
+GEMINI_VISION_MODELS = [
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
+    "gemini-flash-latest",
+]
+
+GEMINI_VIDEO_MODELS = [
+    "veo-3.1-generate-preview",
+    "veo-3.1-fast-generate-preview",
+]
+
+GROQ_MODELS = [
+    "llama-3.1-8b-instant",
+    "llama-3.3-70b-versatile",
+    "openai/gpt-oss-120b",
 ]
 
 # ═══════════════════════════════════════════════════════
@@ -68,40 +66,20 @@ OPENROUTER_MODELS = [
 # ═══════════════════════════════════════════════════════
 SYSTEM_PROMPT = f"""أنت {AI_NAME}، مبرمج محترف Senior Developer من إعداد {DEVELOPER_NAME}.
 
-مهمتك: كتابة الكود فوراً عندما يطلب المستخدم أي شيء تقني. لا تسأله عن التفاصيل، اختر الأنسب ونفّذ.
+مهمتك: كتابة الكود فوراً. لا تسأل عن التفاصيل، اختر الأنسب ونفّذ.
 
-قواعد الكتابة:
-1. ابدأ بالكود مباشرة بدون ترحيب أو مقدمات طويلة.
-2. اكتب الكود كاملاً من أول سطر إلى آخر سطر. ممنوع أي اختصار أو "..." أو "أكمل بنفسك".
-3. اشرح الكود بالعربية بشكل مختصر بعد كتابته.
-4. اذكر المكتبات المطلوبة + أوامر التثبيت + طريقة التشغيل.
+قواعد:
+1. ابدأ بالكود مباشرة بدون ترحيب.
+2. اكتب الكود كاملاً بدون أي اختصار.
+3. اشرح الكود بالعربية بعد كتابته.
+4. اذكر المكتبات وأوامر التثبيت.
+5. تدعم كل لغات البرمجة: Python, JavaScript, PHP, Go, Rust, C, C++, Java, Kotlin, Swift, Ruby, Lua, Bash, SQL, HTML, CSS, React, Vue, Flask, Django, Node.js, وغيرها.
 
-جميع لغات البرمجة مدعومة:
-Python, JavaScript, TypeScript, Node.js, PHP, Ruby, Perl, Go, Rust, C, C++, C#, Java, Kotlin, Swift, Objective-C, Dart, Scala, Haskell, Lua, R, MATLAB, Julia, Shell/Bash, PowerShell, SQL, HTML, CSS, SCSS, React, Vue, Angular, Svelte, Next.js, Flask, FastAPI, Django, Laravel, Express, Spring Boot, ASP.NET, Rails, Electron, React Native, Flutter, Kivy, Tkinter, PyQt, Assembly, Solidity.
-
-التخصصات:
-- Full Stack Web Development
-- APIs (REST, GraphQL)
-- قواعد البيانات (PostgreSQL, MySQL, MongoDB, SQLite, Redis)
-- DevOps (Docker, Kubernetes, CI/CD)
-- الأمن السيبراني الدفاعي
-- الذكاء الاصطناعي وتعلم الآلة
-- تطبيقات الجوال
-- الألعاب
-- الأتمتة والسكربتات
-- أدوات الشبكة
-- البوتات (Telegram, WhatsApp, Discord)
-- أدوات الاختبار والفحص
-- اختبار الاختراق بإذن
-- أي شيء تقني مشروع آخر
-
-❌ ترفض فقط هذه الحالات الأربع (بجملة واحدة قصيرة، بدون محاضرة):
-1. malware أو ransomware أو فيروسات
-2. هجمات DDoS ضد أهداف حقيقية
-3. اختراق أنظمة لا يملكها المستخدم
-4. سرقة بيانات الآخرين
-
-كل ما عدا ذلك: نفّذ فوراً بلا تردد.
+الحالات الأربع المرفوضة فقط:
+- malware / ransomware
+- DDoS
+- اختراق بدون إذن
+- سرقة بيانات
 
 المطور: {DEVELOPER_NAME}
 """
@@ -110,10 +88,11 @@ Python, JavaScript, TypeScript, Node.js, PHP, Ruby, Perl, Go, Rust, C, C++, C#, 
 # Flask
 # ═══════════════════════════════════════════════════════
 app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 32 * 1024 * 1024  # 32MB للصور والفيديو
 
 
 # ═══════════════════════════════════════════════════════
-# قاعدة البيانات
+# قاعدة البيانات الهجينة
 # ═══════════════════════════════════════════════════════
 def get_db():
     if USE_POSTGRES:
@@ -145,6 +124,8 @@ def init_database():
                         chat_id TEXT NOT NULL,
                         role TEXT NOT NULL,
                         content TEXT NOT NULL,
+                        message_type TEXT DEFAULT 'text',
+                        media_data TEXT,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
                 """)
@@ -164,6 +145,8 @@ def init_database():
                         chat_id TEXT NOT NULL,
                         role TEXT NOT NULL,
                         content TEXT NOT NULL,
+                        message_type TEXT DEFAULT 'text',
+                        media_data TEXT,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
                 """)
@@ -285,16 +268,24 @@ def get_messages(chat_id, limit=50):
         try:
             if USE_POSTGRES:
                 cur.execute(
-                    "SELECT role, content FROM messages WHERE chat_id = %s ORDER BY id ASC LIMIT %s",
+                    "SELECT role, content, message_type, media_data FROM messages WHERE chat_id = %s ORDER BY id ASC LIMIT %s",
                     (chat_id, limit)
                 )
             else:
                 cur.execute(
-                    "SELECT role, content FROM messages WHERE chat_id = ? ORDER BY id ASC LIMIT ?",
+                    "SELECT role, content, message_type, media_data FROM messages WHERE chat_id = ? ORDER BY id ASC LIMIT ?",
                     (chat_id, limit)
                 )
             rows = cur.fetchall()
-            return [{"role": r[0], "content": r[1]} for r in rows]
+            return [
+                {
+                    "role": r[0],
+                    "content": r[1],
+                    "type": r[2] or "text",
+                    "media": r[3]
+                }
+                for r in rows
+            ]
         finally:
             cur.close()
             conn.close()
@@ -303,15 +294,15 @@ def get_messages(chat_id, limit=50):
         return []
 
 
-def add_message(chat_id, role, content):
+def add_message(chat_id, role, content, message_type="text", media_data=None):
     try:
         conn = get_db()
         cur = conn.cursor()
         try:
             if USE_POSTGRES:
                 cur.execute(
-                    "INSERT INTO messages (chat_id, role, content) VALUES (%s, %s, %s)",
-                    (chat_id, role, content)
+                    "INSERT INTO messages (chat_id, role, content, message_type, media_data) VALUES (%s, %s, %s, %s, %s)",
+                    (chat_id, role, content, message_type, media_data)
                 )
                 cur.execute(
                     "UPDATE chats SET updated_at = CURRENT_TIMESTAMP WHERE id = %s",
@@ -319,8 +310,8 @@ def add_message(chat_id, role, content):
                 )
             else:
                 cur.execute(
-                    "INSERT INTO messages (chat_id, role, content) VALUES (?, ?, ?)",
-                    (chat_id, role, content)
+                    "INSERT INTO messages (chat_id, role, content, message_type, media_data) VALUES (?, ?, ?, ?, ?)",
+                    (chat_id, role, content, message_type, media_data)
                 )
                 cur.execute(
                     "UPDATE chats SET updated_at = CURRENT_TIMESTAMP WHERE id = ?",
@@ -369,7 +360,117 @@ def chat_belongs_to_user(chat_id, user_id):
 
 
 # ═══════════════════════════════════════════════════════
-# المزودون
+# Gemini API - نصوص
+# ═══════════════════════════════════════════════════════
+def call_gemini_text(history):
+    if not GEMINI_API_KEY:
+        return None, None
+
+    contents = []
+    for m in history:
+        role = "user" if m["role"] == "user" else "model"
+        contents.append({"role": role, "parts": [{"text": m["content"]}]})
+
+    payload = {
+        "systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]},
+        "contents": contents,
+        "generationConfig": {"temperature": 0.8, "maxOutputTokens": 8192}
+    }
+
+    for model in GEMINI_TEXT_MODELS:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={GEMINI_API_KEY}"
+        try:
+            r = requests.post(url, headers={"Content-Type": "application/json"}, json=payload, timeout=60)
+            if r.status_code == 200:
+                d = r.json()
+                text = d["candidates"][0]["content"]["parts"][0]["text"].strip()
+                return text, f"Gemini/{model}"
+            print(f"[GEMINI-TEXT] {model} -> {r.status_code}")
+        except Exception as e:
+            print(f"[GEMINI-TEXT] {model} -> {str(e)[:80]}")
+    return None, None
+
+
+# ═══════════════════════════════════════════════════════
+# Gemini API - صور (Multimodal)
+# ═══════════════════════════════════════════════════════
+def call_gemini_vision(prompt, image_base64, mime_type="image/jpeg"):
+    if not GEMINI_API_KEY:
+        return None, None, "GEMINI_API_KEY غير معيّن"
+
+    # إزالة prefix data URL إذا وُجد
+    if "," in image_base64:
+        image_base64 = image_base64.split(",", 1)[1]
+
+    payload = {
+        "systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]},
+        "contents": [{
+            "role": "user",
+            "parts": [
+                {"text": prompt or "حلل هذه الصورة بالتفصيل."},
+                {"inline_data": {"mime_type": mime_type, "data": image_base64}}
+            ]
+        }],
+        "generationConfig": {"temperature": 0.7, "maxOutputTokens": 4096}
+    }
+
+    for model in GEMINI_VISION_MODELS:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={GEMINI_API_KEY}"
+        try:
+            r = requests.post(url, headers={"Content-Type": "application/json"}, json=payload, timeout=60)
+            if r.status_code == 200:
+                d = r.json()
+                text = d["candidates"][0]["content"]["parts"][0]["text"].strip()
+                return text, f"Gemini-Vision/{model}", None
+            print(f"[GEMINI-VISION] {model} -> {r.status_code}")
+        except Exception as e:
+            print(f"[GEMINI-VISION] {model} -> {str(e)[:80]}")
+    return None, None, "فشلت جميع نماذج الرؤية"
+
+
+# ═══════════════════════════════════════════════════════
+# Gemini API - فيديو (Veo)
+# ═══════════════════════════════════════════════════════
+def call_gemini_video(prompt):
+    if not GEMINI_API_KEY:
+        return None, "GEMINI_API_KEY غير معيّن"
+
+    # Veo يستخدم long-running operation
+    for model in GEMINI_VIDEO_MODELS:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:predictLongRunning?key={GEMINI_API_KEY}"
+        payload = {
+            "instances": [{"prompt": prompt}],
+            "parameters": {"aspectRatio": "16:9", "personGeneration": "allow_adult"}
+        }
+        try:
+            r = requests.post(url, headers={"Content-Type": "application/json"}, json=payload, timeout=60)
+            if r.status_code == 200:
+                d = r.json()
+                op_name = d.get("name")
+                if op_name:
+                    return {"operation": op_name, "model": model}, None
+            print(f"[GEMINI-VIDEO] {model} -> {r.status_code}: {r.text[:200]}")
+        except Exception as e:
+            print(f"[GEMINI-VIDEO] {model} -> {str(e)[:80]}")
+
+    return None, "توليد الفيديو غير متاح لحسابك حالياً. Veo يتطلب صلاحيات خاصة."
+
+
+def check_video_operation(op_name):
+    if not GEMINI_API_KEY:
+        return None, "GEMINI_API_KEY غير معيّن"
+    url = f"https://generativelanguage.googleapis.com/v1beta/{op_name}?key={GEMINI_API_KEY}"
+    try:
+        r = requests.get(url, timeout=30)
+        if r.status_code == 200:
+            return r.json(), None
+        return None, f"خطأ {r.status_code}"
+    except Exception as e:
+        return None, str(e)
+
+
+# ═══════════════════════════════════════════════════════
+# Groq - Fallback
 # ═══════════════════════════════════════════════════════
 def call_groq(history):
     if not GROQ_API_KEY:
@@ -388,107 +489,48 @@ def call_groq(history):
                 return r.json()["choices"][0]["message"]["content"].strip(), f"Groq/{model.split('/')[-1]}"
             if r.status_code == 401:
                 return None, None
-            print(f"[GROQ] {model} -> {r.status_code}")
         except Exception as e:
             print(f"[GROQ] {model} -> {str(e)[:60]}")
     return None, None
 
 
-def call_cloudflare(history):
-    if not CF_ACCOUNT_ID or not CF_API_TOKEN:
-        return None, None
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}] + history
-    headers = {"Authorization": f"Bearer {CF_API_TOKEN}", "Content-Type": "application/json"}
-    for model in CF_MODELS:
-        url = f"https://api.cloudflare.com/client/v4/accounts/{CF_ACCOUNT_ID}/ai/run/{model}"
-        try:
-            r = requests.post(url, headers=headers, json={"messages": messages, "max_tokens": 4096}, timeout=30)
-            if r.status_code == 200:
-                data = r.json()
-                text = None
-                if isinstance(data.get("result"), dict):
-                    text = data["result"].get("response") or \
-                           (data["result"].get("choices", [{}])[0].get("message", {}).get("content"))
-                elif isinstance(data.get("result"), str):
-                    text = data["result"]
-                if text:
-                    return text.strip(), f"Cloudflare/{model.split('/')[-1]}"
-        except Exception as e:
-            print(f"[CF] {model} -> {str(e)[:60]}")
-    return None, None
-
-
-def call_gemini(history):
-    if not GEMINI_API_KEY:
-        return None, None
-    contents = [{"role": "user" if m["role"] == "user" else "model", "parts": [{"text": m["content"]}]} for m in history]
-    payload = {
-        "systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]},
-        "contents": contents,
-        "generationConfig": {"temperature": 0.8, "maxOutputTokens": 4096}
-    }
-    for model in GEMINI_MODELS:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={GEMINI_API_KEY}"
-        try:
-            r = requests.post(url, headers={"Content-Type": "application/json"}, json=payload, timeout=30)
-            if r.status_code == 200:
-                return r.json()["candidates"][0]["content"]["parts"][0]["text"].strip(), f"Gemini/{model}"
-        except Exception as e:
-            print(f"[GEMINI] {model} -> {str(e)[:60]}")
-    return None, None
-
-
-def call_openrouter(history):
-    if not OPENROUTER_API_KEY:
-        return None, None
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}] + history
-    headers = {
-        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://khallaqi.app",
-        "X-Title": "Khallaqi AI"
-    }
-    for model in OPENROUTER_MODELS:
-        try:
-            r = requests.post(
-                "https://openrouter.ai/api/v1/chat/completions",
-                headers=headers,
-                json={"model": model, "messages": messages, "temperature": 0.8, "max_tokens": 4096},
-                timeout=30
-            )
-            if r.status_code == 200:
-                return r.json()["choices"][0]["message"]["content"].strip(), f"OpenRouter/{model.split('/')[-1]}"
-        except Exception as e:
-            print(f"[OR] {model} -> {str(e)[:60]}")
-    return None, None
-
-
-def call_ai(history):
-    for func in (call_groq, call_cloudflare, call_gemini, call_openrouter):
-        text, source = func(history)
-        if text:
-            return text, source, None
+def call_ai_text(history):
+    """نص: Gemini أولاً، ثم Groq"""
+    text, source = call_gemini_text(history)
+    if text:
+        return text, source, None
+    text, source = call_groq(history)
+    if text:
+        return text, source, None
     return None, None, "❌ جميع المزودين فشلوا. تحقق من المفاتيح أو انتظر تجديد الحصة."
 
 
 # ═══════════════════════════════════════════════════════
-# المسارات
+# المسارات - الواجهة
 # ═══════════════════════════════════════════════════════
 @app.route('/')
 def index():
-    return render_template('index.html', ai_name=AI_NAME, developer_name=DEVELOPER_NAME, version=VERSION)
+    return render_template(
+        'index.html',
+        ai_name=AI_NAME,
+        developer_name=DEVELOPER_NAME,
+        version=VERSION
+    )
 
 
-@app.route('/chats', methods=['GET'])
-def list_chats_route():
+# ═══════════════════════════════════════════════════════
+# REST API - المحادثات
+# ═══════════════════════════════════════════════════════
+@app.route('/api/chats', methods=['GET'])
+def api_list_chats():
     user_id = str(request.args.get('user_id', '')).strip()[:64]
     if not user_id:
         return jsonify({"error": "user_id مفقود"}), 400
     return jsonify({"chats": list_chats(user_id)})
 
 
-@app.route('/chats', methods=['POST'])
-def new_chat_route():
+@app.route('/api/chats/new', methods=['POST'])
+def api_new_chat():
     data = request.get_json(silent=True) or {}
     user_id = str(data.get('user_id', '')).strip()[:64]
     if not user_id:
@@ -499,8 +541,16 @@ def new_chat_route():
     return jsonify({"error": f"فشل إنشاء محادثة: {LAST_DB_ERROR}"}), 500
 
 
-@app.route('/chats/<chat_id>', methods=['DELETE'])
-def delete_chat_route(chat_id):
+@app.route('/api/chats/<chat_id>', methods=['GET'])
+def api_get_chat(chat_id):
+    user_id = str(request.args.get('user_id', '')).strip()[:64]
+    if not chat_belongs_to_user(chat_id, user_id):
+        return jsonify({"error": "غير مصرح"}), 403
+    return jsonify({"messages": get_messages(chat_id)})
+
+
+@app.route('/api/chats/<chat_id>', methods=['DELETE'])
+def api_delete_chat(chat_id):
     data = request.get_json(silent=True) or {}
     user_id = str(data.get('user_id', '')).strip()[:64]
     if not user_id:
@@ -510,16 +560,11 @@ def delete_chat_route(chat_id):
     return jsonify({"error": "فشل الحذف"}), 500
 
 
-@app.route('/chats/<chat_id>/messages', methods=['GET'])
-def get_messages_route(chat_id):
-    user_id = str(request.args.get('user_id', '')).strip()[:64]
-    if not chat_belongs_to_user(chat_id, user_id):
-        return jsonify({"error": "غير مصرح"}), 403
-    return jsonify({"messages": get_messages(chat_id)})
-
-
-@app.route('/chat', methods=['POST'])
-def chat_route():
+# ═══════════════════════════════════════════════════════
+# REST API - إرسال الرسائل (نص + صورة)
+# ═══════════════════════════════════════════════════════
+@app.route('/api/chat', methods=['POST'])
+def api_chat():
     try:
         data = request.get_json(silent=True)
         if not data:
@@ -528,27 +573,59 @@ def chat_route():
         user_message = str(data.get('message', '')).strip()
         chat_id = str(data.get('chat_id', '')).strip()
         user_id = str(data.get('user_id', '')).strip()[:64]
+        image_base64 = data.get('image')  # Base64 string (data URL أو raw)
+        image_type = data.get('image_type', 'image/jpeg')
 
-        if not user_message or len(user_message) > 8000:
-            return jsonify({"error": "رسالة فارغة أو طويلة جداً"}), 400
         if not chat_id or not user_id:
             return jsonify({"error": "chat_id أو user_id مفقود"}), 400
+        if not user_message and not image_base64:
+            return jsonify({"error": "لا يوجد نص ولا صورة"}), 400
+        if len(user_message) > 8000:
+            return jsonify({"error": "النص طويل جداً"}), 400
         if not chat_belongs_to_user(chat_id, user_id):
             return jsonify({"error": "غير مصرح"}), 403
 
+        # إذا كانت أول رسالة، استخدم النص أو "صورة" كعنوان
         if count_messages(chat_id) == 0:
-            rename_chat(chat_id, user_id, user_message[:50])
+            title = user_message[:50] if user_message else "🖼️ صورة"
+            rename_chat(chat_id, user_id, title)
 
-        add_message(chat_id, "user", user_message)
+        # ─── حالة الصورة ───
+        if image_base64:
+            # احفظ رسالة المستخدم مع الصورة
+            add_message(
+                chat_id, "user",
+                user_message or "حلل هذه الصورة",
+                message_type="image",
+                media_data=image_base64
+            )
+
+            # استدعاء Gemini Vision
+            prompt = user_message or "حلل هذه الصورة بالتفصيل واشرح محتواها."
+            reply, source, error = call_gemini_vision(prompt, image_base64, image_type)
+
+            if error or not reply:
+                return jsonify({"error": error or "فشل تحليل الصورة", "source": "none"}), 200
+
+            add_message(chat_id, "assistant", reply, message_type="text")
+            return jsonify({"response": reply, "source": source, "type": "text"})
+
+        # ─── حالة النص العادي ───
+        add_message(chat_id, "user", user_message, message_type="text")
         history = get_messages(chat_id, limit=30)
 
-        reply, source, error = call_ai(history)
+        # حول السجل لصيغة Gemini
+        gemini_history = []
+        for m in history:
+            gemini_history.append({"role": m["role"], "content": m["content"]})
+
+        reply, source, error = call_ai_text(gemini_history)
 
         if error:
             return jsonify({"error": error, "source": "none"}), 200
 
-        add_message(chat_id, "assistant", reply)
-        return jsonify({"response": reply, "source": source})
+        add_message(chat_id, "assistant", reply, message_type="text")
+        return jsonify({"response": reply, "source": source, "type": "text"})
 
     except Exception as e:
         print(f"[CHAT] {e}")
@@ -556,8 +633,85 @@ def chat_route():
         return jsonify({"error": f"خطأ: {str(e)[:150]}"}), 500
 
 
-@app.route('/status', methods=['GET'])
-def status():
+# ═══════════════════════════════════════════════════════
+# REST API - توليد الفيديو
+# ═══════════════════════════════════════════════════════
+@app.route('/api/generate-video', methods=['POST'])
+def api_generate_video():
+    try:
+        data = request.get_json(silent=True) or {}
+        prompt = str(data.get('prompt', '')).strip()
+        chat_id = str(data.get('chat_id', '')).strip()
+        user_id = str(data.get('user_id', '')).strip()[:64]
+
+        if not prompt:
+            return jsonify({"error": "الوصف مطلوب"}), 400
+        if len(prompt) > 2000:
+            return jsonify({"error": "الوصف طويل جداً"}), 400
+
+        result, error = call_gemini_video(prompt)
+
+        if error or not result:
+            return jsonify({
+                "error": error or "فشل توليد الفيديو",
+                "hint": "Veo يتطلب تفعيلاً خاصاً في Google AI Studio. يمكنك استخدام نماذج فيديو أخرى."
+            }), 200
+
+        if chat_id and user_id and chat_belongs_to_user(chat_id, user_id):
+            add_message(chat_id, "user", f"🎬 طلب فيديو: {prompt}", message_type="text")
+            add_message(
+                chat_id, "assistant",
+                f"جاري توليد الفيديو... العملية: {result['operation']}",
+                message_type="video_pending",
+                media_data=result["operation"]
+            )
+
+        return jsonify({
+            "status": "pending",
+            "operation": result["operation"],
+            "model": result["model"],
+            "message": "جاري توليد الفيديو. استخدم /api/video-status لمتابعة الحالة."
+        })
+
+    except Exception as e:
+        print(f"[VIDEO] {e}")
+        return jsonify({"error": str(e)[:150]}), 500
+
+
+@app.route('/api/video-status', methods=['POST'])
+def api_video_status():
+    try:
+        data = request.get_json(silent=True) or {}
+        op_name = str(data.get('operation', '')).strip()
+        if not op_name:
+            return jsonify({"error": "operation مطلوب"}), 400
+
+        result, error = check_video_operation(op_name)
+        if error:
+            return jsonify({"error": error}), 200
+
+        done = result.get("done", False)
+        if done:
+            response = result.get("response", {})
+            # استخراج رابط الفيديو إن وُجد
+            videos = response.get("generateVideoResponse", {}).get("generatedSamples", [])
+            video_uri = videos[0].get("video", {}).get("uri") if videos else None
+            return jsonify({
+                "done": True,
+                "video_url": video_uri,
+                "raw": response
+            })
+        return jsonify({"done": False, "status": "still_processing"})
+
+    except Exception as e:
+        return jsonify({"error": str(e)[:150]}), 500
+
+
+# ═══════════════════════════════════════════════════════
+# REST API - حالة المزودين
+# ═══════════════════════════════════════════════════════
+@app.route('/api/status', methods=['GET'])
+def api_status():
     db_ok = False
     db_error = ""
     try:
@@ -578,12 +732,40 @@ def status():
         "db_ok": db_ok,
         "db_error": db_error,
         "providers": {
-            "groq": bool(GROQ_API_KEY),
-            "cloudflare": bool(CF_ACCOUNT_ID and CF_API_TOKEN),
             "gemini": bool(GEMINI_API_KEY),
+            "groq": bool(GROQ_API_KEY),
             "openrouter": bool(OPENROUTER_API_KEY)
+        },
+        "features": {
+            "text": bool(GEMINI_API_KEY or GROQ_API_KEY),
+            "image": bool(GEMINI_API_KEY),
+            "video": bool(GEMINI_API_KEY),
+            "voice": True
         }
     })
+
+
+# ═══════════════════════════════════════════════════════
+# مسارات قديمة (توافق خلفي)
+# ═══════════════════════════════════════════════════════
+@app.route('/chats', methods=['GET'])
+def legacy_list_chats():
+    return api_list_chats()
+
+
+@app.route('/chats', methods=['POST'])
+def legacy_new_chat():
+    return api_new_chat()
+
+
+@app.route('/chat', methods=['POST'])
+def legacy_chat():
+    return api_chat()
+
+
+@app.route('/status', methods=['GET'])
+def legacy_status():
+    return api_status()
 
 
 @app.errorhandler(Exception)
@@ -593,8 +775,21 @@ def unhandled(e):
 
 
 # ═══════════════════════════════════════════════════════
+# التشغيل
+# ═══════════════════════════════════════════════════════
 init_database()
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
+    print(f"""
+    ╔══════════════════════════════════════════╗
+    ║   {AI_NAME} - {VERSION}              ║
+    ║   المطور: {DEVELOPER_NAME}                ║
+    ╚══════════════════════════════════════════╝
+    المنفذ: {port}
+    Gemini:     {"✅" if GEMINI_API_KEY else "❌"}
+    Groq:       {"✅" if GROQ_API_KEY else "❌"}
+    OpenRouter: {"✅" if OPENROUTER_API_KEY else "❌"}
+    قاعدة البيانات: {"PostgreSQL" if USE_POSTGRES else SQLite_PATH}
+    """)
     app.run(host='0.0.0.0', port=port, debug=False)
