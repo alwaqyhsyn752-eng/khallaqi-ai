@@ -19,7 +19,7 @@ import requests
 # ═══════════════════════════════════════════════════════
 AI_NAME = "الخلاقي"
 DEVELOPER_NAME = "حسين غلاب"
-VERSION = "6.1-DB-Fix"
+VERSION = "6.2-SQLite-Fix"
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "").strip()
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
@@ -30,10 +30,7 @@ CF_API_TOKEN = os.environ.get("CF_API_TOKEN", "").strip()
 DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
 USE_POSTGRES = DATABASE_URL.startswith("postgres")
 
-# ✅ المهم: استخدام /tmp/ القابل للكتابة على Render
 SQLITE_PATH = "/tmp/khallaqi.db"
-
-# متغير عالمي لتخزين آخر خطأ قاعدة بيانات
 LAST_DB_ERROR = ""
 
 GROQ_MODELS = [
@@ -93,7 +90,7 @@ Python, JavaScript, TypeScript, Node.js, PHP, Ruby, Go, Rust, C, C++, C#, Java, 
 app = Flask(__name__)
 
 # ═══════════════════════════════════════════════════════
-# قاعدة البيانات
+# قاعدة البيانات - مع إصلاح cursor
 # ═══════════════════════════════════════════════════════
 def get_db():
     if USE_POSTGRES:
@@ -106,51 +103,55 @@ def get_db():
 def init_database():
     global LAST_DB_ERROR
     try:
-        with closing(get_db()) as conn:
-            with conn.cursor() as cur:
-                if USE_POSTGRES:
-                    cur.execute("""
-                        CREATE TABLE IF NOT EXISTS chats (
-                            id TEXT PRIMARY KEY,
-                            user_id TEXT NOT NULL,
-                            title TEXT DEFAULT 'محادثة جديدة',
-                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                        )
-                    """)
-                    cur.execute("""
-                        CREATE TABLE IF NOT EXISTS messages (
-                            id SERIAL PRIMARY KEY,
-                            chat_id TEXT NOT NULL,
-                            role TEXT NOT NULL,
-                            content TEXT NOT NULL,
-                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                        )
-                    """)
-                else:
-                    cur.execute("""
-                        CREATE TABLE IF NOT EXISTS chats (
-                            id TEXT PRIMARY KEY,
-                            user_id TEXT NOT NULL,
-                            title TEXT DEFAULT 'محادثة جديدة',
-                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                        )
-                    """)
-                    cur.execute("""
-                        CREATE TABLE IF NOT EXISTS messages (
-                            id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            chat_id TEXT NOT NULL,
-                            role TEXT NOT NULL,
-                            content TEXT NOT NULL,
-                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                        )
-                    """)
-                conn.commit()
-        print(f"[DB] تم تهيئة قاعدة البيانات: {'PostgreSQL' if USE_POSTGRES else SQLITE_PATH}")
+        conn = get_db()
+        cur = conn.cursor()
+        try:
+            if USE_POSTGRES:
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS chats (
+                        id TEXT PRIMARY KEY,
+                        user_id TEXT NOT NULL,
+                        title TEXT DEFAULT 'محادثة جديدة',
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS messages (
+                        id SERIAL PRIMARY KEY,
+                        chat_id TEXT NOT NULL,
+                        role TEXT NOT NULL,
+                        content TEXT NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
+            else:
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS chats (
+                        id TEXT PRIMARY KEY,
+                        user_id TEXT NOT NULL,
+                        title TEXT DEFAULT 'محادثة جديدة',
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS messages (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        chat_id TEXT NOT NULL,
+                        role TEXT NOT NULL,
+                        content TEXT NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
+            conn.commit()
+            print(f"[DB] ✅ تم تهيئة قاعدة البيانات: {'PostgreSQL' if USE_POSTGRES else SQLITE_PATH}")
+        finally:
+            cur.close()
+            conn.close()
     except Exception as e:
         LAST_DB_ERROR = str(e)
-        print(f"[DB] فشل التهيئة: {e}")
+        print(f"[DB] ❌ فشل التهيئة: {e}")
         traceback.print_exc()
 
 
@@ -158,159 +159,191 @@ def create_chat(user_id):
     global LAST_DB_ERROR
     chat_id = str(uuid.uuid4())
     try:
-        with closing(get_db()) as conn:
-            with conn.cursor() as cur:
-                if USE_POSTGRES:
-                    cur.execute(
-                        "INSERT INTO chats (id, user_id, title) VALUES (%s, %s, %s)",
-                        (chat_id, user_id, "محادثة جديدة")
-                    )
-                else:
-                    cur.execute(
-                        "INSERT INTO chats (id, user_id, title) VALUES (?, ?, ?)",
-                        (chat_id, user_id, "محادثة جديدة")
-                    )
-                conn.commit()
+        conn = get_db()
+        cur = conn.cursor()
+        try:
+            if USE_POSTGRES:
+                cur.execute(
+                    "INSERT INTO chats (id, user_id, title) VALUES (%s, %s, %s)",
+                    (chat_id, user_id, "محادثة جديدة")
+                )
+            else:
+                cur.execute(
+                    "INSERT INTO chats (id, user_id, title) VALUES (?, ?, ?)",
+                    (chat_id, user_id, "محادثة جديدة")
+                )
+            conn.commit()
+        finally:
+            cur.close()
+            conn.close()
         return chat_id
     except Exception as e:
         LAST_DB_ERROR = str(e)
-        print(f"[DB] فشل إنشاء محادثة: {e}")
+        print(f"[DB] ❌ فشل إنشاء محادثة: {e}")
         traceback.print_exc()
         return None
 
 
 def list_chats(user_id):
     try:
-        with closing(get_db()) as conn:
-            with conn.cursor() as cur:
-                if USE_POSTGRES:
-                    cur.execute(
-                        "SELECT id, title, created_at, updated_at FROM chats WHERE user_id = %s ORDER BY updated_at DESC",
-                        (user_id,)
-                    )
-                else:
-                    cur.execute(
-                        "SELECT id, title, created_at, updated_at FROM chats WHERE user_id = ? ORDER BY updated_at DESC",
-                        (user_id,)
-                    )
-                rows = cur.fetchall()
-                return [
-                    {"id": r[0], "title": r[1], "created_at": str(r[2]), "updated_at": str(r[3])}
-                    for r in rows
-                ]
+        conn = get_db()
+        cur = conn.cursor()
+        try:
+            if USE_POSTGRES:
+                cur.execute(
+                    "SELECT id, title, created_at, updated_at FROM chats WHERE user_id = %s ORDER BY updated_at DESC",
+                    (user_id,)
+                )
+            else:
+                cur.execute(
+                    "SELECT id, title, created_at, updated_at FROM chats WHERE user_id = ? ORDER BY updated_at DESC",
+                    (user_id,)
+                )
+            rows = cur.fetchall()
+            return [
+                {"id": r[0], "title": r[1], "created_at": str(r[2]), "updated_at": str(r[3])}
+                for r in rows
+            ]
+        finally:
+            cur.close()
+            conn.close()
     except Exception as e:
-        print(f"[DB] فشل جلب المحادثات: {e}")
+        print(f"[DB] ❌ فشل جلب المحادثات: {e}")
         return []
 
 
 def delete_chat(chat_id, user_id):
     try:
-        with closing(get_db()) as conn:
-            with conn.cursor() as cur:
-                if USE_POSTGRES:
-                    cur.execute("DELETE FROM messages WHERE chat_id = %s", (chat_id,))
-                    cur.execute("DELETE FROM chats WHERE id = %s AND user_id = %s", (chat_id, user_id))
-                else:
-                    cur.execute("DELETE FROM messages WHERE chat_id = ?", (chat_id,))
-                    cur.execute("DELETE FROM chats WHERE id = ? AND user_id = ?", (chat_id, user_id))
-                conn.commit()
+        conn = get_db()
+        cur = conn.cursor()
+        try:
+            if USE_POSTGRES:
+                cur.execute("DELETE FROM messages WHERE chat_id = %s", (chat_id,))
+                cur.execute("DELETE FROM chats WHERE id = %s AND user_id = %s", (chat_id, user_id))
+            else:
+                cur.execute("DELETE FROM messages WHERE chat_id = ?", (chat_id,))
+                cur.execute("DELETE FROM chats WHERE id = ? AND user_id = ?", (chat_id, user_id))
+            conn.commit()
+        finally:
+            cur.close()
+            conn.close()
         return True
     except Exception as e:
-        print(f"[DB] فشل حذف محادثة: {e}")
+        print(f"[DB] ❌ فشل حذف محادثة: {e}")
         return False
 
 
 def rename_chat(chat_id, user_id, title):
     try:
-        with closing(get_db()) as conn:
-            with conn.cursor() as cur:
-                if USE_POSTGRES:
-                    cur.execute(
-                        "UPDATE chats SET title = %s WHERE id = %s AND user_id = %s",
-                        (title[:80], chat_id, user_id)
-                    )
-                else:
-                    cur.execute(
-                        "UPDATE chats SET title = ? WHERE id = ? AND user_id = ?",
-                        (title[:80], chat_id, user_id)
-                    )
-                conn.commit()
+        conn = get_db()
+        cur = conn.cursor()
+        try:
+            if USE_POSTGRES:
+                cur.execute(
+                    "UPDATE chats SET title = %s WHERE id = %s AND user_id = %s",
+                    (title[:80], chat_id, user_id)
+                )
+            else:
+                cur.execute(
+                    "UPDATE chats SET title = ? WHERE id = ? AND user_id = ?",
+                    (title[:80], chat_id, user_id)
+                )
+            conn.commit()
+        finally:
+            cur.close()
+            conn.close()
         return True
     except Exception as e:
-        print(f"[DB] فشل إعادة التسمية: {e}")
+        print(f"[DB] ❌ فشل إعادة التسمية: {e}")
         return False
 
 
 def get_messages(chat_id, limit=50):
     try:
-        with closing(get_db()) as conn:
-            with conn.cursor() as cur:
-                if USE_POSTGRES:
-                    cur.execute(
-                        "SELECT role, content FROM messages WHERE chat_id = %s ORDER BY id ASC LIMIT %s",
-                        (chat_id, limit)
-                    )
-                else:
-                    cur.execute(
-                        "SELECT role, content FROM messages WHERE chat_id = ? ORDER BY id ASC LIMIT ?",
-                        (chat_id, limit)
-                    )
-                rows = cur.fetchall()
-                return [{"role": r[0], "content": r[1]} for r in rows]
+        conn = get_db()
+        cur = conn.cursor()
+        try:
+            if USE_POSTGRES:
+                cur.execute(
+                    "SELECT role, content FROM messages WHERE chat_id = %s ORDER BY id ASC LIMIT %s",
+                    (chat_id, limit)
+                )
+            else:
+                cur.execute(
+                    "SELECT role, content FROM messages WHERE chat_id = ? ORDER BY id ASC LIMIT ?",
+                    (chat_id, limit)
+                )
+            rows = cur.fetchall()
+            return [{"role": r[0], "content": r[1]} for r in rows]
+        finally:
+            cur.close()
+            conn.close()
     except Exception as e:
-        print(f"[DB] فشل جلب الرسائل: {e}")
+        print(f"[DB] ❌ فشل جلب الرسائل: {e}")
         return []
 
 
 def add_message(chat_id, role, content):
     try:
-        with closing(get_db()) as conn:
-            with conn.cursor() as cur:
-                if USE_POSTGRES:
-                    cur.execute(
-                        "INSERT INTO messages (chat_id, role, content) VALUES (%s, %s, %s)",
-                        (chat_id, role, content)
-                    )
-                    cur.execute(
-                        "UPDATE chats SET updated_at = CURRENT_TIMESTAMP WHERE id = %s",
-                        (chat_id,)
-                    )
-                else:
-                    cur.execute(
-                        "INSERT INTO messages (chat_id, role, content) VALUES (?, ?, ?)",
-                        (chat_id, role, content)
-                    )
-                    cur.execute(
-                        "UPDATE chats SET updated_at = CURRENT_TIMESTAMP WHERE id = ?",
-                        (chat_id,)
-                    )
-                conn.commit()
+        conn = get_db()
+        cur = conn.cursor()
+        try:
+            if USE_POSTGRES:
+                cur.execute(
+                    "INSERT INTO messages (chat_id, role, content) VALUES (%s, %s, %s)",
+                    (chat_id, role, content)
+                )
+                cur.execute(
+                    "UPDATE chats SET updated_at = CURRENT_TIMESTAMP WHERE id = %s",
+                    (chat_id,)
+                )
+            else:
+                cur.execute(
+                    "INSERT INTO messages (chat_id, role, content) VALUES (?, ?, ?)",
+                    (chat_id, role, content)
+                )
+                cur.execute(
+                    "UPDATE chats SET updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+                    (chat_id,)
+                )
+            conn.commit()
+        finally:
+            cur.close()
+            conn.close()
     except Exception as e:
-        print(f"[DB] فشل حفظ رسالة: {e}")
+        print(f"[DB] ❌ فشل حفظ رسالة: {e}")
 
 
 def count_messages(chat_id):
     try:
-        with closing(get_db()) as conn:
-            with conn.cursor() as cur:
-                if USE_POSTGRES:
-                    cur.execute("SELECT COUNT(*) FROM messages WHERE chat_id = %s", (chat_id,))
-                else:
-                    cur.execute("SELECT COUNT(*) FROM messages WHERE chat_id = ?", (chat_id,))
-                return cur.fetchone()[0]
+        conn = get_db()
+        cur = conn.cursor()
+        try:
+            if USE_POSTGRES:
+                cur.execute("SELECT COUNT(*) FROM messages WHERE chat_id = %s", (chat_id,))
+            else:
+                cur.execute("SELECT COUNT(*) FROM messages WHERE chat_id = ?", (chat_id,))
+            return cur.fetchone()[0]
+        finally:
+            cur.close()
+            conn.close()
     except Exception:
         return 0
 
 
 def chat_belongs_to_user(chat_id, user_id):
     try:
-        with closing(get_db()) as conn:
-            with conn.cursor() as cur:
-                if USE_POSTGRES:
-                    cur.execute("SELECT 1 FROM chats WHERE id = %s AND user_id = %s", (chat_id, user_id))
-                else:
-                    cur.execute("SELECT 1 FROM chats WHERE id = ? AND user_id = ?", (chat_id, user_id))
-                return cur.fetchone() is not None
+        conn = get_db()
+        cur = conn.cursor()
+        try:
+            if USE_POSTGRES:
+                cur.execute("SELECT 1 FROM chats WHERE id = %s AND user_id = %s", (chat_id, user_id))
+            else:
+                cur.execute("SELECT 1 FROM chats WHERE id = ? AND user_id = ?", (chat_id, user_id))
+            return cur.fetchone() is not None
+        finally:
+            cur.close()
+            conn.close()
     except Exception:
         return False
 
@@ -507,10 +540,12 @@ def status():
     db_ok = False
     db_error = ""
     try:
-        with closing(get_db()) as conn:
-            with conn.cursor() as cur:
-                cur.execute("SELECT COUNT(*) FROM chats")
-                cur.fetchone()
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("SELECT COUNT(*) FROM chats")
+        cur.fetchone()
+        cur.close()
+        conn.close()
         db_ok = True
     except Exception as e:
         db_error = str(e)
