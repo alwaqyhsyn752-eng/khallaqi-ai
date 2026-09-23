@@ -9,8 +9,8 @@
 import os
 import sqlite3
 import uuid
+import traceback
 from contextlib import closing
-from datetime import datetime
 from flask import Flask, request, jsonify, render_template
 import requests
 
@@ -19,7 +19,7 @@ import requests
 # ═══════════════════════════════════════════════════════
 AI_NAME = "الخلاقي"
 DEVELOPER_NAME = "حسين غلاب"
-VERSION = "6.0-ChatSystem"
+VERSION = "6.1-DB-Fix"
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "").strip()
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
@@ -29,7 +29,12 @@ CF_API_TOKEN = os.environ.get("CF_API_TOKEN", "").strip()
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
 USE_POSTGRES = DATABASE_URL.startswith("postgres")
-SQLITE_PATH = os.path.join(os.path.dirname(__file__), "khallaqi.db")
+
+# ✅ المهم: استخدام /tmp/ القابل للكتابة على Render
+SQLITE_PATH = "/tmp/khallaqi.db"
+
+# متغير عالمي لتخزين آخر خطأ قاعدة بيانات
+LAST_DB_ERROR = ""
 
 GROQ_MODELS = [
     "openai/gpt-oss-120b",
@@ -88,7 +93,7 @@ Python, JavaScript, TypeScript, Node.js, PHP, Ruby, Go, Rust, C, C++, C#, Java, 
 app = Flask(__name__)
 
 # ═══════════════════════════════════════════════════════
-# قاعدة البيانات - نظام محادثات كامل
+# قاعدة البيانات
 # ═══════════════════════════════════════════════════════
 def get_db():
     if USE_POSTGRES:
@@ -99,6 +104,7 @@ def get_db():
 
 
 def init_database():
+    global LAST_DB_ERROR
     try:
         with closing(get_db()) as conn:
             with conn.cursor() as cur:
@@ -141,12 +147,15 @@ def init_database():
                         )
                     """)
                 conn.commit()
-        print("[DB] تم تهيئة قاعدة البيانات")
+        print(f"[DB] تم تهيئة قاعدة البيانات: {'PostgreSQL' if USE_POSTGRES else SQLITE_PATH}")
     except Exception as e:
-        print(f"[DB] تحذير: {e}")
+        LAST_DB_ERROR = str(e)
+        print(f"[DB] فشل التهيئة: {e}")
+        traceback.print_exc()
 
 
 def create_chat(user_id):
+    global LAST_DB_ERROR
     chat_id = str(uuid.uuid4())
     try:
         with closing(get_db()) as conn:
@@ -164,7 +173,9 @@ def create_chat(user_id):
                 conn.commit()
         return chat_id
     except Exception as e:
+        LAST_DB_ERROR = str(e)
         print(f"[DB] فشل إنشاء محادثة: {e}")
+        traceback.print_exc()
         return None
 
 
@@ -431,7 +442,7 @@ def new_chat_route():
     chat_id = create_chat(user_id)
     if chat_id:
         return jsonify({"chat_id": chat_id, "title": "محادثة جديدة"})
-    return jsonify({"error": "فشل إنشاء محادثة"}), 500
+    return jsonify({"error": f"فشل إنشاء محادثة: {LAST_DB_ERROR}"}), 500
 
 
 @app.route('/chats/<chat_id>', methods=['DELETE'])
@@ -471,7 +482,6 @@ def chat_route():
         if not chat_belongs_to_user(chat_id, user_id):
             return jsonify({"error": "غير مصرح"}), 403
 
-        # تحديث عنوان المحادثة من أول رسالة
         if count_messages(chat_id) == 0:
             rename_chat(chat_id, user_id, user_message[:50])
 
@@ -488,14 +498,29 @@ def chat_route():
 
     except Exception as e:
         print(f"[CHAT] {e}")
+        traceback.print_exc()
         return jsonify({"error": f"خطأ: {str(e)[:150]}"}), 500
 
 
 @app.route('/status', methods=['GET'])
 def status():
+    db_ok = False
+    db_error = ""
+    try:
+        with closing(get_db()) as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT COUNT(*) FROM chats")
+                cur.fetchone()
+        db_ok = True
+    except Exception as e:
+        db_error = str(e)
+
     return jsonify({
         "ai_name": AI_NAME,
         "version": VERSION,
+        "database": "postgresql" if USE_POSTGRES else f"sqlite ({SQLITE_PATH})",
+        "db_ok": db_ok,
+        "db_error": db_error,
         "providers": {
             "groq": bool(GROQ_API_KEY),
             "cloudflare": bool(CF_ACCOUNT_ID and CF_API_TOKEN),
@@ -508,6 +533,7 @@ def status():
 @app.errorhandler(Exception)
 def unhandled(e):
     print(f"[UNHANDLED] {e}")
+    traceback.print_exc()
     return jsonify({"error": str(e)[:150]}), 500
 
 
