@@ -2,137 +2,82 @@
 # -*- coding: utf-8 -*-
 
 """
-الخلاقي - مساعد برمجي متعدد المزودين
+الخلاقي - مساعد برمجي متعدد المزودين مع نظام محادثات
 المطور: حسين غلاب
-يدعم: Groq + Cloudflare + Gemini + OpenRouter
 """
 
 import os
 import sqlite3
-import json
+import uuid
 from contextlib import closing
+from datetime import datetime
 from flask import Flask, request, jsonify, render_template
 import requests
 
 # ═══════════════════════════════════════════════════════
-# الإعدادات العامة
+# الإعدادات
 # ═══════════════════════════════════════════════════════
 AI_NAME = "الخلاقي"
 DEVELOPER_NAME = "حسين غلاب"
-VERSION = "5.0-AllLanguages"
+VERSION = "6.0-ChatSystem"
 
-# ─── المفاتيح من متغيرات البيئة ───
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "").strip()
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "").strip()
 CF_ACCOUNT_ID = os.environ.get("CF_ACCOUNT_ID", "").strip()
 CF_API_TOKEN = os.environ.get("CF_API_TOKEN", "").strip()
 
-# ─── قاعدة البيانات ───
 DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
 USE_POSTGRES = DATABASE_URL.startswith("postgres")
 SQLITE_PATH = os.path.join(os.path.dirname(__file__), "khallaqi.db")
 
-# ─── النماذج لكل مزود ───
 GROQ_MODELS = [
     "openai/gpt-oss-120b",
     "openai/gpt-oss-20b",
     "llama-3.3-70b-versatile",
     "llama-3.1-8b-instant",
 ]
-
 CF_MODELS = [
     "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
     "@cf/meta/llama-3.1-8b-instruct",
-    "@cf/qwen/qwen1.5-14b-chat-awq",
 ]
-
 GEMINI_MODELS = [
     "gemini-2.5-flash",
     "gemini-flash-latest",
     "gemini-2.5-flash-lite",
 ]
-
 OPENROUTER_MODELS = [
     "meta-llama/llama-3.1-8b-instruct:free",
     "google/gemma-2-9b-it:free",
-    "mistralai/mistral-7b-instruct:free",
 ]
 
 # ═══════════════════════════════════════════════════════
-# System Prompt - شامل لكل لغات البرمجة
+# System Prompt
 # ═══════════════════════════════════════════════════════
-SYSTEM_PROMPT = f"""أنت {AI_NAME}، مبرمج محترف Senior Developer. مهمتك كتابة الكود فوراً.
+SYSTEM_PROMPT = f"""أنت {AI_NAME}، مبرمج محترف Senior Developer. مهمتك: كتابة الكود فوراً.
 
-🚨 القاعدة الذهبية: عندما يطلب المستخدم أي كود، اكتبه فوراً. ممنوع تسأله "ماذا تريد؟" أو ترحب فقط.
+🚨 قاعدة ذهبية: عندما يطلب المستخدم أي شيء، اختر أنت التفاصيل واكتب الكود فوراً. لا تسأله "ما نوعه؟" أو "ما التفاصيل؟" — هو يعرف، نفّذ.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-💻 لغات البرمجة المدعومة (كلها):
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-Python, JavaScript, TypeScript, Node.js, PHP, Ruby, Perl, Go, Rust, C, C++, C#, Java, Kotlin, Swift, Objective-C, Dart, Scala, Haskell, Lua, R, MATLAB, Julia, Shell/Bash, PowerShell, SQL (MySQL, PostgreSQL, SQLite, MongoDB), HTML5, CSS3, SCSS, Sass, React, Vue, Angular, Svelte, Next.js, Nuxt, Flask, FastAPI, Django, Express, Laravel, Spring Boot, ASP.NET, Rails, Electron, React Native, Flutter, Kivy, KivyMD, Tkinter, PyQt, Assembly (x86, ARM), Solidity, VHDL, Verilog, COBOL, Fortran, Ada, Prolog, Lisp, Clojure, Elixir, Erlang, F#, OCaml, Groovy, Visual Basic, Delphi, Pascal, Scheme, Racket, CoffeeScript, Elm, Nim, Crystal, Zig.
+📌 أمثلة:
+• "لعبة" → اكتب لعبة ثعبان Python/Pygame كاملة
+• "موقع" → اكتب موقع Portfolio HTML/CSS/JS
+• "بوت" → اكتب بوت تيليجرام Python
+• "سكربت" → اكتب سكربت Python مفيد
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ تخصصاتك الإضافية:
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-- DevOps: Docker, Kubernetes, CI/CD, Jenkins, GitHub Actions
-- Cloud: AWS, GCP, Azure, Cloudflare
-- Databases: PostgreSQL, MySQL, MongoDB, Redis, Cassandra
-- OS: Linux, Windows, macOS, Android, iOS, BSD
-- Web Security الدفاعي: OWASP, WAF, TLS, cryptography
-- Data Science: Pandas, NumPy, TensorFlow, PyTorch, scikit-learn
-- Game Dev: Unity, Unreal, Godot, Pygame
-- Blockchain: Web3, Solidity, Ethereum
-- Networking: TCP/IP, DNS, VPN, SDN
-- Embedded: Arduino, Raspberry Pi, ESP32
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━
 📌 سلوكك الإلزامي:
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. ابدأ ردك بالكود مباشرة — بلا مقدمات ولا ترحيب.
-2. اكتب الكود كاملاً من أول سطر لآخر سطر — ممنوع أي اختصار.
-3. بعد الكود: اشرحه بالعربية في نقاط مختصرة.
-4. اذكر المكتبات + أوامر التثبيت + طريقة التشغيل.
-5. إذا كان الطلب غامضاً، اختر التفسير الأكثر شيوعاً ونفذه فوراً.
-6. اكتب أي كود يطلبه المستخدم: ألعاب، مواقع، بوتات، تطبيقات، سكربتات، أدوات، أنظمة كاملة.
+1. ابدأ بالكود فوراً بدون ترحيب أو مقدمات
+2. الكود كامل — ممنوع "..." أو "// اكتب الباقي"
+3. بعد الكود: 3-5 أسطر شرح فقط بالعربية
+4. اذكر المكتبات + أوامر التثبيت
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-❌ الحالات الأربع الوحيدة التي ترفضها:
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. malware / ransomware / فيروسات تُدمّر أجهزة الآخرين
-2. أدوات DDoS ضد أهداف حقيقية
+💻 اللغات المدعومة:
+Python, JavaScript, TypeScript, Node.js, PHP, Ruby, Go, Rust, C, C++, C#, Java, Kotlin, Swift, Dart, Shell/Bash, PowerShell, SQL, HTML, CSS, React, Vue, Angular, Flask, FastAPI, Django, Laravel, Express, Spring, Flutter, Kivy, Tkinter, PyQt, Solidity, Assembly, وغيرها.
+
+❌ ترفض فقط (بجملة واحدة):
+1. malware / ransomware
+2. DDoS ضد أهداف حقيقية
 3. اختراق شبكات/حسابات لا يملكها المستخدم
-4. سرقة بيانات الآخرين
-
-عند رفض أي منها: جملة واحدة فقط. لا محاضرات أخلاقية. ثم اقترح بديلاً دفاعياً.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ أمثلة على الردود الصحيحة:
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-المستخدم: "اكتب لعبة"
-الرد: [اكتب كود اللعبة كاملاً] ثم اشرح.
-
-المستخدم: "اكتب موقع"
-الرد: [اكتب HTML+CSS+JS كاملاً] ثم اشرح.
-
-المستخدم: "اكتب بوت تيليجرام"
-الرد: [اكتب كود البوت كاملاً] ثم اشرح.
-
-المستخدم: "اكتب سكربت اختبار اختراق بإذن"
-الرد: [اكتب nmap script لاختبار أنظمة المستخدم] ثم اشرح.
-
-❌ الردود الممنوعة:
-- "مرحباً! كيف أساعدك؟" ← ممنوع
-- "ما نوع الكود؟" ← ممنوع
-- رفض بدون سبب واضح ← ممنوع
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-📌 اللغة:
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-- ترد بلغة المستخدم (عربي/إنجليزي/أي لغة).
-- الكود باللغة الإنجليزية دائماً.
-
-🎯 كل رد يجب أن يحتوي على كود جاهز للنسخ. اكتب الآن.
+4. سرقة بيانات
 
 المطور: {DEVELOPER_NAME}
 """
@@ -143,9 +88,9 @@ Python, JavaScript, TypeScript, Node.js, PHP, Ruby, Perl, Go, Rust, C, C++, C#, 
 app = Flask(__name__)
 
 # ═══════════════════════════════════════════════════════
-# قاعدة البيانات
+# قاعدة البيانات - نظام محادثات كامل
 # ═══════════════════════════════════════════════════════
-def get_db_connection():
+def get_db():
     if USE_POSTGRES:
         import psycopg2
         url = DATABASE_URL.replace("postgres://", "postgresql://", 1)
@@ -155,13 +100,22 @@ def get_db_connection():
 
 def init_database():
     try:
-        with closing(get_db_connection()) as conn:
+        with closing(get_db()) as conn:
             with conn.cursor() as cur:
                 if USE_POSTGRES:
                     cur.execute("""
-                        CREATE TABLE IF NOT EXISTS conversations (
+                        CREATE TABLE IF NOT EXISTS chats (
+                            id TEXT PRIMARY KEY,
+                            user_id TEXT NOT NULL,
+                            title TEXT DEFAULT 'محادثة جديدة',
+                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                        )
+                    """)
+                    cur.execute("""
+                        CREATE TABLE IF NOT EXISTS messages (
                             id SERIAL PRIMARY KEY,
-                            session_id TEXT NOT NULL,
+                            chat_id TEXT NOT NULL,
                             role TEXT NOT NULL,
                             content TEXT NOT NULL,
                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -169,9 +123,18 @@ def init_database():
                     """)
                 else:
                     cur.execute("""
-                        CREATE TABLE IF NOT EXISTS conversations (
+                        CREATE TABLE IF NOT EXISTS chats (
+                            id TEXT PRIMARY KEY,
+                            user_id TEXT NOT NULL,
+                            title TEXT DEFAULT 'محادثة جديدة',
+                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                        )
+                    """)
+                    cur.execute("""
+                        CREATE TABLE IF NOT EXISTS messages (
                             id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            session_id TEXT NOT NULL,
+                            chat_id TEXT NOT NULL,
                             role TEXT NOT NULL,
                             content TEXT NOT NULL,
                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -183,241 +146,263 @@ def init_database():
         print(f"[DB] تحذير: {e}")
 
 
-def save_message(session_id, role, content):
+def create_chat(user_id):
+    chat_id = str(uuid.uuid4())
     try:
-        with closing(get_db_connection()) as conn:
+        with closing(get_db()) as conn:
             with conn.cursor() as cur:
                 if USE_POSTGRES:
                     cur.execute(
-                        "INSERT INTO conversations (session_id, role, content) VALUES (%s, %s, %s)",
-                        (session_id, role, content)
+                        "INSERT INTO chats (id, user_id, title) VALUES (%s, %s, %s)",
+                        (chat_id, user_id, "محادثة جديدة")
                     )
                 else:
                     cur.execute(
-                        "INSERT INTO conversations (session_id, role, content) VALUES (?, ?, ?)",
-                        (session_id, role, content)
+                        "INSERT INTO chats (id, user_id, title) VALUES (?, ?, ?)",
+                        (chat_id, user_id, "محادثة جديدة")
                     )
                 conn.commit()
+        return chat_id
     except Exception as e:
-        print(f"[DB] فشل حفظ: {e}")
+        print(f"[DB] فشل إنشاء محادثة: {e}")
+        return None
 
 
-def load_conversation(session_id, limit=20):
+def list_chats(user_id):
     try:
-        with closing(get_db_connection()) as conn:
+        with closing(get_db()) as conn:
             with conn.cursor() as cur:
                 if USE_POSTGRES:
                     cur.execute(
-                        "SELECT role, content FROM conversations WHERE session_id = %s ORDER BY id DESC LIMIT %s",
-                        (session_id, limit)
+                        "SELECT id, title, created_at, updated_at FROM chats WHERE user_id = %s ORDER BY updated_at DESC",
+                        (user_id,)
                     )
                 else:
                     cur.execute(
-                        "SELECT role, content FROM conversations WHERE session_id = ? ORDER BY id DESC LIMIT ?",
-                        (session_id, limit)
+                        "SELECT id, title, created_at, updated_at FROM chats WHERE user_id = ? ORDER BY updated_at DESC",
+                        (user_id,)
                     )
                 rows = cur.fetchall()
-                return [{"role": r[0], "content": r[1]} for r in reversed(rows)]
+                return [
+                    {"id": r[0], "title": r[1], "created_at": str(r[2]), "updated_at": str(r[3])}
+                    for r in rows
+                ]
     except Exception as e:
-        print(f"[DB] فشل تحميل: {e}")
+        print(f"[DB] فشل جلب المحادثات: {e}")
         return []
 
 
-def clear_conversation(session_id):
+def delete_chat(chat_id, user_id):
     try:
-        with closing(get_db_connection()) as conn:
+        with closing(get_db()) as conn:
             with conn.cursor() as cur:
                 if USE_POSTGRES:
-                    cur.execute("DELETE FROM conversations WHERE session_id = %s", (session_id,))
+                    cur.execute("DELETE FROM messages WHERE chat_id = %s", (chat_id,))
+                    cur.execute("DELETE FROM chats WHERE id = %s AND user_id = %s", (chat_id, user_id))
                 else:
-                    cur.execute("DELETE FROM conversations WHERE session_id = ?", (session_id,))
+                    cur.execute("DELETE FROM messages WHERE chat_id = ?", (chat_id,))
+                    cur.execute("DELETE FROM chats WHERE id = ? AND user_id = ?", (chat_id, user_id))
                 conn.commit()
         return True
     except Exception as e:
-        print(f"[DB] فشل حذف: {e}")
+        print(f"[DB] فشل حذف محادثة: {e}")
+        return False
+
+
+def rename_chat(chat_id, user_id, title):
+    try:
+        with closing(get_db()) as conn:
+            with conn.cursor() as cur:
+                if USE_POSTGRES:
+                    cur.execute(
+                        "UPDATE chats SET title = %s WHERE id = %s AND user_id = %s",
+                        (title[:80], chat_id, user_id)
+                    )
+                else:
+                    cur.execute(
+                        "UPDATE chats SET title = ? WHERE id = ? AND user_id = ?",
+                        (title[:80], chat_id, user_id)
+                    )
+                conn.commit()
+        return True
+    except Exception as e:
+        print(f"[DB] فشل إعادة التسمية: {e}")
+        return False
+
+
+def get_messages(chat_id, limit=50):
+    try:
+        with closing(get_db()) as conn:
+            with conn.cursor() as cur:
+                if USE_POSTGRES:
+                    cur.execute(
+                        "SELECT role, content FROM messages WHERE chat_id = %s ORDER BY id ASC LIMIT %s",
+                        (chat_id, limit)
+                    )
+                else:
+                    cur.execute(
+                        "SELECT role, content FROM messages WHERE chat_id = ? ORDER BY id ASC LIMIT ?",
+                        (chat_id, limit)
+                    )
+                rows = cur.fetchall()
+                return [{"role": r[0], "content": r[1]} for r in rows]
+    except Exception as e:
+        print(f"[DB] فشل جلب الرسائل: {e}")
+        return []
+
+
+def add_message(chat_id, role, content):
+    try:
+        with closing(get_db()) as conn:
+            with conn.cursor() as cur:
+                if USE_POSTGRES:
+                    cur.execute(
+                        "INSERT INTO messages (chat_id, role, content) VALUES (%s, %s, %s)",
+                        (chat_id, role, content)
+                    )
+                    cur.execute(
+                        "UPDATE chats SET updated_at = CURRENT_TIMESTAMP WHERE id = %s",
+                        (chat_id,)
+                    )
+                else:
+                    cur.execute(
+                        "INSERT INTO messages (chat_id, role, content) VALUES (?, ?, ?)",
+                        (chat_id, role, content)
+                    )
+                    cur.execute(
+                        "UPDATE chats SET updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+                        (chat_id,)
+                    )
+                conn.commit()
+    except Exception as e:
+        print(f"[DB] فشل حفظ رسالة: {e}")
+
+
+def count_messages(chat_id):
+    try:
+        with closing(get_db()) as conn:
+            with conn.cursor() as cur:
+                if USE_POSTGRES:
+                    cur.execute("SELECT COUNT(*) FROM messages WHERE chat_id = %s", (chat_id,))
+                else:
+                    cur.execute("SELECT COUNT(*) FROM messages WHERE chat_id = ?", (chat_id,))
+                return cur.fetchone()[0]
+    except Exception:
+        return 0
+
+
+def chat_belongs_to_user(chat_id, user_id):
+    try:
+        with closing(get_db()) as conn:
+            with conn.cursor() as cur:
+                if USE_POSTGRES:
+                    cur.execute("SELECT 1 FROM chats WHERE id = %s AND user_id = %s", (chat_id, user_id))
+                else:
+                    cur.execute("SELECT 1 FROM chats WHERE id = ? AND user_id = ?", (chat_id, user_id))
+                return cur.fetchone() is not None
+    except Exception:
         return False
 
 
 # ═══════════════════════════════════════════════════════
-# 1. Groq
+# المزودون
 # ═══════════════════════════════════════════════════════
 def call_groq(history):
     if not GROQ_API_KEY:
         return None, None
-
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-    for m in history:
-        messages.append({"role": m["role"], "content": m["content"]})
-
-    headers = {
-        "Authorization": f"Bearer {GROQ_API_KEY}",
-        "Content-Type": "application/json"
-    }
-
+    messages = [{"role": "system", "content": SYSTEM_PROMPT}] + history
+    headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     for model in GROQ_MODELS:
-        payload = {
-            "model": model,
-            "messages": messages,
-            "temperature": 0.7,
-            "max_tokens": 4096
-        }
         try:
             r = requests.post(
                 "https://api.groq.com/openai/v1/chat/completions",
-                headers=headers, json=payload, timeout=30
+                headers=headers,
+                json={"model": model, "messages": messages, "temperature": 0.7, "max_tokens": 4096},
+                timeout=30
             )
             if r.status_code == 200:
-                data = r.json()
-                text = data["choices"][0]["message"]["content"].strip()
-                return text, f"Groq/{model.split('/')[-1]}"
+                return r.json()["choices"][0]["message"]["content"].strip(), f"Groq/{model.split('/')[-1]}"
             if r.status_code == 401:
-                print("[GROQ] مفتاح خاطئ")
                 return None, None
-            print(f"[GROQ] {model} → {r.status_code}")
         except Exception as e:
-            print(f"[GROQ] {model} → {str(e)[:80]}")
-
+            print(f"[GROQ] {model} → {str(e)[:60]}")
     return None, None
 
 
-# ═══════════════════════════════════════════════════════
-# 2. Cloudflare Workers AI
-# ═══════════════════════════════════════════════════════
 def call_cloudflare(history):
     if not CF_ACCOUNT_ID or not CF_API_TOKEN:
         return None, None
-
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-    for m in history:
-        messages.append({"role": m["role"], "content": m["content"]})
-
-    headers = {
-        "Authorization": f"Bearer {CF_API_TOKEN}",
-        "Content-Type": "application/json"
-    }
-
+    messages = [{"role": "system", "content": SYSTEM_PROMPT}] + history
+    headers = {"Authorization": f"Bearer {CF_API_TOKEN}", "Content-Type": "application/json"}
     for model in CF_MODELS:
         url = f"https://api.cloudflare.com/client/v4/accounts/{CF_ACCOUNT_ID}/ai/run/{model}"
-        payload = {
-            "messages": messages,
-            "max_tokens": 4096,
-            "temperature": 0.7
-        }
         try:
-            r = requests.post(url, headers=headers, json=payload, timeout=30)
+            r = requests.post(url, headers=headers, json={"messages": messages, "max_tokens": 4096}, timeout=30)
             if r.status_code == 200:
                 data = r.json()
                 text = None
-                if "result" in data:
-                    if isinstance(data["result"], dict):
-                        text = data["result"].get("response") or \
-                               (data["result"].get("choices", [{}])[0].get("message", {}).get("content"))
-                    elif isinstance(data["result"], str):
-                        text = data["result"]
+                if isinstance(data.get("result"), dict):
+                    text = data["result"].get("response") or \
+                           (data["result"].get("choices", [{}])[0].get("message", {}).get("content"))
+                elif isinstance(data.get("result"), str):
+                    text = data["result"]
                 if text:
                     return text.strip(), f"Cloudflare/{model.split('/')[-1]}"
-            print(f"[CF] {model} → {r.status_code}")
         except Exception as e:
-            print(f"[CF] {model} → {str(e)[:80]}")
-
+            print(f"[CF] {model} → {str(e)[:60]}")
     return None, None
 
 
-# ═══════════════════════════════════════════════════════
-# 3. Google Gemini
-# ═══════════════════════════════════════════════════════
 def call_gemini(history):
     if not GEMINI_API_KEY:
         return None, None
-
-    contents = []
-    for m in history:
-        role = "user" if m["role"] == "user" else "model"
-        contents.append({"role": role, "parts": [{"text": m["content"]}]})
-
+    contents = [{"role": "user" if m["role"] == "user" else "model", "parts": [{"text": m["content"]}]} for m in history]
     payload = {
         "systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]},
         "contents": contents,
         "generationConfig": {"temperature": 0.7, "maxOutputTokens": 4096}
     }
-    headers = {"Content-Type": "application/json"}
-
     for model in GEMINI_MODELS:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={GEMINI_API_KEY}"
         try:
-            r = requests.post(url, headers=headers, json=payload, timeout=30)
+            r = requests.post(url, headers={"Content-Type": "application/json"}, json=payload, timeout=30)
             if r.status_code == 200:
-                data = r.json()
-                text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
-                return text, f"Gemini/{model}"
-            print(f"[GEMINI] {model} → {r.status_code}")
+                return r.json()["candidates"][0]["content"]["parts"][0]["text"].strip(), f"Gemini/{model}"
         except Exception as e:
-            print(f"[GEMINI] {model} → {str(e)[:80]}")
-
+            print(f"[GEMINI] {model} → {str(e)[:60]}")
     return None, None
 
 
-# ═══════════════════════════════════════════════════════
-# 4. OpenRouter
-# ═══════════════════════════════════════════════════════
 def call_openrouter(history):
     if not OPENROUTER_API_KEY:
         return None, None
-
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-    for m in history:
-        messages.append({"role": m["role"], "content": m["content"]})
-
+    messages = [{"role": "system", "content": SYSTEM_PROMPT}] + history
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
         "Content-Type": "application/json",
         "HTTP-Referer": "https://khallaqi.app",
         "X-Title": "Khallaqi AI"
     }
-
     for model in OPENROUTER_MODELS:
-        payload = {
-            "model": model,
-            "messages": messages,
-            "temperature": 0.7,
-            "max_tokens": 4096
-        }
         try:
             r = requests.post(
                 "https://openrouter.ai/api/v1/chat/completions",
-                headers=headers, json=payload, timeout=30
+                headers=headers,
+                json={"model": model, "messages": messages, "temperature": 0.7, "max_tokens": 4096},
+                timeout=30
             )
             if r.status_code == 200:
-                data = r.json()
-                text = data["choices"][0]["message"]["content"].strip()
-                return text, f"OpenRouter/{model.split('/')[-1]}"
-            print(f"[OR] {model} → {r.status_code}")
+                return r.json()["choices"][0]["message"]["content"].strip(), f"OpenRouter/{model.split('/')[-1]}"
         except Exception as e:
-            print(f"[OR] {model} → {str(e)[:80]}")
-
+            print(f"[OR] {model} → {str(e)[:60]}")
     return None, None
 
 
-# ═══════════════════════════════════════════════════════
-# الدالة الرئيسية: تجرب المزودين بالترتيب
-# ═══════════════════════════════════════════════════════
 def call_ai(history):
-    text, source = call_groq(history)
-    if text:
-        return text, source, None
-
-    text, source = call_cloudflare(history)
-    if text:
-        return text, source, None
-
-    text, source = call_gemini(history)
-    if text:
-        return text, source, None
-
-    text, source = call_openrouter(history)
-    if text:
-        return text, source, None
-
+    for func in (call_groq, call_cloudflare, call_gemini, call_openrouter):
+        text, source = func(history)
+        if text:
+            return text, source, None
     return None, None, "❌ جميع المزودين فشلوا. تحقق من المفاتيح أو انتظر تجديد الحصة."
 
 
@@ -426,54 +411,84 @@ def call_ai(history):
 # ═══════════════════════════════════════════════════════
 @app.route('/')
 def index():
-    return render_template(
-        'index.html',
-        ai_name=AI_NAME,
-        developer_name=DEVELOPER_NAME,
-        version=VERSION
-    )
+    return render_template('index.html', ai_name=AI_NAME, developer_name=DEVELOPER_NAME, version=VERSION)
+
+
+@app.route('/chats', methods=['GET'])
+def list_chats_route():
+    user_id = str(request.args.get('user_id', '')).strip()[:64]
+    if not user_id:
+        return jsonify({"error": "user_id مفقود"}), 400
+    return jsonify({"chats": list_chats(user_id)})
+
+
+@app.route('/chats', methods=['POST'])
+def new_chat_route():
+    data = request.get_json(silent=True) or {}
+    user_id = str(data.get('user_id', '')).strip()[:64]
+    if not user_id:
+        return jsonify({"error": "user_id مفقود"}), 400
+    chat_id = create_chat(user_id)
+    if chat_id:
+        return jsonify({"chat_id": chat_id, "title": "محادثة جديدة"})
+    return jsonify({"error": "فشل إنشاء محادثة"}), 500
+
+
+@app.route('/chats/<chat_id>', methods=['DELETE'])
+def delete_chat_route(chat_id):
+    data = request.get_json(silent=True) or {}
+    user_id = str(data.get('user_id', '')).strip()[:64]
+    if not user_id:
+        return jsonify({"error": "user_id مفقود"}), 400
+    if delete_chat(chat_id, user_id):
+        return jsonify({"status": "ok"})
+    return jsonify({"error": "فشل الحذف"}), 500
+
+
+@app.route('/chats/<chat_id>/messages', methods=['GET'])
+def get_messages_route(chat_id):
+    user_id = str(request.args.get('user_id', '')).strip()[:64]
+    if not chat_belongs_to_user(chat_id, user_id):
+        return jsonify({"error": "غير مصرح"}), 403
+    return jsonify({"messages": get_messages(chat_id)})
 
 
 @app.route('/chat', methods=['POST'])
-def chat():
+def chat_route():
     try:
         data = request.get_json(silent=True)
-        if not data or 'message' not in data:
-            return jsonify({"error": "حقل 'message' مفقود"}), 400
+        if not data:
+            return jsonify({"error": "بيانات مفقودة"}), 400
 
-        user_message = str(data['message']).strip()
-        if not user_message:
-            return jsonify({"error": "الرسالة فارغة"}), 400
-        if len(user_message) > 8000:
-            return jsonify({"error": "الرسالة طويلة جداً (الحد 8000 حرف)"}), 400
+        user_message = str(data.get('message', '')).strip()
+        chat_id = str(data.get('chat_id', '')).strip()
+        user_id = str(data.get('user_id', '')).strip()[:64]
 
-        session_id = str(data.get('session_id', 'default'))[:64]
+        if not user_message or len(user_message) > 8000:
+            return jsonify({"error": "رسالة فارغة أو طويلة جداً"}), 400
+        if not chat_id or not user_id:
+            return jsonify({"error": "chat_id أو user_id مفقود"}), 400
+        if not chat_belongs_to_user(chat_id, user_id):
+            return jsonify({"error": "غير مصرح"}), 403
 
-        save_message(session_id, "user", user_message)
-        history = load_conversation(session_id, limit=20)
+        # تحديث عنوان المحادثة من أول رسالة
+        if count_messages(chat_id) == 0:
+            rename_chat(chat_id, user_id, user_message[:50])
+
+        add_message(chat_id, "user", user_message)
+        history = get_messages(chat_id, limit=30)
+
         reply, source, error = call_ai(history)
 
         if error:
             return jsonify({"error": error, "source": "none"}), 200
 
-        save_message(session_id, "assistant", reply)
+        add_message(chat_id, "assistant", reply)
         return jsonify({"response": reply, "source": source})
 
     except Exception as e:
         print(f"[CHAT] {e}")
-        return jsonify({"error": f"خطأ داخلي: {str(e)[:150]}"}), 500
-
-
-@app.route('/clear', methods=['POST'])
-def clear():
-    try:
-        data = request.get_json(silent=True) or {}
-        session_id = str(data.get('session_id', 'default'))[:64]
-        if clear_conversation(session_id):
-            return jsonify({"status": "ok"})
-        return jsonify({"error": "فشل حذف المحادثة"}), 500
-    except Exception as e:
-        return jsonify({"error": str(e)[:150]}), 500
+        return jsonify({"error": f"خطأ: {str(e)[:150]}"}), 500
 
 
 @app.route('/status', methods=['GET'])
@@ -486,35 +501,19 @@ def status():
             "cloudflare": bool(CF_ACCOUNT_ID and CF_API_TOKEN),
             "gemini": bool(GEMINI_API_KEY),
             "openrouter": bool(OPENROUTER_API_KEY)
-        },
-        "database": "postgresql" if USE_POSTGRES else "sqlite"
+        }
     })
 
 
 @app.errorhandler(Exception)
 def unhandled(e):
     print(f"[UNHANDLED] {e}")
-    return jsonify({"error": f"خطأ: {str(e)[:150]}"}), 500
+    return jsonify({"error": str(e)[:150]}), 500
 
 
-# ═══════════════════════════════════════════════════════
-# التشغيل
 # ═══════════════════════════════════════════════════════
 init_database()
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
-    print(f"""
-    ╔══════════════════════════════════════════╗
-    ║   {AI_NAME} - النسخة {VERSION}      ║
-    ║   المطور: {DEVELOPER_NAME}                ║
-    ╚══════════════════════════════════════════╝
-    المنفذ: {port}
-    المزودون المتاحون:
-      - Groq:        {"✅" if GROQ_API_KEY else "❌"}
-      - Cloudflare:  {"✅" if (CF_ACCOUNT_ID and CF_API_TOKEN) else "❌"}
-      - Gemini:      {"✅" if GEMINI_API_KEY else "❌"}
-      - OpenRouter:  {"✅" if OPENROUTER_API_KEY else "❌"}
-    قاعدة البيانات: {"PostgreSQL" if USE_POSTGRES else "SQLite"}
-    """)
     app.run(host='0.0.0.0', port=port, debug=False)
