@@ -4,6 +4,7 @@
 """
 الخلاقي - مساعد برمجي متعدد المزودين مع نظام محادثات
 المطور: حسين غلاب
+الإصدار: 7.0-Final
 """
 
 import os
@@ -19,67 +20,88 @@ import requests
 # ═══════════════════════════════════════════════════════
 AI_NAME = "الخلاقي"
 DEVELOPER_NAME = "حسين غلاب"
-VERSION = "6.2-SQLite-Fix"
+VERSION = "7.0-Final"
 
+# المفاتيح من متغيرات البيئة
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "").strip()
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "").strip()
 CF_ACCOUNT_ID = os.environ.get("CF_ACCOUNT_ID", "").strip()
 CF_API_TOKEN = os.environ.get("CF_API_TOKEN", "").strip()
 
+# قاعدة البيانات: SQLite محلياً / PostgreSQL على Render
 DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
 USE_POSTGRES = DATABASE_URL.startswith("postgres")
-
 SQLITE_PATH = "/tmp/khallaqi.db"
+
 LAST_DB_ERROR = ""
 
+# النماذج لكل مزود
 GROQ_MODELS = [
+    "llama-3.1-8b-instant",
+    "llama-3.3-70b-versatile",
     "openai/gpt-oss-120b",
     "openai/gpt-oss-20b",
-    "llama-3.3-70b-versatile",
-    "llama-3.1-8b-instant",
+    "meta-llama/llama-4-scout-17b-16e-instruct",
+    "qwen/qwen3-32b",
 ]
+
 CF_MODELS = [
     "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
     "@cf/meta/llama-3.1-8b-instruct",
 ]
+
 GEMINI_MODELS = [
     "gemini-2.5-flash",
     "gemini-flash-latest",
     "gemini-2.5-flash-lite",
 ]
+
 OPENROUTER_MODELS = [
     "meta-llama/llama-3.1-8b-instruct:free",
     "google/gemma-2-9b-it:free",
+    "mistralai/mistral-7b-instruct:free",
 ]
 
 # ═══════════════════════════════════════════════════════
 # System Prompt
 # ═══════════════════════════════════════════════════════
-SYSTEM_PROMPT = f"""أنت {AI_NAME}، مبرمج محترف Senior Developer. مهمتك: كتابة الكود فوراً.
+SYSTEM_PROMPT = f"""أنت {AI_NAME}، مبرمج محترف Senior Developer من إعداد {DEVELOPER_NAME}.
 
-🚨 قاعدة ذهبية: عندما يطلب المستخدم أي شيء، اختر أنت التفاصيل واكتب الكود فوراً. لا تسأله "ما نوعه؟" أو "ما التفاصيل؟" — هو يعرف، نفّذ.
+مهمتك: كتابة الكود فوراً عندما يطلب المستخدم أي شيء تقني. لا تسأله عن التفاصيل، اختر الأنسب ونفّذ.
 
-📌 أمثلة:
-• "لعبة" → اكتب لعبة ثعبان Python/Pygame كاملة
-• "موقع" → اكتب موقع Portfolio HTML/CSS/JS
-• "بوت" → اكتب بوت تيليجرام Python
-• "سكربت" → اكتب سكربت Python مفيد
+قواعد الكتابة:
+1. ابدأ بالكود مباشرة بدون ترحيب أو مقدمات طويلة.
+2. اكتب الكود كاملاً من أول سطر إلى آخر سطر. ممنوع أي اختصار أو "..." أو "أكمل بنفسك".
+3. اشرح الكود بالعربية بشكل مختصر بعد كتابته.
+4. اذكر المكتبات المطلوبة + أوامر التثبيت + طريقة التشغيل.
 
-📌 سلوكك الإلزامي:
-1. ابدأ بالكود فوراً بدون ترحيب أو مقدمات
-2. الكود كامل — ممنوع "..." أو "// اكتب الباقي"
-3. بعد الكود: 3-5 أسطر شرح فقط بالعربية
-4. اذكر المكتبات + أوامر التثبيت
+جميع لغات البرمجة مدعومة:
+Python, JavaScript, TypeScript, Node.js, PHP, Ruby, Perl, Go, Rust, C, C++, C#, Java, Kotlin, Swift, Objective-C, Dart, Scala, Haskell, Lua, R, MATLAB, Julia, Shell/Bash, PowerShell, SQL, HTML, CSS, SCSS, React, Vue, Angular, Svelte, Next.js, Flask, FastAPI, Django, Laravel, Express, Spring Boot, ASP.NET, Rails, Electron, React Native, Flutter, Kivy, Tkinter, PyQt, Assembly, Solidity.
 
-💻 اللغات المدعومة:
-Python, JavaScript, TypeScript, Node.js, PHP, Ruby, Go, Rust, C, C++, C#, Java, Kotlin, Swift, Dart, Shell/Bash, PowerShell, SQL, HTML, CSS, React, Vue, Angular, Flask, FastAPI, Django, Laravel, Express, Spring, Flutter, Kivy, Tkinter, PyQt, Solidity, Assembly, وغيرها.
+التخصصات:
+- Full Stack Web Development
+- APIs (REST, GraphQL)
+- قواعد البيانات (PostgreSQL, MySQL, MongoDB, SQLite, Redis)
+- DevOps (Docker, Kubernetes, CI/CD)
+- الأمن السيبراني الدفاعي
+- الذكاء الاصطناعي وتعلم الآلة
+- تطبيقات الجوال
+- الألعاب
+- الأتمتة والسكربتات
+- أدوات الشبكة
+- البوتات (Telegram, WhatsApp, Discord)
+- أدوات الاختبار والفحص
+- اختبار الاختراق بإذن
+- أي شيء تقني مشروع آخر
 
-❌ ترفض فقط (بجملة واحدة):
-1. malware / ransomware
-2. DDoS ضد أهداف حقيقية
-3. اختراق شبكات/حسابات لا يملكها المستخدم
-4. سرقة بيانات
+❌ ترفض فقط هذه الحالات الأربع (بجملة واحدة قصيرة، بدون محاضرة):
+1. malware أو ransomware أو فيروسات
+2. هجمات DDoS ضد أهداف حقيقية
+3. اختراق أنظمة لا يملكها المستخدم
+4. سرقة بيانات الآخرين
+
+كل ما عدا ذلك: نفّذ فوراً بلا تردد.
 
 المطور: {DEVELOPER_NAME}
 """
@@ -89,8 +111,9 @@ Python, JavaScript, TypeScript, Node.js, PHP, Ruby, Go, Rust, C, C++, C#, Java, 
 # ═══════════════════════════════════════════════════════
 app = Flask(__name__)
 
+
 # ═══════════════════════════════════════════════════════
-# قاعدة البيانات - مع إصلاح cursor
+# قاعدة البيانات
 # ═══════════════════════════════════════════════════════
 def get_db():
     if USE_POSTGRES:
@@ -145,14 +168,12 @@ def init_database():
                     )
                 """)
             conn.commit()
-            print(f"[DB] ✅ تم تهيئة قاعدة البيانات: {'PostgreSQL' if USE_POSTGRES else SQLITE_PATH}")
         finally:
             cur.close()
             conn.close()
     except Exception as e:
         LAST_DB_ERROR = str(e)
-        print(f"[DB] ❌ فشل التهيئة: {e}")
-        traceback.print_exc()
+        print(f"[DB] فشل التهيئة: {e}")
 
 
 def create_chat(user_id):
@@ -179,8 +200,7 @@ def create_chat(user_id):
         return chat_id
     except Exception as e:
         LAST_DB_ERROR = str(e)
-        print(f"[DB] ❌ فشل إنشاء محادثة: {e}")
-        traceback.print_exc()
+        print(f"[DB] فشل إنشاء محادثة: {e}")
         return None
 
 
@@ -208,7 +228,7 @@ def list_chats(user_id):
             cur.close()
             conn.close()
     except Exception as e:
-        print(f"[DB] ❌ فشل جلب المحادثات: {e}")
+        print(f"[DB] فشل جلب المحادثات: {e}")
         return []
 
 
@@ -229,7 +249,7 @@ def delete_chat(chat_id, user_id):
             conn.close()
         return True
     except Exception as e:
-        print(f"[DB] ❌ فشل حذف محادثة: {e}")
+        print(f"[DB] فشل حذف محادثة: {e}")
         return False
 
 
@@ -240,12 +260,12 @@ def rename_chat(chat_id, user_id, title):
         try:
             if USE_POSTGRES:
                 cur.execute(
-                    "UPDATE chats SET title = %s WHERE id = %s AND user_id = %s",
+                    "UPDATE chats SET title = %s, updated_at = CURRENT_TIMESTAMP WHERE id = %s AND user_id = %s",
                     (title[:80], chat_id, user_id)
                 )
             else:
                 cur.execute(
-                    "UPDATE chats SET title = ? WHERE id = ? AND user_id = ?",
+                    "UPDATE chats SET title = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?",
                     (title[:80], chat_id, user_id)
                 )
             conn.commit()
@@ -254,7 +274,7 @@ def rename_chat(chat_id, user_id, title):
             conn.close()
         return True
     except Exception as e:
-        print(f"[DB] ❌ فشل إعادة التسمية: {e}")
+        print(f"[DB] فشل إعادة التسمية: {e}")
         return False
 
 
@@ -279,7 +299,7 @@ def get_messages(chat_id, limit=50):
             cur.close()
             conn.close()
     except Exception as e:
-        print(f"[DB] ❌ فشل جلب الرسائل: {e}")
+        print(f"[DB] فشل جلب الرسائل: {e}")
         return []
 
 
@@ -311,7 +331,7 @@ def add_message(chat_id, role, content):
             cur.close()
             conn.close()
     except Exception as e:
-        print(f"[DB] ❌ فشل حفظ رسالة: {e}")
+        print(f"[DB] فشل حفظ رسالة: {e}")
 
 
 def count_messages(chat_id):
@@ -361,15 +381,16 @@ def call_groq(history):
             r = requests.post(
                 "https://api.groq.com/openai/v1/chat/completions",
                 headers=headers,
-                json={"model": model, "messages": messages, "temperature": 0.7, "max_tokens": 4096},
+                json={"model": model, "messages": messages, "temperature": 0.8, "max_tokens": 4096},
                 timeout=30
             )
             if r.status_code == 200:
                 return r.json()["choices"][0]["message"]["content"].strip(), f"Groq/{model.split('/')[-1]}"
             if r.status_code == 401:
                 return None, None
+            print(f"[GROQ] {model} -> {r.status_code}")
         except Exception as e:
-            print(f"[GROQ] {model} → {str(e)[:60]}")
+            print(f"[GROQ] {model} -> {str(e)[:60]}")
     return None, None
 
 
@@ -393,7 +414,7 @@ def call_cloudflare(history):
                 if text:
                     return text.strip(), f"Cloudflare/{model.split('/')[-1]}"
         except Exception as e:
-            print(f"[CF] {model} → {str(e)[:60]}")
+            print(f"[CF] {model} -> {str(e)[:60]}")
     return None, None
 
 
@@ -404,7 +425,7 @@ def call_gemini(history):
     payload = {
         "systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]},
         "contents": contents,
-        "generationConfig": {"temperature": 0.7, "maxOutputTokens": 4096}
+        "generationConfig": {"temperature": 0.8, "maxOutputTokens": 4096}
     }
     for model in GEMINI_MODELS:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={GEMINI_API_KEY}"
@@ -413,7 +434,7 @@ def call_gemini(history):
             if r.status_code == 200:
                 return r.json()["candidates"][0]["content"]["parts"][0]["text"].strip(), f"Gemini/{model}"
         except Exception as e:
-            print(f"[GEMINI] {model} → {str(e)[:60]}")
+            print(f"[GEMINI] {model} -> {str(e)[:60]}")
     return None, None
 
 
@@ -432,13 +453,13 @@ def call_openrouter(history):
             r = requests.post(
                 "https://openrouter.ai/api/v1/chat/completions",
                 headers=headers,
-                json={"model": model, "messages": messages, "temperature": 0.7, "max_tokens": 4096},
+                json={"model": model, "messages": messages, "temperature": 0.8, "max_tokens": 4096},
                 timeout=30
             )
             if r.status_code == 200:
                 return r.json()["choices"][0]["message"]["content"].strip(), f"OpenRouter/{model.split('/')[-1]}"
         except Exception as e:
-            print(f"[OR] {model} → {str(e)[:60]}")
+            print(f"[OR] {model} -> {str(e)[:60]}")
     return None, None
 
 
@@ -568,7 +589,6 @@ def status():
 @app.errorhandler(Exception)
 def unhandled(e):
     print(f"[UNHANDLED] {e}")
-    traceback.print_exc()
     return jsonify({"error": str(e)[:150]}), 500
 
 
