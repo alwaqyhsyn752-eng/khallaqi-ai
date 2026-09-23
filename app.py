@@ -4,7 +4,7 @@
 """
 الخلاقي للذكاء والبرمجة
 المطور: حسين غلاب
-يعمل مع Google Gemini API (المفتاح في الرابط)
+يدعم عدة نماذج Gemini تلقائياً
 """
 
 import os
@@ -16,7 +16,15 @@ AI_NAME = "الخلاقي"
 DEVELOPER_NAME = "حسين غلاب"
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
-GEMINI_MODEL = "gemini-3.6-flash"
+
+# قائمة النماذج — يجرّبها بالترتيب حتى ينجح واحد
+GEMINI_MODELS = [
+    "gemini-3.6-flash",
+    "gemini-3.0-flash",
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
+    "gemini-flash-latest",
+]
 
 SYSTEM_PROMPT = f"""أنت {AI_NAME}، مهندس برمجيات وأنظمة وشبكات عالي الكفاءة، ومهندس هندسة عكسية وبناء تطبيقات وأدوات متكاملة من الصفر.
 
@@ -41,7 +49,7 @@ conversation_history = [
 
 # ========== دالة استدعاء Gemini ==========
 def call_gemini(messages):
-    """استدعاء Gemini API — المفتاح يُمرَّر عبر الرابط key="""
+    """يجرّب عدة نماذج Gemini بالترتيب حتى ينجح واحد"""
     if not GEMINI_API_KEY:
         return "❌ خطأ: لم يتم تعيين مفتاح GEMINI_API_KEY في متغيرات البيئة."
 
@@ -58,19 +66,25 @@ def call_gemini(messages):
             "maxOutputTokens": 2048,
         }
     }
-
-    # ✅ المفتاح يُمرَّر في الرابط كما توصي Google
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
     headers = {"Content-Type": "application/json"}
 
-    try:
-        r = requests.post(url, headers=headers, json=payload, timeout=60)
-        if r.status_code != 200:
-            return f"❌ خطأ من Gemini ({r.status_code}): {r.text[:400]}"
-        data = r.json()
-        return data["candidates"][0]["content"]["parts"][0]["text"].strip()
-    except Exception as e:
-        return f"❌ استثناء: {str(e)}"
+    last_error = ""
+    for model in GEMINI_MODELS:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={GEMINI_API_KEY}"
+        try:
+            r = requests.post(url, headers=headers, json=payload, timeout=60)
+            print(f"[GEMINI] محاولة: {model} → {r.status_code}")
+            if r.status_code == 200:
+                data = r.json()
+                print(f"[GEMINI] ✅ نجح: {model}")
+                return data["candidates"][0]["content"]["parts"][0]["text"].strip()
+            last_error = f"{model} → {r.status_code}: {r.text[:150]}"
+            print(f"[GEMINI] ❌ {last_error}")
+        except Exception as e:
+            last_error = f"{model} → استثناء: {e}"
+            print(f"[GEMINI] ❌ {last_error}")
+
+    return f"❌ كل النماذج فشلت.\n\nآخر خطأ:\n{last_error}\n\nإذا كان الخطأ 503 أو 429، انتظر دقيقة وأعد المحاولة."
 
 # ========== المسارات ==========
 @app.route('/')
@@ -108,7 +122,7 @@ def clear_history():
 def status():
     return jsonify({
         "api_key_set": bool(GEMINI_API_KEY),
-        "model": GEMINI_MODEL
+        "models": GEMINI_MODELS
     })
 
 # ========== التشغيل ==========
