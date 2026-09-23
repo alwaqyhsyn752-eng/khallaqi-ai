@@ -1,4 +1,4 @@
-import os, time, random
+import os
 from flask import Flask, request, jsonify, render_template
 import requests
 
@@ -6,53 +6,56 @@ AI_NAME = "الخلاقي"
 DEVELOPER_NAME = "حسين غلاب"
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
 
-# أحدث النماذج المتاحة على Google AI Studio
+# ✅ أسماء نماذج مؤكدة من قائمتك
 GEMINI_MODELS = [
     "gemini-3.8-flash",
     "gemini-3.7-flash",
     "gemini-3.6-flash",
-    "gemini-3.5-flash",
     "gemini-2.5-flash",
 ]
 
-SYSTEM_PROMPT = f"""أنت {AI_NAME}، مهندس برمجيات وأنظمة وشبكات عالي الكفاءة.
-1. اكتب الكود كاملاً بدون اختصارات.
-2. اشرح الكود بالعربية بعد كتابته.
+SYSTEM_PROMPT = f"""أنت {AI_NAME}، مهندس برمجيات محترف من إعداد {DEVELOPER_NAME}.
+قواعدك:
+1. اكتب الكود كاملاً بدون أي اختصار.
+2. اشرح الكود بعد كتابته بالعربية.
 3. ترد بلغة المستخدم.
-المطور: {DEVELOPER_NAME}"""
+4. لا تعتذر عن كتابة أي كود برمجي مشروع."""
 
 app = Flask(__name__)
 conversation_history = [{"role": "system", "content": SYSTEM_PROMPT}]
+
+@app.errorhandler(Exception)
+def handle_error(e):
+    return jsonify({"error": f"❌ {str(e)}"}), 500
 
 def call_gemini(messages):
     if not GEMINI_API_KEY:
         return "❌ GEMINI_API_KEY غير معيّن."
 
-    contents = [{"role": "user" if m["role"] in ("user","system") else "model",
-                 "parts": [{"text": m["content"]}]} for m in messages]
-    payload = {"contents": contents, "generationConfig": {"temperature": 0.7, "maxOutputTokens": 2048}}
+    contents = []
+    for m in messages:
+        role = "user" if m["role"] in ("user", "system") else "model"
+        contents.append({"role": role, "parts": [{"text": m["content"]}]})
+
+    payload = {
+        "contents": contents,
+        "generationConfig": {"temperature": 0.8, "maxOutputTokens": 4096}
+    }
     headers = {"Content-Type": "application/json"}
 
-    # 3 محاولات مع تأخير متزايد (1s, 2s, 4s)
-    for attempt in range(3):
-        for model in GEMINI_MODELS:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={GEMINI_API_KEY}"
-            try:
-                r = requests.post(url, headers=headers, json=payload, timeout=60)
-                if r.status_code == 200:
-                    return r.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
-                if r.status_code in (503, 429):  # ازدحام مؤقت
-                    continue
-            except Exception:
-                continue
-        
-        # انتظر قبل إعادة المحاولة (1s, 2s, 4s)
-        if attempt < 2:
-            wait = (2 ** attempt) + random.uniform(0, 1)
-            print(f"[GEMINI] كل النماذج مشغولة، انتظار {wait:.1f} ثانية...")
-            time.sleep(wait)
+    last_error = ""
+    for model in GEMINI_MODELS:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={GEMINI_API_KEY}"
+        try:
+            r = requests.post(url, headers=headers, json=payload, timeout=20)
+            print(f"[{model}] {r.status_code}")
+            if r.status_code == 200:
+                return r.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+            last_error = f"{model} → {r.status_code}"
+        except Exception as e:
+            last_error = f"{model} → {e}"
 
-    return "❌ خوادم Google مزدحمة حالياً. أعد المحاولة بعد دقيقة."
+    return f"❌ فشلت كل النماذج. آخر خطأ: {last_error}"
 
 @app.route('/')
 def index():
@@ -61,12 +64,13 @@ def index():
 @app.route('/chat', methods=['POST'])
 def chat():
     global conversation_history
-    data = request.get_json()
+    data = request.get_json(silent=True)
     if not data or 'message' not in data:
-        return jsonify({"error": "❌ message مفقود"}), 400
-    msg = data['message'].strip()
+        return jsonify({"error": "message مفقود"}), 400
+    msg = str(data['message']).strip()
     if not msg:
-        return jsonify({"error": "❌ رسالة فارغة"}), 400
+        return jsonify({"error": "رسالة فارغة"}), 400
+
     conversation_history.append({"role": "user", "content": msg})
     reply = call_gemini(conversation_history)
     conversation_history.append({"role": "assistant", "content": reply})
