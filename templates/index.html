@@ -3,19 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{{ ai_name }} - متعدد الوسائط</title>
+<title>{{ ai_name }} - صوتي</title>
 <style>
 :root{--bg:#0a0e1a;--surface:#131826;--surface2:#1a2138;--sidebar:#0f1420;--text:#e5e9f0;--muted:#8b95a9;--accent:#a855f7;--accent2:#7c3aed;--success:#10b981;--danger:#ef4444;--warning:#f59e0b;--border:#1f2937;--code:#0d1117}
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%}
 body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--text);display:flex;overflow:hidden}
 
-/* الشريط الجانبي */
 .sidebar{width:280px;background:var(--sidebar);border-left:1px solid var(--border);display:flex;flex-direction:column;transition:transform .3s;z-index:10}
 .sb-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.sb-header h2{font-size:1rem;color:var(--accent);display:flex;align-items:center;gap:8px}
+.sb-header h2{font-size:1rem;color:var(--accent)}
 .sb-header .sub{font-size:.68rem;color:var(--muted);margin-top:2px}
-.new-chat-btn{margin:12px;padding:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:10px;cursor:pointer;font-weight:bold;font-family:inherit;font-size:.9rem;display:flex;align-items:center;justify-content:center;gap:8px}
+.new-chat-btn{margin:12px;padding:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:10px;cursor:pointer;font-weight:bold;font-family:inherit;font-size:.9rem}
 .new-chat-btn:hover{opacity:.9}
 .chats-list{flex:1;overflow-y:auto;padding:0 8px 8px}
 .chat-item{padding:10px 12px;background:transparent;color:var(--text);border:1px solid transparent;border-radius:8px;cursor:pointer;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;font-size:.85rem;width:100%;text-align:right;font-family:inherit}
@@ -33,28 +32,27 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--t
 .sb-footer button{width:100%;padding:10px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.8rem;font-family:inherit}
 .sb-footer button:hover{background:var(--accent);color:#fff}
 
-/* المحتوى الرئيسي */
 .main{flex:1;display:flex;flex-direction:column;min-width:0}
-.header{background:var(--surface);padding:12px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:10px}
+.header{background:var(--surface);padding:12px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .hl{display:flex;align-items:center;gap:12px}
 .menu-btn{display:none;background:transparent;border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:1.1rem}
 .header h1{font-size:1.1rem;color:var(--accent)}
 .header .sub{font-size:.72rem;color:var(--muted)}
-.header-actions{display:flex;gap:8px;align-items:center}
-.toggle-tts{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;font-size:.72rem;color:var(--muted);cursor:pointer;user-select:none}
-.toggle-tts.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.header-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.toggle-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;font-size:.72rem;color:var(--muted);cursor:pointer;user-select:none;font-family:inherit}
+.toggle-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.toggle-btn.live{background:var(--danger);color:#fff;border-color:var(--danger);animation:pulse-live 1.5s infinite}
+@keyframes pulse-live{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.7)}50%{box-shadow:0 0 0 10px rgba(239,68,68,0)}}
 .badge{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;font-size:.7rem;color:var(--muted)}
 .dot-live{width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success)}
 
-/* شريط الأزرار السريعة */
 .quick-bar{padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
 .quick-bar::-webkit-scrollbar{display:none}
 .quick-bar button{padding:6px 12px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:14px;cursor:pointer;font-size:.75rem;font-family:inherit;white-space:nowrap}
-.quick-bar button:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.quick-bar button:hover{background:var(--accent);color:#fff}
 
-/* المحادثة */
 .chat{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
-.msg{max-width:85%;padding:12px 16px;border-radius:12px;line-height:1.65;word-wrap:break-word}
+.msg{max-width:85%;padding:12px 16px;border-radius:12px;line-height:1.65;word-wrap:break-word;position:relative}
 .msg.user{align-self:flex-end;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-bottom-left-radius:3px}
 .msg.bot{align-self:flex-start;background:var(--surface2);border:1px solid var(--border);border-bottom-right-radius:3px}
 .msg.error{align-self:center;background:rgba(239,68,68,.15);border:1px solid var(--danger);color:#fca5a5;font-size:.85rem;text-align:center;max-width:90%;padding:10px 16px;border-radius:8px}
@@ -62,15 +60,15 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--t
 .sender{font-weight:bold;font-size:.72rem;opacity:.75;margin-bottom:4px}
 .content{white-space:pre-wrap}
 .msg img.attached{max-width:100%;border-radius:8px;margin:8px 0;border:1px solid var(--border);display:block}
-.msg video.attached{max-width:100%;border-radius:8px;margin:8px 0;border:1px solid var(--border);display:block}
 pre{background:var(--code);border:1px solid var(--border);border-radius:8px;padding:12px;padding-top:34px;margin:8px 0;overflow-x:auto;direction:ltr;text-align:left;font-family:'Cascadia Code','Fira Code',monospace;font-size:.82rem;position:relative;white-space:pre}
 .inline-code{background:var(--code);border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-family:monospace;font-size:.85em}
 .copy-btn{position:absolute;top:6px;right:6px;background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:4px;padding:4px 10px;cursor:pointer;font-size:.7rem;font-family:inherit}
 .copy-btn:hover{background:var(--accent);color:#fff}
 .copy-btn.done{background:var(--success);color:#fff}
 .source-badge{font-size:.65rem;color:var(--muted);margin-top:6px;padding-top:6px;border-top:1px dashed var(--border);opacity:.7}
+.speak-btn{position:absolute;top:6px;left:6px;background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:4px;padding:4px 8px;cursor:pointer;font-size:.7rem;font-family:inherit;z-index:2}
+.speak-btn:hover{background:var(--accent);color:#fff}
 
-/* شاشة فارغة */
 .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:40px 20px}
 .empty h2{color:var(--accent);font-size:1.5rem}
 .empty p{color:var(--muted);max-width:500px;line-height:1.7}
@@ -78,35 +76,43 @@ pre{background:var(--code);border:1px solid var(--border);border-radius:8px;padd
 .empty .chips button{padding:10px 16px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:20px;cursor:pointer;font-family:inherit;font-size:.85rem}
 .empty .chips button:hover{background:var(--accent);color:#fff}
 
-/* منطقة الإدخال */
 .input-area{background:var(--surface);padding:12px 20px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
 .input-row{display:flex;gap:8px;align-items:flex-end}
 textarea{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-family:inherit;font-size:.95rem;resize:none;max-height:140px;min-height:44px;line-height:1.5}
 textarea:focus{outline:none;border-color:var(--accent)}
 .send-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:0 22px;height:44px;cursor:pointer;font-weight:bold;font-family:inherit}
-.send-btn:hover:not(:disabled){opacity:.9}
 .send-btn:disabled{opacity:.4;cursor:not-allowed}
 .icon-btn{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:10px;width:44px;height:44px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;transition:all .2s;flex-shrink:0}
 .icon-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
 .icon-btn.recording{background:var(--danger);color:#fff;border-color:var(--danger);animation:pulse-rec 1.5s infinite}
-.icon-btn.active{background:var(--warning);color:#fff;border-color:var(--warning)}
+.icon-btn.speaking{background:var(--warning);color:#fff;border-color:var(--warning)}
+.icon-btn.active-mode{background:var(--accent);color:#fff;border-color:var(--accent)}
 @keyframes pulse-rec{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.7)}50%{box-shadow:0 0 0 12px rgba(239,68,68,0)}}
 
-/* معاينة الصورة قبل الإرسال */
-.preview-area{display:none;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;align-items:center;gap:12px;margin-bottom:4px}
+.preview-area{display:none;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;align-items:center;gap:12px}
 .preview-area.show{display:flex}
 .preview-area img{max-width:80px;max-height:80px;border-radius:8px;border:1px solid var(--border)}
 .preview-area .info{flex:1;font-size:.8rem;color:var(--muted)}
 .preview-area .remove{background:var(--danger);color:#fff;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;font-size:.8rem;font-family:inherit}
 
-/* مؤشر الكتابة */
+.voice-indicator{display:none;padding:8px 14px;background:linear-gradient(135deg,rgba(168,85,247,.2),rgba(124,58,237,.2));border:1px solid var(--accent);border-radius:10px;color:var(--accent);font-size:.8rem;align-items:center;gap:10px;animation:fadeIn .3s}
+.voice-indicator.show{display:flex}
+.voice-wave{display:flex;gap:3px;align-items:center;height:20px}
+.voice-wave span{width:3px;background:var(--accent);border-radius:2px;animation:wave 1s infinite ease-in-out}
+.voice-wave span:nth-child(1){animation-delay:0s;height:8px}
+.voice-wave span:nth-child(2){animation-delay:.1s;height:16px}
+.voice-wave span:nth-child(3){animation-delay:.2s;height:12px}
+.voice-wave span:nth-child(4){animation-delay:.3s;height:18px}
+.voice-wave span:nth-child(5){animation-delay:.4s;height:10px}
+@keyframes wave{0%,100%{transform:scaleY(.5)}50%{transform:scaleY(1)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
 .typing{align-self:flex-start;background:var(--surface2);border:1px solid var(--border);padding:12px 18px;border-radius:12px;display:flex;gap:5px}
 .typing span{width:8px;height:8px;background:var(--accent);border-radius:50%;animation:typing 1.3s infinite}
 .typing span:nth-child(2){animation-delay:.15s}
 .typing span:nth-child(3){animation-delay:.3s}
 @keyframes typing{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-7px);opacity:1}}
 
-/* Modal فيديو */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;justify-content:center;align-items:center;padding:15px;z-index:100}
 .modal.show{display:flex}
 .modal-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;max-width:480px;width:100%}
@@ -118,11 +124,9 @@ textarea:focus{outline:none;border-color:var(--accent)}
 .modal-box .actions .primary{background:var(--accent);color:#fff}
 .modal-box .actions .cancel{background:var(--surface2);color:var(--text)}
 
-/* Overlay */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9}
 .overlay.show{display:block}
 
-/* الاستجابة للجوال */
 @media (max-width:768px){
 .sidebar{position:fixed;right:0;top:0;bottom:0;transform:translateX(100%)}
 .sidebar.open{transform:translateX(0)}
@@ -134,12 +138,10 @@ textarea:focus{outline:none;border-color:var(--accent)}
 ::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:var(--accent)}
 </style>
 </head>
 <body>
 
-<!-- الشريط الجانبي -->
 <aside class="sidebar" id="sidebar">
     <div class="sb-header">
         <div>
@@ -150,12 +152,13 @@ textarea:focus{outline:none;border-color:var(--accent)}
     </div>
     <button class="new-chat-btn" onclick="newChat()">➕ محادثة جديدة</button>
     <div class="chats-list" id="chatsList"></div>
-    <div class="provider-status" id="providerStatus">
+    <div class="provider-status">
         <div class="row">Gemini <span><span class="dot no" id="dotGem"></span></span></div>
         <div class="row">Groq <span><span class="dot no" id="dotGroq"></span></span></div>
-        <div class="row">الصور <span><span class="dot no" id="dotImg"></span></span></div>
-        <div class="row">الفيديو <span><span class="dot no" id="dotVid"></span></span></div>
-        <div class="row">الصوت <span><span class="dot ok" id="dotVoice"></span></span></div>
+        <div class="row">صور <span><span class="dot no" id="dotImg"></span></span></div>
+        <div class="row">فيديو <span><span class="dot no" id="dotVid"></span></span></div>
+        <div class="row">Azure صوت <span><span class="dot no" id="dotAzure"></span></span></div>
+        <div class="row">صوت المتصفح <span><span class="dot ok" id="dotVoice"></span></span></div>
     </div>
     <div class="sb-footer">
         <button onclick="checkStatus()">🔄 تحديث الحالة</button>
@@ -163,19 +166,21 @@ textarea:focus{outline:none;border-color:var(--accent)}
 </aside>
 <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
-<!-- المحتوى الرئيسي -->
 <div class="main">
     <header class="header">
         <div class="hl">
             <button class="menu-btn" onclick="toggleSidebar()">☰</button>
             <div>
                 <h1>{{ ai_name }}</h1>
-                <div class="sub">مساعد متعدد الوسائط</div>
+                <div class="sub">مساعد صوتي - {{ developer_name }}</div>
             </div>
         </div>
         <div class="header-actions">
-            <div class="toggle-tts" id="ttsToggle" onclick="toggleTTS()" title="النطق الصوتي التلقائي">
-                🔊 <span>النطق</span>
+            <div class="toggle-btn" id="ttsToggle" onclick="toggleTTS()" title="النطق التلقائي للردود">
+                🔊 <span>نطق الردود</span>
+            </div>
+            <div class="toggle-btn" id="liveModeBtn" onclick="toggleLiveMode()" title="محادثة صوتية مستمرة">
+                🎙️ <span>محادثة حية</span>
             </div>
             <div class="badge"><span class="dot-live"></span><span id="activeProvider">جاهز</span></div>
         </div>
@@ -187,36 +192,40 @@ textarea:focus{outline:none;border-color:var(--accent)}
         <button onclick="quickPrompt('اكتب بوت تيليجرام Python كامل')">🤖 بوت تيليجرام</button>
         <button onclick="quickPrompt('اكتب Flask API كامل')">🐍 Flask API</button>
         <button onclick="quickPrompt('اكتب آلة حاسبة Tkinter كود كامل')">🧮 آلة حاسبة</button>
-        <button onclick="quickPrompt('اكتب سكربت Bash للنسخ الاحتياطي')">💾 Bash Backup</button>
     </div>
 
     <div class="chat" id="chat"></div>
 
     <div class="input-area">
-        <!-- معاينة الصورة -->
         <div class="preview-area" id="previewArea">
             <img id="previewImg" src="" alt="" />
-            <div class="info" id="previewInfo">صورة جاهزة للإرسال</div>
+            <div class="info" id="previewInfo">صورة جاهزة</div>
             <button class="remove" onclick="removeImage()">✖ إزالة</button>
         </div>
 
+        <div class="voice-indicator" id="voiceIndicator">
+            <div class="voice-wave">
+                <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <span id="voiceStatusText">جاري الاستماع...</span>
+        </div>
+
         <div class="input-row">
-            <button class="icon-btn" id="micBtn" onclick="toggleVoice()" title="المحادثة الصوتية">🎤</button>
+            <button class="icon-btn" id="micBtn" onclick="toggleVoice()" title="اضغط للتحدث">🎤</button>
             <button class="icon-btn" onclick="pickImage()" title="رفع صورة">🖼️</button>
             <button class="icon-btn" onclick="openVideoModal()" title="توليد فيديو">🎬</button>
-            <textarea id="input" placeholder="اطلب أي كود أو صف صورة أو تحدث بالصوت..." rows="1"></textarea>
+            <textarea id="input" placeholder="اكتب أو اضغط 🎤 للتحدث..." rows="1"></textarea>
             <button class="send-btn" id="sendBtn" onclick="sendMsg()">إرسال</button>
         </div>
         <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFileSelect(event)">
     </div>
 </div>
 
-<!-- Modal توليد الفيديو -->
 <div class="modal" id="videoModal">
     <div class="modal-box">
         <h3>🎬 توليد فيديو</h3>
         <label>وصف الفيديو:</label>
-        <textarea id="videoPrompt" placeholder="مثال: قطة تلعب بكرة صوف في حديقة مشمسة..."></textarea>
+        <textarea id="videoPrompt" placeholder="مثال: قطة تلعب بكرة صوف..."></textarea>
         <div class="actions">
             <button class="cancel" onclick="closeVideoModal()">إلغاء</button>
             <button class="primary" onclick="generateVideo()">توليد</button>
@@ -239,10 +248,15 @@ let chats = [];
 let isSending = false;
 let selectedImage = null;
 let selectedImageType = 'image/jpeg';
+
+// ═══ إعدادات الصوت ═══
 let ttsEnabled = localStorage.getItem('khallaqi_tts') === 'true';
-let recognition = null;
+let liveMode = false;                // محادثة صوتية مستمرة
 let isRecording = false;
-let currentUtterance = null;
+let isSpeaking = false;
+let recognition = null;
+let currentAudio = null;             // لمشغل Azure TTS
+let azureAvailable = false;
 
 const chatEl = document.getElementById('chat');
 const inputEl = document.getElementById('input');
@@ -254,36 +268,170 @@ const fileInput = document.getElementById('fileInput');
 const previewArea = document.getElementById('previewArea');
 const previewImg = document.getElementById('previewImg');
 const ttsToggle = document.getElementById('ttsToggle');
+const liveModeBtn = document.getElementById('liveModeBtn');
+const voiceIndicator = document.getElementById('voiceIndicator');
+const voiceStatusText = document.getElementById('voiceStatusText');
 
 // ═══════════════════════════════════════════════════════
-// TTS - تفعيل/إيقاف
+// إعدادات صوت شاب سعودي
+// ═══════════════════════════════════════════════════════
+const VOICE_CONFIG = {
+    lang: 'ar-SA',          // العربية السعودية
+    pitch: 0.95,            // نبرة رزينة (أقل قليلاً = أعمق)
+    rate: 0.95,             // سرعة هادئة واثقة
+    volume: 1.0,
+    preferMale: true,       // فضّل صوتاً ذكرياً
+    preferKeywords: ['hamed', 'hameed', 'حامد', 'male', 'رجل', 'majed', 'ماجد', 'naayf', 'shakir']
+};
+
+// ═══════════════════════════════════════════════════════
+// TTS - تفعيل/إيقاف النطق
 // ═══════════════════════════════════════════════════════
 function updateTtsUI() {
-    if (ttsEnabled) {
-        ttsToggle.classList.add('active');
-    } else {
-        ttsToggle.classList.remove('active');
-    }
+    ttsToggle.classList.toggle('active', ttsEnabled);
 }
 function toggleTTS() {
     ttsEnabled = !ttsEnabled;
     localStorage.setItem('khallaqi_tts', ttsEnabled ? 'true' : 'false');
     updateTtsUI();
-    if (ttsEnabled) speak('تم تفعيل النطق الصوتي');
+    if (ttsEnabled) {
+        speakText('تم تفعيل النطق الصوتي');
+    } else {
+        stopSpeaking();
+    }
 }
 updateTtsUI();
 
 // ═══════════════════════════════════════════════════════
-// Text-To-Speech
+// اختيار أفضل صوت عربي (ذكر سعودي)
 // ═══════════════════════════════════════════════════════
-function speak(text) {
-    if (!('speechSynthesis' in window)) return;
+function pickArabicMaleVoice() {
+    if (!('speechSynthesis' in window)) return null;
+    const voices = window.speechSynthesis.getVoices();
+    if (!voices || voices.length === 0) return null;
+
+    // أولاً: صوت سعودي ذكر
+    let saudiMale = voices.find(v => {
+        const n = v.name.toLowerCase();
+        const l = v.lang.toLowerCase();
+        const isSaudi = l.startsWith('ar-sa') || l.includes('sa');
+        const isMale = VOICE_CONFIG.preferKeywords.some(k => n.includes(k.toLowerCase()));
+        return isSaudi && isMale;
+    });
+    if (saudiMale) return saudiMale;
+
+    // ثانياً: أي صوت عربي ذكر
+    let arabicMale = voices.find(v => {
+        const n = v.name.toLowerCase();
+        const l = v.lang.toLowerCase();
+        const isArabic = l.startsWith('ar');
+        const isMale = VOICE_CONFIG.preferKeywords.some(k => n.includes(k.toLowerCase()));
+        return isArabic && isMale;
+    });
+    if (arabicMale) return arabicMale;
+
+    // ثالثاً: أي صوت سعودي
+    let saudiAny = voices.find(v => v.lang.toLowerCase().startsWith('ar-sa'));
+    if (saudiAny) return saudiAny;
+
+    // رابعاً: أي صوت عربي
+    let arabicAny = voices.find(v => v.lang.toLowerCase().startsWith('ar'));
+    if (arabicAny) return arabicAny;
+
+    return null;
+}
+
+// انتظر تحميل الأصوات
+if ('speechSynthesis' in window) {
+    window.speechSynthesis.onvoiceschanged = () => {
+        // فقط لتحديث القائمة
+        console.log('Voices loaded:', window.speechSynthesis.getVoices().length);
+    };
+}
+
+// ═══════════════════════════════════════════════════════
+// دالة النطق الرئيسية
+// ═══════════════════════════════════════════════════════
+async function speakText(text) {
     if (!text) return;
+    stopSpeaking();
 
-    // أوقف أي نطق جاري
-    window.speechSynthesis.cancel();
+    // جرّب Azure أولاً
+    if (azureAvailable) {
+        try {
+            const audioBlob = await fetchAzureTTS(text);
+            if (audioBlob) {
+                await playAudioBlob(audioBlob);
+                return;
+            }
+        } catch (e) {
+            console.warn('Azure TTS failed, falling back to Web Speech:', e);
+        }
+    }
 
-    // نظّف النص من الأكواد الطويلة
+    // Web Speech API (fallback)
+    speakWebSpeech(text);
+}
+
+async function fetchAzureTTS(text) {
+    try {
+        const r = await fetch('/api/tts', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({text: text})
+        });
+        const contentType = r.headers.get('content-type') || '';
+        if (contentType.includes('audio')) {
+            const blob = await r.blob();
+            return blob;
+        }
+        // فشل، أرجع JSON مع خطأ
+        const d = await r.json();
+        console.warn('Azure TTS:', d.error || 'unknown');
+        return null;
+    } catch (e) {
+        console.warn('Azure TTS error:', e);
+        return null;
+    }
+}
+
+function playAudioBlob(blob) {
+    return new Promise((resolve) => {
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        currentAudio = audio;
+        isSpeaking = true;
+        micBtn.classList.add('speaking');
+
+        audio.onended = () => {
+            isSpeaking = false;
+            micBtn.classList.remove('speaking');
+            URL.revokeObjectURL(url);
+            currentAudio = null;
+            resolve();
+            onSpeechEnd();
+        };
+        audio.onerror = () => {
+            isSpeaking = false;
+            micBtn.classList.remove('speaking');
+            URL.revokeObjectURL(url);
+            currentAudio = null;
+            resolve();
+            onSpeechEnd();
+        };
+        audio.play().catch(e => {
+            console.warn('Audio play failed:', e);
+            isSpeaking = false;
+            micBtn.classList.remove('speaking');
+            resolve();
+            onSpeechEnd();
+        });
+    });
+}
+
+function speakWebSpeech(text) {
+    if (!('speechSynthesis' in window)) return;
+
     let clean = text
         .replace(/```[\s\S]*?```/g, ' (كود برمجي) ')
         .replace(/`([^`]+)`/g, '$1')
@@ -291,33 +439,69 @@ function speak(text) {
         .substring(0, 500);
 
     const u = new SpeechSynthesisUtterance(clean);
-    u.lang = 'ar-SA';
-    u.rate = 1.0;
-    u.pitch = 1.0;
+    u.lang = VOICE_CONFIG.lang;
+    u.pitch = VOICE_CONFIG.pitch;
+    u.rate = VOICE_CONFIG.rate;
+    u.volume = VOICE_CONFIG.volume;
 
-    // اختر صوتاً عربياً إن وُجد
-    const voices = window.speechSynthesis.getVoices();
-    const arVoice = voices.find(v => v.lang.startsWith('ar'));
-    if (arVoice) u.voice = arVoice;
+    const voice = pickArabicMaleVoice();
+    if (voice) {
+        u.voice = voice;
+        console.log('Using voice:', voice.name, voice.lang);
+    }
 
-    currentUtterance = u;
+    u.onstart = () => {
+        isSpeaking = true;
+        micBtn.classList.add('speaking');
+    };
+    u.onend = () => {
+        isSpeaking = false;
+        micBtn.classList.remove('speaking');
+        onSpeechEnd();
+    };
+    u.onerror = () => {
+        isSpeaking = false;
+        micBtn.classList.remove('speaking');
+        onSpeechEnd();
+    };
+
     window.speechSynthesis.speak(u);
 }
 
-// تحميل الأصوات بعد التهيئة
-if ('speechSynthesis' in window) {
-    window.speechSynthesis.onvoiceschanged = () => {};
+function stopSpeaking() {
+    if (currentAudio) {
+        try { currentAudio.pause(); currentAudio = null; } catch(e){}
+    }
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+    }
+    isSpeaking = false;
+    micBtn.classList.remove('speaking');
 }
 
 // ═══════════════════════════════════════════════════════
-// Speech-To-Text (Web Speech API)
+// دورة المحادثة الحية - Auto-Listen بعد انتهاء النطق
+// ═══════════════════════════════════════════════════════
+function onSpeechEnd() {
+    // إذا كنا في الوضع الحي، افتح الميكروفون تلقائياً
+    if (liveMode && !isRecording) {
+        setTimeout(() => {
+            if (liveMode && !isSending) {
+                startVoice();
+            }
+        }, 400);
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+// Speech-to-Text
 // ═══════════════════════════════════════════════════════
 function initRecognition() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) return null;
 
     const r = new SR();
-    r.lang = 'ar-SA';
+    r.lang = 'ar-SA';           // العربية السعودية
     r.continuous = false;
     r.interimResults = true;
     r.maxAlternatives = 1;
@@ -332,16 +516,19 @@ function initRecognition() {
         }
         inputEl.value = final || interim;
         autoResize();
+
         if (final) {
-            // أرسل تلقائياً عند الانتهاء
-            setTimeout(() => { if (!isSending) sendMsg(); }, 400);
+            voiceStatusText.textContent = 'تم الالتقاط، جاري الإرسال...';
+            setTimeout(() => {
+                if (!isSending) sendMsg();
+            }, 500);
         }
     };
 
     r.onerror = (e) => {
         console.error('Speech recognition error:', e.error);
         if (e.error === 'not-allowed') {
-            showError('❌ يجب السماح بالوصول إلى الميكروفون في المتصفح.');
+            showError('❌ يجب السماح بالوصول إلى الميكروفون.');
         } else if (e.error === 'no-speech') {
             showInfo('لم يتم التقاط صوت، حاول مرة أخرى.');
         }
@@ -364,6 +551,10 @@ function toggleVoice() {
 }
 
 function startVoice() {
+    if (isSpeaking) {
+        stopSpeaking();
+        return;
+    }
     if (!recognition) {
         recognition = initRecognition();
     }
@@ -377,47 +568,69 @@ function startVoice() {
         micBtn.classList.add('recording');
         micBtn.textContent = '⏹️';
         inputEl.placeholder = '🎤 جاري الاستماع...';
-    } catch(e) {
+        voiceIndicator.classList.add('show');
+        voiceStatusText.textContent = 'جاري الاستماع...';
+    } catch (e) {
         console.error(e);
     }
 }
 
 function stopVoice() {
     if (recognition && isRecording) {
-        try { recognition.stop(); } catch(e) {}
+        try { recognition.stop(); } catch (e) {}
     }
     isRecording = false;
     micBtn.classList.remove('recording');
     micBtn.textContent = '🎤';
-    inputEl.placeholder = 'اطلب أي كود أو صف صورة أو تحدث بالصوت...';
+    inputEl.placeholder = 'اكتب أو اضغط 🎤 للتحدث...';
+    voiceIndicator.classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════════════
+// الوضع الحي (Live Mode)
+// ═══════════════════════════════════════════════════════
+function toggleLiveMode() {
+    liveMode = !liveMode;
+    if (liveMode) {
+        liveModeBtn.classList.add('live');
+        liveModeBtn.querySelector('span').textContent = 'محادثة حية ⏺';
+        ttsEnabled = true;
+        localStorage.setItem('khallaqi_tts', 'true');
+        updateTtsUI();
+        showInfo('🎙️ تم تفعيل المحادثة الحية. تحدث الآن وسيرد عليك صوتياً.');
+        startVoice();
+    } else {
+        liveModeBtn.classList.remove('live');
+        liveModeBtn.querySelector('span').textContent = 'محادثة حية';
+        stopVoice();
+        stopSpeaking();
+        showInfo('تم إيقاف المحادثة الحية.');
+    }
 }
 
 // ═══════════════════════════════════════════════════════
 // رفع الصور
 // ═══════════════════════════════════════════════════════
-function pickImage() {
-    fileInput.click();
-}
+function pickImage() { fileInput.click(); }
 
 function handleFileSelect(event) {
     const file = event.target.files[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-        showError('❌ يرجى اختيار ملف صورة صالح.');
+        showError('❌ يرجى اختيار صورة.');
         return;
     }
     if (file.size > 10 * 1024 * 1024) {
-        showError('❌ الصورة كبيرة جداً (الحد 10 ميجابايت).');
+        showError('❌ الصورة كبيرة (الحد 10 ميجا).');
         return;
     }
-
     selectedImageType = file.type;
     const reader = new FileReader();
     reader.onload = (e) => {
         selectedImage = e.target.result;
         previewImg.src = selectedImage;
         document.getElementById('previewInfo').textContent =
-            `صورة جاهزة (${(file.size / 1024).toFixed(1)} KB) - اكتب طلبك ثم أرسل`;
+            `صورة جاهزة (${(file.size / 1024).toFixed(1)} KB)`;
         previewArea.classList.add('show');
     };
     reader.readAsDataURL(file);
@@ -454,41 +667,24 @@ async function generateVideo() {
         const r = await fetch('/api/generate-video', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                prompt: prompt,
-                chat_id: currentChatId,
-                user_id: USER_ID
-            })
+            body: JSON.stringify({prompt, chat_id: currentChatId, user_id: USER_ID})
         });
         const d = await r.json();
         hideTyping();
-
         if (d.error) {
             addMsg('❌ ' + d.error + (d.hint ? '\n\n💡 ' + d.hint : ''), 'error');
             return;
         }
-
-        addMsg(
-            '🎬 تم بدء توليد الفيديو.\n\nالعملية: ' + d.operation +
-            '\nالنموذج: ' + d.model +
-            '\n\nسيتم إشعارك عند اكتمال التوليد.',
-            'bot', d.model
-        );
-
-        // راقب الحالة كل 10 ثوان
+        addMsg('🎬 تم بدء التوليد.\nالعملية: ' + d.operation + '\nالنموذج: ' + d.model, 'bot', d.model);
         pollVideoStatus(d.operation);
-
-    } catch(e) {
+    } catch (e) {
         hideTyping();
-        addMsg('❌ فشل الاتصال: ' + e.message, 'error');
+        addMsg('❌ ' + e.message, 'error');
     }
 }
 
 async function pollVideoStatus(opName, attempts = 0) {
-    if (attempts > 60) { // 10 دقائق كحد أقصى
-        showInfo('⏱️ الفيديو يستغرق وقتاً أطول من المتوقع.');
-        return;
-    }
+    if (attempts > 60) { showInfo('⏱️ الفيديو يستغرق وقتاً أطول.'); return; }
     setTimeout(async () => {
         try {
             const r = await fetch('/api/video-status', {
@@ -498,15 +694,11 @@ async function pollVideoStatus(opName, attempts = 0) {
             });
             const d = await r.json();
             if (d.done && d.video_url) {
-                addMsg(
-                    '✅ تم توليد الفيديو!\n\n<a href="' + d.video_url + '" target="_blank">مشاهدة الفيديو</a>',
-                    'bot'
-                );
+                addMsg('✅ تم توليد الفيديو!\n<a href="' + d.video_url + '" target="_blank">مشاهدة</a>', 'bot');
             } else if (!d.done) {
                 pollVideoStatus(opName, attempts + 1);
             }
-        } catch(e) {
-            console.error(e);
+        } catch (e) {
             pollVideoStatus(opName, attempts + 1);
         }
     }, 10000);
@@ -543,9 +735,6 @@ function showInfo(text) {
     chatEl.scrollTop = chatEl.scrollHeight;
 }
 
-// ═══════════════════════════════════════════════════════
-// API Helper
-// ═══════════════════════════════════════════════════════
 async function api(url, options = {}) {
     const r = await fetch(url, options);
     const raw = await r.text();
@@ -556,7 +745,7 @@ async function api(url, options = {}) {
 }
 
 // ═══════════════════════════════════════════════════════
-// Chats
+// المحادثات
 // ═══════════════════════════════════════════════════════
 async function loadChats() {
     try {
@@ -600,17 +789,12 @@ async function newChat() {
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({user_id: USER_ID})
         });
-        if (!d.chat_id) {
-            showError('❌ ' + (d.error || 'فشل إنشاء محادثة'));
-            return;
-        }
+        if (!d.chat_id) { showError('❌ ' + (d.error || 'فشل')); return; }
         currentChatId = d.chat_id;
         await loadChats();
         showEmptyChat();
         if (window.innerWidth <= 768) toggleSidebar();
-    } catch (e) {
-        showError('❌ ' + e.message);
-    }
+    } catch (e) { showError('❌ ' + e.message); }
 }
 
 async function openChat(chatId) {
@@ -621,21 +805,12 @@ async function openChat(chatId) {
         const d = await api(`/api/chats/${chatId}?user_id=` + encodeURIComponent(USER_ID));
         if (d.messages && d.messages.length > 0) {
             d.messages.forEach(m => {
-                addMsg(
-                    m.content,
-                    m.role === 'user' ? 'user' : 'bot',
-                    null,
-                    false,
-                    m.type,
-                    m.media
-                );
+                addMsg(m.content, m.role === 'user' ? 'user' : 'bot', null, false, m.type, m.media);
             });
         } else {
             showEmptyChat();
         }
-    } catch (e) {
-        showError('❌ ' + e.message);
-    }
+    } catch (e) { showError('❌ ' + e.message); }
     if (window.innerWidth <= 768) toggleSidebar();
 }
 
@@ -656,18 +831,18 @@ async function deleteChat(chatId) {
 }
 
 // ═══════════════════════════════════════════════════════
-// Display
+// عرض الرسائل
 // ═══════════════════════════════════════════════════════
 function showEmptyChat() {
     chatEl.innerHTML = `
         <div class="empty">
             <h2>⚡ ${escapeHtml('{{ ai_name }}')}</h2>
-            <p>مساعد متعدد الوسائط: اكتب كود، ارفع صورة، تحدث بالصوت، أو وَلّد فيديو.</p>
+            <p>اكتب كود، ارفع صورة، تحدث بالصوت، أو وَلّد فيديو.</p>
             <div class="chips">
                 <button onclick="quickPrompt('اكتب لعبة ثعبان Python كود كامل')">🐍 لعبة ثعبان</button>
                 <button onclick="quickPrompt('اكتب موقع شخصي كامل')">🌐 موقع</button>
                 <button onclick="pickImage()">🖼️ ارفع صورة</button>
-                <button onclick="openVideoModal()">🎬 وَلّد فيديو</button>
+                <button onclick="toggleLiveMode()">🎙️ محادثة صوتية</button>
             </div>
         </div>`;
 }
@@ -684,7 +859,6 @@ function addMsg(text, who, source, save = true, msgType = 'text', media = null) 
         div.appendChild(s);
     }
 
-    // إذا كانت رسالة تحتوي صورة
     if (msgType === 'image' && media) {
         const img = document.createElement('img');
         img.className = 'attached';
@@ -744,12 +918,21 @@ function addMsg(text, who, source, save = true, msgType = 'text', media = null) 
         div.appendChild(sb);
     }
 
+    // زر تشغيل صوتي يدوي لكل رد
+    if (who === 'bot' && text && !text.startsWith('❌')) {
+        const speakBtn = document.createElement('button');
+        speakBtn.className = 'speak-btn';
+        speakBtn.textContent = '🔊 اسمع';
+        speakBtn.onclick = () => speakText(text);
+        div.appendChild(speakBtn);
+    }
+
     chatEl.appendChild(div);
     chatEl.scrollTop = chatEl.scrollHeight;
 
-    // TTS للردود
+    // نطق تلقائي
     if (who === 'bot' && ttsEnabled && text && !text.startsWith('❌')) {
-        speak(text);
+        speakText(text);
     }
 }
 
@@ -773,12 +956,15 @@ function hideTyping() {
 }
 
 // ═══════════════════════════════════════════════════════
-// Send
+// الإرسال
 // ═══════════════════════════════════════════════════════
 async function sendMsg() {
     if (isSending) return;
     const text = inputEl.value.trim();
     if (!text && !selectedImage) return;
+
+    // أوقف أي نطق جاري
+    stopSpeaking();
 
     if (!currentChatId) {
         try {
@@ -796,7 +982,6 @@ async function sendMsg() {
 
     isSending = true;
 
-    // عرض رسالة المستخدم (مع الصورة إن وُجدت)
     if (selectedImage) {
         addMsg(text || 'حلل هذه الصورة', 'user', null, true, 'image', selectedImage);
     } else {
@@ -814,11 +999,7 @@ async function sendMsg() {
     document.getElementById('activeProvider').textContent = 'يفكر...';
 
     try {
-        const payload = {
-            message: text,
-            chat_id: currentChatId,
-            user_id: USER_ID
-        };
+        const payload = {message: text, chat_id: currentChatId, user_id: USER_ID};
         if (imgToSend) {
             payload.image = imgToSend;
             payload.image_type = imgType;
@@ -841,7 +1022,6 @@ async function sendMsg() {
             document.getElementById('activeProvider').textContent = 'فشل';
         }
 
-        // إزالة الصورة بعد الإرسال
         if (imgToSend) removeImage();
 
     } catch (e) {
@@ -865,13 +1045,15 @@ inputEl.addEventListener('keydown', e => {
 });
 
 // ═══════════════════════════════════════════════════════
-// Status
+// الحالة
 // ═══════════════════════════════════════════════════════
 async function checkStatus() {
     try {
         const d = await api('/api/status');
         const p = d.providers || {};
         const f = d.features || {};
+        azureAvailable = !!f.voice_tts_azure;
+
         const set = (id, ok) => {
             const el = document.getElementById(id);
             if (el) el.className = 'dot ' + (ok ? 'ok' : 'no');
@@ -880,40 +1062,46 @@ async function checkStatus() {
         set('dotGroq', p.groq);
         set('dotImg', f.image);
         set('dotVid', f.video);
+        set('dotAzure', f.voice_tts_azure);
         set('dotVoice', true);
 
         let names = [];
-        if (p.gemini) names.push('Gemini (نص+صور+فيديو)');
-        if (p.groq) names.push('Groq (نص احتياطي)');
-        if (p.openrouter) names.push('OpenRouter');
+        if (p.gemini) names.push('Gemini');
+        if (p.groq) names.push('Groq');
+        if (f.voice_tts_azure) names.push('Azure TTS');
 
         alert('الحالة:\n' + (names.length ? '• ' + names.join('\n• ') : 'لا يوجد مزود') +
-              '\n\nالميزات:\n🎤 الصوت: مفعّل\n🖼️ الصور: ' + (f.image ? 'مفعّل' : 'يتطلب Gemini') +
-              '\n🎬 الفيديو: ' + (f.video ? 'مفعّل' : 'يتطلب تفعيل Veo'));
+              '\n\n🎤 الميكروفون: متاح في Chrome/Edge' +
+              '\n🔊 النطق: ' + (azureAvailable ? 'Azure (احترافي)' : 'صوت المتصفح'));
     } catch (e) { alert('❌ ' + e.message); }
 }
 
 // ═══════════════════════════════════════════════════════
-// Init
+// بدء
 // ═══════════════════════════════════════════════════════
 window.addEventListener('load', async () => {
     try {
         const d = await api('/api/status');
         const p = d.providers || {};
+        const f = d.features || {};
+        azureAvailable = !!f.voice_tts_azure;
+
         if (!p.gemini && !p.groq) {
-            showError('❌ لا يوجد أي مفتاح API. اذهب إلى Render > Environment وأضف GEMINI_API_KEY.');
+            showError('❌ لا يوجد مفتاح API. أضف GEMINI_API_KEY في Render.');
             return;
         }
-        // تفعيل مؤشرات المزودين
+
         const set = (id, ok) => {
             const el = document.getElementById(id);
             if (el) el.className = 'dot ' + (ok ? 'ok' : 'no');
         };
         set('dotGem', p.gemini);
         set('dotGroq', p.groq);
-        set('dotImg', d.features?.image);
-        set('dotVid', d.features?.video);
+        set('dotImg', f.image);
+        set('dotVid', f.video);
+        set('dotAzure', f.voice_tts_azure);
         set('dotVoice', true);
+
     } catch (e) {
         showError('❌ فشل الاتصال: ' + e.message);
         return;
