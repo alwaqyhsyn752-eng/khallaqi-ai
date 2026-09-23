@@ -10,26 +10,23 @@
 html,body{height:100%}
 body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--text);display:flex;overflow:hidden}
 
-/* Sidebar */
 .sidebar{width:280px;background:var(--sidebar);border-left:1px solid var(--border);display:flex;flex-direction:column;transition:transform .3s;z-index:10}
 .sb-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
 .sb-header h2{font-size:1rem;color:var(--accent)}
 .sb-header .sub{font-size:.68rem;color:var(--muted);margin-top:2px}
-.new-chat-btn{margin:12px;padding:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:10px;cursor:pointer;font-weight:bold;font-family:inherit;font-size:.9rem;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s}
+.new-chat-btn{margin:12px;padding:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:10px;cursor:pointer;font-weight:bold;font-family:inherit;font-size:.9rem}
 .new-chat-btn:hover{opacity:.9}
 .chats-list{flex:1;overflow-y:auto;padding:0 8px 8px}
-.chat-item{padding:10px 12px;background:transparent;color:var(--text);border:1px solid transparent;border-radius:8px;cursor:pointer;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;font-size:.85rem;transition:all .15s;font-family:inherit;width:100%;text-align:right}
+.chat-item{padding:10px 12px;background:transparent;color:var(--text);border:1px solid transparent;border-radius:8px;cursor:pointer;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;font-size:.85rem;width:100%;text-align:right;font-family:inherit}
 .chat-item:hover{background:var(--surface2)}
 .chat-item.active{background:var(--surface2);border-color:var(--accent)}
 .chat-item .title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-left:8px}
-.chat-item .del{opacity:0;padding:3px 6px;border-radius:4px;font-size:.7rem;color:var(--muted);transition:opacity .15s;background:transparent;border:none;cursor:pointer}
-.chat-item:hover .del{opacity:1}
+.chat-item .del{padding:3px 6px;border-radius:4px;font-size:.75rem;color:var(--muted);background:transparent;border:none;cursor:pointer}
 .chat-item .del:hover{background:var(--danger);color:#fff}
 .sb-footer{padding:10px;border-top:1px solid var(--border);display:flex;gap:6px}
 .sb-footer button{flex:1;padding:10px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.8rem;font-family:inherit}
 .sb-footer button:hover{background:var(--accent);color:#fff}
 
-/* Main */
 .main{flex:1;display:flex;flex-direction:column;min-width:0}
 .header{background:var(--surface);padding:12px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:10px}
 .hl{display:flex;align-items:center;gap:12px}
@@ -39,42 +36,39 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--t
 .badge{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;font-size:.7rem;color:var(--muted)}
 .dot-live{width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success)}
 
-/* Quick bar */
 .quick-bar{padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
 .quick-bar::-webkit-scrollbar{display:none}
-.quick-bar button{padding:6px 12px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:14px;cursor:pointer;font-size:.75rem;font-family:inherit;white-space:nowrap;transition:all .15s}
+.quick-bar button{padding:6px 12px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:14px;cursor:pointer;font-size:.75rem;font-family:inherit;white-space:nowrap}
 .quick-bar button:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
 
-/* Chat */
 .chat{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
-.msg{max-width:85%;padding:12px 16px;border-radius:12px;line-height:1.65;word-wrap:break-word;animation:fadeIn .2s}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.msg{max-width:85%;padding:12px 16px;border-radius:12px;line-height:1.65;word-wrap:break-word}
 .msg.user{align-self:flex-end;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-bottom-left-radius:3px}
 .msg.bot{align-self:flex-start;background:var(--surface2);border:1px solid var(--border);border-bottom-right-radius:3px}
-.msg.error{align-self:center;background:rgba(239,68,68,.15);border:1px solid var(--danger);color:#fca5a5;font-size:.85rem;text-align:center;max-width:90%}
+.msg.error{align-self:center;background:rgba(239,68,68,.15);border:1px solid var(--danger);color:#fca5a5;font-size:.85rem;text-align:center;max-width:90%;padding:10px 16px;border-radius:8px}
+.msg.info{align-self:center;background:rgba(59,130,246,.15);border:1px solid #3b82f6;color:#93c5fd;font-size:.8rem;text-align:center;padding:8px 14px;border-radius:8px}
 .sender{font-weight:bold;font-size:.72rem;opacity:.75;margin-bottom:4px}
 .content{white-space:pre-wrap}
 pre{background:var(--code);border:1px solid var(--border);border-radius:8px;padding:12px;padding-top:34px;margin:8px 0;overflow-x:auto;direction:ltr;text-align:left;font-family:'Cascadia Code','Fira Code',monospace;font-size:.82rem;position:relative;white-space:pre}
 .inline-code{background:var(--code);border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-family:monospace;font-size:.85em}
-.copy-btn{position:absolute;top:6px;right:6px;background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:4px;padding:4px 10px;cursor:pointer;font-size:.7rem;font-family:inherit;transition:all .15s}
+.copy-btn{position:absolute;top:6px;right:6px;background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:4px;padding:4px 10px;cursor:pointer;font-size:.7rem;font-family:inherit}
 .copy-btn:hover{background:var(--accent);color:#fff}
 .copy-btn.done{background:var(--success);color:#fff;border-color:var(--success)}
 .source-badge{font-size:.65rem;color:var(--muted);margin-top:6px;padding-top:6px;border-top:1px dashed var(--border);opacity:.7}
 
 .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:40px 20px}
-.empty h2{color:var(--accent);font-size:1.6rem}
+.empty h2{color:var(--accent);font-size:1.5rem}
 .empty p{color:var(--muted);max-width:500px;line-height:1.7}
 .empty .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px}
-.empty .chips button{padding:10px 16px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:20px;cursor:pointer;font-family:inherit;font-size:.85rem;transition:all .15s}
+.empty .chips button{padding:10px 16px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:20px;cursor:pointer;font-family:inherit;font-size:.85rem}
 .empty .chips button:hover{background:var(--accent);color:#fff}
 
-/* Input */
 .input-area{background:var(--surface);padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end}
 textarea{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-family:inherit;font-size:.95rem;resize:none;max-height:140px;min-height:44px;line-height:1.5}
 textarea:focus{outline:none;border-color:var(--accent)}
 .send-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:0 22px;height:44px;cursor:pointer;font-weight:bold;font-family:inherit}
 .send-btn:hover:not(:disabled){opacity:.9}
-.send-btn:disabled{opacity:.4;cursor:not-allowed}
+.send-btn:disabled{opacity:.4;cursor:not-allowed;background:var(--surface2);color:var(--muted)}
 
 .typing{align-self:flex-start;background:var(--surface2);border:1px solid var(--border);padding:12px 18px;border-radius:12px;display:flex;gap:5px}
 .typing span{width:8px;height:8px;background:var(--accent);border-radius:50%;animation:typing 1.3s infinite}
@@ -91,10 +85,9 @@ textarea:focus{outline:none;border-color:var(--accent)}
 .msg{max-width:95%}
 .input-area{padding:10px}
 }
-::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar{width:6px}
 ::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:var(--accent)}
 </style>
 </head>
 <body>
@@ -105,12 +98,12 @@ textarea:focus{outline:none;border-color:var(--accent)}
             <h2>⚡ {{ ai_name }}</h2>
             <div class="sub">{{ developer_name }}</div>
         </div>
-        <button class="del" style="opacity:1;padding:6px 10px;font-size:1rem;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--text);cursor:pointer" onclick="toggleSidebar()">✖</button>
+        <button style="background:transparent;border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;cursor:pointer" onclick="toggleSidebar()">✖</button>
     </div>
     <button class="new-chat-btn" onclick="newChat()">➕ محادثة جديدة</button>
     <div class="chats-list" id="chatsList"></div>
     <div class="sb-footer">
-        <button onclick="checkStatus()">🔄 حالة المزودين</button>
+        <button onclick="testConnection()">🔌 اختبار الاتصال</button>
     </div>
 </aside>
 <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
@@ -131,11 +124,7 @@ textarea:focus{outline:none;border-color:var(--accent)}
         <button onclick="quickPrompt('اكتب لعبة ثعبان Python كود كامل')">🐍 لعبة ثعبان</button>
         <button onclick="quickPrompt('اكتب موقع HTML CSS JS كامل')">🌐 موقع</button>
         <button onclick="quickPrompt('اكتب بوت تيليجرام Python كود كامل')">🤖 بوت تيليجرام</button>
-        <button onclick="quickPrompt('اكتب سكربت Python مفيد كامل')">🐍 سكربت Python</button>
-        <button onclick="quickPrompt('اكتب تطبيق مهام React كامل')">⚛️ React App</button>
         <button onclick="quickPrompt('اكتب آلة حاسبة Python Tkinter كود كامل')">🧮 آلة حاسبة</button>
-        <button onclick="quickPrompt('اكتب سكربت Bash للنسخ الاحتياطي كامل')">💾 Bash Backup</button>
-        <button onclick="quickPrompt('اكتب لعبة XO Python كود كامل')">❌⭕ XO</button>
     </div>
 
     <div class="chat" id="chat"></div>
@@ -150,11 +139,12 @@ textarea:focus{outline:none;border-color:var(--accent)}
 // ═══ Constants ═══
 let USER_ID = localStorage.getItem('khallaqi_user_id');
 if (!USER_ID) {
-    USER_ID = 'user_' + Math.random().toString(36).slice(2) + Date.now();
+    USER_ID = 'u_' + Math.random().toString(36).slice(2) + Date.now();
     localStorage.setItem('khallaqi_user_id', USER_ID);
 }
 let currentChatId = null;
 let chats = [];
+let isSending = false;
 
 const chatEl = document.getElementById('chat');
 const inputEl = document.getElementById('input');
@@ -162,20 +152,68 @@ const sendBtn = document.getElementById('sendBtn');
 const sidebar = document.getElementById('sidebar');
 const overlay = document.getElementById('overlay');
 
-// ═══ Sidebar ═══
+console.log('[INIT] USER_ID =', USER_ID);
+
+// ═══ UI helpers ═══
 function toggleSidebar() {
     sidebar.classList.toggle('open');
     overlay.classList.toggle('show');
 }
 
+function showError(text) {
+    if (chatEl.querySelector('.empty')) chatEl.innerHTML = '';
+    const d = document.createElement('div');
+    d.className = 'msg error';
+    d.textContent = text;
+    chatEl.appendChild(d);
+    chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+function showInfo(text) {
+    const d = document.createElement('div');
+    d.className = 'msg info';
+    d.textContent = text;
+    chatEl.appendChild(d);
+    chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+// ═══ API helper - يعرض كل الأخطاء بوضوح ═══
+async function api(url, options = {}) {
+    console.log('[API]', options.method || 'GET', url);
+    try {
+        const r = await fetch(url, options);
+        const raw = await r.text();
+        console.log('[API] Response status:', r.status, 'body:', raw.substring(0, 200));
+        let data;
+        try {
+            data = JSON.parse(raw);
+        } catch (e) {
+            console.error('[API] JSON parse error:', e, 'raw:', raw.substring(0, 300));
+            throw new Error('السيرفر أرجع رداً غير متوقع (قد يكون السيرفر متوقفاً أو هناك خطأ داخلي)');
+        }
+        if (!r.ok && !data.error) {
+            throw new Error('HTTP ' + r.status + ' - ' + (data.message || 'خطأ غير معروف'));
+        }
+        return data;
+    } catch (e) {
+        console.error('[API] Fetch failed:', e);
+        if (e.name === 'TypeError' && e.message.includes('fetch')) {
+            throw new Error('تعذّر الاتصال بالسيرفر. قد يكون متوقفاً أو بطيئاً — أعد المحاولة بعد 30 ثانية.');
+        }
+        throw e;
+    }
+}
+
 // ═══ Chats ═══
 async function loadChats() {
     try {
-        const r = await fetch('/chats?user_id=' + encodeURIComponent(USER_ID));
-        const d = await r.json();
+        const d = await api('/chats?user_id=' + encodeURIComponent(USER_ID));
         chats = d.chats || [];
         renderChats();
-    } catch(e) { console.error(e); }
+        console.log('[CHATS] loaded:', chats.length);
+    } catch (e) {
+        console.error('[CHATS] loadChats failed:', e);
+    }
 }
 
 function renderChats() {
@@ -188,57 +226,67 @@ function renderChats() {
     chats.forEach(c => {
         const btn = document.createElement('div');
         btn.className = 'chat-item' + (c.id === currentChatId ? ' active' : '');
-        btn.innerHTML = `<span class="title">💬 ${escapeHtml(c.title)}</span>`;
-        btn.onclick = (e) => {
-            if (e.target.classList.contains('del')) return;
-            openChat(c.id);
-        };
+        const t = document.createElement('span');
+        t.className = 'title';
+        t.textContent = '💬 ' + (c.title || 'محادثة');
+        btn.appendChild(t);
         const del = document.createElement('button');
         del.className = 'del';
         del.textContent = '🗑️';
         del.onclick = (e) => { e.stopPropagation(); deleteChat(c.id); };
         btn.appendChild(del);
+        btn.onclick = (e) => {
+            if (e.target.classList.contains('del')) return;
+            openChat(c.id);
+        };
         list.appendChild(btn);
     });
 }
 
 async function newChat() {
+    console.log('[CHAT] newChat called');
     try {
-        const r = await fetch('/chats', {
+        const d = await api('/chats', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({user_id: USER_ID})
         });
-        const d = await r.json();
-        if (d.chat_id) {
-            currentChatId = d.chat_id;
-            await loadChats();
-            showEmptyChat();
-            if (window.innerWidth <= 768) toggleSidebar();
+        if (!d.chat_id) {
+            showError('❌ فشل إنشاء محادثة: ' + (d.error || 'رد غير متوقع'));
+            return;
         }
-    } catch(e) { console.error(e); }
+        currentChatId = d.chat_id;
+        console.log('[CHAT] created:', currentChatId);
+        await loadChats();
+        showEmptyChat();
+        if (window.innerWidth <= 768) toggleSidebar();
+    } catch (e) {
+        showError('❌ فشل إنشاء محادثة: ' + e.message);
+    }
 }
 
 async function openChat(chatId) {
+    console.log('[CHAT] opening:', chatId);
     currentChatId = chatId;
     await loadChats();
     chatEl.innerHTML = '';
     try {
-        const r = await fetch(`/chats/${chatId}/messages?user_id=` + encodeURIComponent(USER_ID));
-        const d = await r.json();
+        const d = await api(`/chats/${chatId}/messages?user_id=` + encodeURIComponent(USER_ID));
         if (d.messages && d.messages.length > 0) {
             d.messages.forEach(m => addMsg(m.content, m.role === 'user' ? 'user' : 'bot', null, false));
         } else {
             showEmptyChat();
         }
-    } catch(e) { console.error(e); }
+    } catch (e) {
+        showError('❌ فشل تحميل الرسائل: ' + e.message);
+    }
     if (window.innerWidth <= 768) toggleSidebar();
 }
 
 async function deleteChat(chatId) {
     if (!confirm('حذف هذه المحادثة؟')) return;
     try {
-        await fetch('/chats/' + chatId, {
+        await api('/chats/' + chatId, {
             method: 'DELETE',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({user_id: USER_ID})
@@ -248,10 +296,12 @@ async function deleteChat(chatId) {
             showEmptyChat();
         }
         await loadChats();
-    } catch(e) { console.error(e); }
+    } catch (e) {
+        showError('❌ فشل الحذف: ' + e.message);
+    }
 }
 
-// ═══ Chat display ═══
+// ═══ Display ═══
 function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
@@ -263,7 +313,7 @@ function showEmptyChat() {
             <p>اطلب أي كود برمجي بأي لغة. سأكتبه كاملاً مع الشرح.</p>
             <div class="chips">
                 <button onclick="quickPrompt('اكتب لعبة ثعبان Python كود كامل')">🐍 لعبة ثعبان</button>
-                <button onclick="quickPrompt('اكتب موقع شخصي HTML CSS كامل')">🌐 موقع شخصي</button>
+                <button onclick="quickPrompt('اكتب موقع شخصي HTML CSS كامل')">🌐 موقع</button>
                 <button onclick="quickPrompt('اكتب بوت تيليجرام Python كامل')">🤖 بوت تيليجرام</button>
                 <button onclick="quickPrompt('اكتب آلة حاسبة Tkinter كود كامل')">🧮 آلة حاسبة</button>
             </div>
@@ -274,18 +324,16 @@ function addMsg(text, who, source, save = true) {
     if (chatEl.querySelector('.empty')) chatEl.innerHTML = '';
     const div = document.createElement('div');
     div.className = 'msg ' + who;
-
-    if (who !== 'error') {
+    if (who !== 'error' && who !== 'info') {
         const s = document.createElement('div');
         s.className = 'sender';
         s.textContent = who === 'user' ? 'أنت:' : 'الخلاقي:';
         div.appendChild(s);
     }
-
     const content = document.createElement('div');
     content.className = 'content';
 
-    if (who === 'error') {
+    if (who === 'error' || who === 'info') {
         content.textContent = text;
     } else {
         const parts = text.split('```');
@@ -350,54 +398,84 @@ function showTyping() {
     chatEl.appendChild(d);
     chatEl.scrollTop = chatEl.scrollHeight;
 }
-function hideTyping() { document.getElementById('typingIndicator')?.remove(); }
+function hideTyping() { const e = document.getElementById('typingIndicator'); if (e) e.remove(); }
 
-// ═══ Send ═══
+// ═══ SEND - النسخة المحسّنة ═══
 async function sendMsg() {
+    if (isSending) {
+        console.log('[SEND] already sending, ignored');
+        return;
+    }
     const text = inputEl.value.trim();
-    if (!text) return;
-    if (!currentChatId) {
-        await newChat();
-        if (!currentChatId) return;
+    if (!text) {
+        console.log('[SEND] empty text');
+        return;
     }
 
+    console.log('[SEND] start, text length:', text.length, 'currentChatId:', currentChatId);
+
+    // إن لم يكن هناك محادثة، أنشئ واحدة أولاً
+    if (!currentChatId) {
+        showInfo('⏳ جاري إنشاء محادثة جديدة...');
+        try {
+            const d = await api('/chats', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({user_id: USER_ID})
+            });
+            if (!d.chat_id) {
+                showError('❌ تعذّر إنشاء محادثة: ' + (d.error || 'رد غير متوقع'));
+                return;
+            }
+            currentChatId = d.chat_id;
+            chatEl.innerHTML = '';
+            await loadChats();
+        } catch (e) {
+            showError('❌ تعذّر إنشاء محادثة: ' + e.message);
+            return;
+        }
+    }
+
+    isSending = true;
     addMsg(text, 'user');
     inputEl.value = '';
     inputEl.style.height = 'auto';
     sendBtn.disabled = true;
+    sendBtn.textContent = '...';
     showTyping();
     document.getElementById('activeProvider').textContent = 'يفكر...';
 
     try {
-        const res = await fetch('/chat', {
+        const data = await api('/chat', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ message: text, chat_id: currentChatId, user_id: USER_ID })
+            body: JSON.stringify({
+                message: text,
+                chat_id: currentChatId,
+                user_id: USER_ID
+            })
         });
-        const raw = await res.text();
-        let data;
-        try { data = JSON.parse(raw); }
-        catch(e) {
-            hideTyping();
-            addMsg('رد غير متوقع من السيرفر', 'error');
-            sendBtn.disabled = false;
-            return;
-        }
+
         hideTyping();
 
         if (data.response) {
             addMsg(data.response, 'bot', data.source);
             document.getElementById('activeProvider').textContent = data.source || 'جاهز';
-            loadChats(); // تحديث العنوان
+            loadChats();
         } else if (data.error) {
-            addMsg(data.error, 'error');
+            showError('❌ ' + data.error);
             document.getElementById('activeProvider').textContent = 'فشل';
+        } else {
+            showError('❌ رد فارغ من السيرفر');
         }
-    } catch(e) {
+    } catch (e) {
         hideTyping();
-        addMsg('فشل الاتصال: ' + e.message, 'error');
+        showError('❌ ' + e.message);
+        document.getElementById('activeProvider').textContent = 'خطأ';
     } finally {
+        isSending = false;
         sendBtn.disabled = false;
+        sendBtn.textContent = 'إرسال';
         inputEl.focus();
     }
 }
@@ -411,21 +489,49 @@ inputEl.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
 });
 
-async function checkStatus() {
+// ═══ اختبار الاتصال ═══
+async function testConnection() {
+    chatEl.innerHTML = '';
+    showInfo('⏳ جاري اختبار الاتصال بالسيرفر...');
     try {
         const r = await fetch('/status');
         const d = await r.json();
-        const names = [];
-        if (d.providers.groq) names.push('Groq');
-        if (d.providers.cloudflare) names.push('Cloudflare');
-        if (d.providers.gemini) names.push('Gemini');
-        if (d.providers.openrouter) names.push('OpenRouter');
-        alert('المزودون المتاحون:\n' + (names.length ? names.join('\n') : 'لا يوجد أي مزود'));
-    } catch(e) { alert('فشل الاتصال'); }
+        chatEl.innerHTML = '';
+        showInfo('✅ السيرفر يعمل');
+        const p = d.providers || {};
+        let msg = 'المزودون المتاحون:\n';
+        msg += '• Groq: ' + (p.groq ? '✅' : '❌') + '\n';
+        msg += '• Cloudflare: ' + (p.cloudflare ? '✅' : '❌') + '\n';
+        msg += '• Gemini: ' + (p.gemini ? '✅' : '❌') + '\n';
+        msg += '• OpenRouter: ' + (p.openrouter ? '✅' : '❌');
+        showInfo(msg);
+        if (!p.groq && !p.cloudflare && !p.gemini && !p.openrouter) {
+            showError('❌ لا يوجد أي مفتاح API مضاف! اذهب إلى Render > Environment وأضف واحداً على الأقل.');
+        }
+    } catch (e) {
+        chatEl.innerHTML = '';
+        showError('❌ فشل الاتصال: ' + e.message);
+    }
 }
 
 // ═══ Init ═══
 window.addEventListener('load', async () => {
+    console.log('[INIT] page loaded');
+    // اختبار سريع أولاً
+    try {
+        const r = await fetch('/status');
+        const d = await r.json();
+        console.log('[INIT] status:', d);
+        const p = d.providers || {};
+        if (!p.groq && !p.cloudflare && !p.gemini && !p.openrouter) {
+            showError('❌ لا يوجد أي مفتاح API. اذهب إلى Render وأضف GROQ_API_KEY على الأقل.');
+            return;
+        }
+    } catch (e) {
+        showError('❌ فشل الاتصال بالسيرفر. تحقق من أن التطبيق يعمل على Render.');
+        return;
+    }
+
     await loadChats();
     if (chats.length > 0) {
         await openChat(chats[0].id);
