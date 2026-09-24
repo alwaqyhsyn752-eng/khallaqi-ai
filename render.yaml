@@ -1,9 +1,34 @@
 services:
   - type: web
-    name: khallaqi-ai
-    env: python
+    name: khallaqi
+    runtime: python
+    plan: free
+    region: frankfurt
+    branch: main
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
       - key: GEMINI_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: AZURE_SPEECH_KEY
+        sync: false
+      - key: AZURE_SPEECH_REGION
+        value: westeurope
+      - key: AZURE_VOICE_AR
+        value: ar-SA-HamedNeural
+      - key: RATE_LIMIT_PER_MIN
+        value: "20"
+      - key: RATE_LIMIT_PER_HOUR
+        value: "500"
+      - key: LOG_LEVEL
+        value: INFO
+      - key: FLASK_SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
         sync: false
