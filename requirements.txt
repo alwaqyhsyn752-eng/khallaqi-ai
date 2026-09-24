@@ -48,3 +48,4 @@ faker==30.0.0
 ruff==0.6.9
 black==24.10.0
 mypy==1.11.2
+uvicorn[standard]==0.32.0
