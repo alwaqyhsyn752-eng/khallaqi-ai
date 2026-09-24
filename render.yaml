@@ -5,11 +5,15 @@ services:
     plan: free
     region: frankfurt
     branch: main
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    buildCommand: |
+      pip install -r requirements.txt
+      alembic upgrade head
+    startCommand: gunicorn app.main:app --worker-class uvicorn.workers.UvicornWorker --config gunicorn.conf.py
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
+      - key: ENVIRONMENT
+        value: production
       - key: GEMINI_API_KEY
         sync: false
       - key: GROQ_API_KEY
@@ -28,7 +32,27 @@ services:
         value: "500"
       - key: LOG_LEVEL
         value: INFO
-      - key: FLASK_SECRET_KEY
+      - key: SECRET_KEY
         generateValue: true
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: khallaqi-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: khallaqi-redis
+          type: redis
+          property: connectionString
+
+  - type: redis
+    name: khallaqi-redis
+    plan: free
+    region: frankfurt
+    ipAllowList: []
+
+databases:
+  - name: khallaqi-db
+    plan: free
+    region: frankfurt
+    databaseName: khallaqi
+    user: khallaqi
