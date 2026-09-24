@@ -1,1 +1,1240 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ ai_name }} - صوتي</title>
+<style>
+:root{--bg:#0a0e1a;--surface:#131826;--surface2:#1a2138;--sidebar:#0f1420;--text:#e5e9f0;--muted:#8b95a9;--accent:#a855f7;--accent2:#7c3aed;--success:#10b981;--danger:#ef4444;--warning:#f59e0b;--border:#1f2937;--code:#0d1117}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--text);display:flex;overflow:hidden}
 
+.sidebar{width:280px;background:var(--sidebar);border-left:1px solid var(--border);display:flex;flex-direction:column;transition:transform .3s;z-index:10}
+.sb-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.sb-header h2{font-size:1rem;color:var(--accent)}
+.sb-header .sub{font-size:.68rem;color:var(--muted);margin-top:2px}
+.new-chat-btn{margin:12px;padding:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:10px;cursor:pointer;font-weight:bold;font-family:inherit;font-size:.9rem}
+.new-chat-btn:hover{opacity:.9}
+.chats-list{flex:1;overflow-y:auto;padding:0 8px 8px}
+.chat-item{padding:10px 12px;background:transparent;color:var(--text);border:1px solid transparent;border-radius:8px;cursor:pointer;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;font-size:.85rem;width:100%;text-align:right;font-family:inherit}
+.chat-item:hover{background:var(--surface2)}
+.chat-item.active{background:var(--surface2);border-color:var(--accent)}
+.chat-item .title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-left:8px}
+.chat-item .del{padding:3px 6px;border-radius:4px;font-size:.75rem;color:var(--muted);background:transparent;border:none;cursor:pointer}
+.chat-item .del:hover{background:var(--danger);color:#fff}
+.provider-status{padding:10px 14px;border-top:1px solid var(--border);font-size:.72rem;color:var(--muted)}
+.provider-status .row{display:flex;justify-content:space-between;padding:3px 0}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px}
+.dot.ok{background:var(--success);box-shadow:0 0 6px var(--success)}
+.dot.no{background:#4a5568}
+.sb-footer{padding:10px;border-top:1px solid var(--border)}
+.sb-footer button{width:100%;padding:10px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.8rem;font-family:inherit}
+.sb-footer button:hover{background:var(--accent);color:#fff}
+
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.header{background:var(--surface);padding:12px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.hl{display:flex;align-items:center;gap:12px}
+.menu-btn{display:none;background:transparent;border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:1.1rem}
+.header h1{font-size:1.1rem;color:var(--accent)}
+.header .sub{font-size:.72rem;color:var(--muted)}
+.header-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.toggle-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;font-size:.72rem;color:var(--muted);cursor:pointer;user-select:none;font-family:inherit}
+.toggle-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.toggle-btn.live{background:var(--danger);color:#fff;border-color:var(--danger);animation:pulse-live 1.5s infinite}
+@keyframes pulse-live{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.7)}50%{box-shadow:0 0 0 10px rgba(239,68,68,0)}}
+.badge{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;font-size:.7rem;color:var(--muted)}
+.dot-live{width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success)}
+
+.quick-bar{padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.quick-bar::-webkit-scrollbar{display:none}
+.quick-bar button{padding:6px 12px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:14px;cursor:pointer;font-size:.75rem;font-family:inherit;white-space:nowrap}
+.quick-bar button:hover{background:var(--accent);color:#fff}
+
+.chat{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
+.msg{max-width:85%;padding:12px 16px;border-radius:12px;line-height:1.65;word-wrap:break-word;position:relative}
+.msg.user{align-self:flex-end;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-bottom-left-radius:3px}
+.msg.bot{align-self:flex-start;background:var(--surface2);border:1px solid var(--border);border-bottom-right-radius:3px}
+.msg.error{align-self:center;background:rgba(239,68,68,.15);border:1px solid var(--danger);color:#fca5a5;font-size:.85rem;text-align:center;max-width:90%;padding:10px 16px;border-radius:8px}
+.msg.info{align-self:center;background:rgba(59,130,246,.15);border:1px solid #3b82f6;color:#93c5fd;font-size:.8rem;text-align:center;padding:8px 14px;border-radius:8px}
+.sender{font-weight:bold;font-size:.72rem;opacity:.75;margin-bottom:4px}
+.content{white-space:pre-wrap}
+.msg img.attached{max-width:100%;border-radius:8px;margin:8px 0;border:1px solid var(--border);display:block}
+pre{background:var(--code);border:1px solid var(--border);border-radius:8px;padding:12px;padding-top:34px;margin:8px 0;overflow-x:auto;direction:ltr;text-align:left;font-family:'Cascadia Code','Fira Code',monospace;font-size:.82rem;position:relative;white-space:pre}
+.inline-code{background:var(--code);border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-family:monospace;font-size:.85em}
+.copy-btn{position:absolute;top:6px;right:6px;background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:4px;padding:4px 10px;cursor:pointer;font-size:.7rem;font-family:inherit}
+.copy-btn:hover{background:var(--accent);color:#fff}
+.copy-btn.done{background:var(--success);color:#fff}
+.source-badge{font-size:.65rem;color:var(--muted);margin-top:6px;padding-top:6px;border-top:1px dashed var(--border);opacity:.7}
+.speak-btn{position:absolute;top:6px;left:6px;background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:4px;padding:4px 8px;cursor:pointer;font-size:.7rem;font-family:inherit;z-index:2}
+.speak-btn:hover{background:var(--accent);color:#fff}
+.streaming-cursor{display:inline-block;width:8px;height:16px;background:var(--accent);animation:blink .8s infinite;vertical-align:middle;margin-right:4px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:40px 20px}
+.empty h2{color:var(--accent);font-size:1.5rem}
+.empty p{color:var(--muted);max-width:500px;line-height:1.7}
+.empty .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px}
+.empty .chips button{padding:10px 16px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:20px;cursor:pointer;font-family:inherit;font-size:.85rem}
+.empty .chips button:hover{background:var(--accent);color:#fff}
+
+.input-area{background:var(--surface);padding:12px 20px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
+.input-row{display:flex;gap:8px;align-items:flex-end}
+textarea{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-family:inherit;font-size:.95rem;resize:none;max-height:140px;min-height:44px;line-height:1.5}
+textarea:focus{outline:none;border-color:var(--accent)}
+.send-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:0 22px;height:44px;cursor:pointer;font-weight:bold;font-family:inherit;min-width:80px}
+.send-btn:disabled{opacity:.4;cursor:not-allowed}
+.send-btn.stopping{background:var(--danger)}
+.icon-btn{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:10px;width:44px;height:44px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;transition:all .2s;flex-shrink:0}
+.icon-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.icon-btn.recording{background:var(--danger);color:#fff;border-color:var(--danger);animation:pulse-rec 1.5s infinite}
+.icon-btn.speaking{background:var(--warning);color:#fff;border-color:var(--warning)}
+.icon-btn.active-mode{background:var(--accent);color:#fff;border-color:var(--accent)}
+@keyframes pulse-rec{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.7)}50%{box-shadow:0 0 0 12px rgba(239,68,68,0)}}
+
+.preview-area{display:none;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;align-items:center;gap:12px}
+.preview-area.show{display:flex}
+.preview-area img{max-width:80px;max-height:80px;border-radius:8px;border:1px solid var(--border)}
+.preview-area .info{flex:1;font-size:.8rem;color:var(--muted)}
+.preview-area .remove{background:var(--danger);color:#fff;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;font-size:.8rem;font-family:inherit}
+
+.voice-indicator{display:none;padding:8px 14px;background:linear-gradient(135deg,rgba(168,85,247,.2),rgba(124,58,237,.2));border:1px solid var(--accent);border-radius:10px;color:var(--accent);font-size:.8rem;align-items:center;gap:10px;animation:fadeIn .3s}
+.voice-indicator.show{display:flex}
+.voice-wave{display:flex;gap:3px;align-items:center;height:20px}
+.voice-wave span{width:3px;background:var(--accent);border-radius:2px;animation:wave 1s infinite ease-in-out}
+.voice-wave span:nth-child(1){animation-delay:0s;height:8px}
+.voice-wave span:nth-child(2){animation-delay:.1s;height:16px}
+.voice-wave span:nth-child(3){animation-delay:.2s;height:12px}
+.voice-wave span:nth-child(4){animation-delay:.3s;height:18px}
+.voice-wave span:nth-child(5){animation-delay:.4s;height:10px}
+@keyframes wave{0%,100%{transform:scaleY(.5)}50%{transform:scaleY(1)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+.typing{align-self:flex-start;background:var(--surface2);border:1px solid var(--border);padding:12px 18px;border-radius:12px;display:flex;gap:5px}
+.typing span{width:8px;height:8px;background:var(--accent);border-radius:50%;animation:typing 1.3s infinite}
+.typing span:nth-child(2){animation-delay:.15s}
+.typing span:nth-child(3){animation-delay:.3s}
+@keyframes typing{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-7px);opacity:1}}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;justify-content:center;align-items:center;padding:15px;z-index:100}
+.modal.show{display:flex}
+.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;max-width:480px;width:100%}
+.modal-box h3{color:var(--accent);margin-bottom:14px}
+.modal-box label{display:block;font-size:.85rem;color:var(--muted);margin:10px 0 5px}
+.modal-box textarea{width:100%;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px;min-height:100px;font-family:inherit;font-size:.9rem;resize:vertical}
+.modal-box .actions{display:flex;gap:8px;margin-top:14px}
+.modal-box .actions button{flex:1;padding:10px;border-radius:8px;border:none;font-weight:bold;cursor:pointer;font-family:inherit}
+.modal-box .actions .primary{background:var(--accent);color:#fff}
+.modal-box .actions .cancel{background:var(--surface2);color:var(--text)}
+
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9}
+.overlay.show{display:block}
+
+@media (max-width:768px){
+.sidebar{position:fixed;right:0;top:0;bottom:0;transform:translateX(100%)}
+.sidebar.open{transform:translateX(0)}
+.menu-btn{display:block}
+.overlay.show{display:block}
+.msg{max-width:95%}
+.input-area{padding:10px}
+}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+    <div class="sb-header">
+        <div>
+            <h2>⚡ {{ ai_name }}</h2>
+            <div class="sub">{{ developer_name }} - {{ version }}</div>
+        </div>
+        <button style="background:transparent;border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;cursor:pointer" onclick="toggleSidebar()">✖</button>
+    </div>
+    <button class="new-chat-btn" onclick="newChat()">➕ محادثة جديدة</button>
+    <div class="chats-list" id="chatsList"></div>
+    <div class="provider-status">
+        <div class="row">Gemini <span><span class="dot no" id="dotGem"></span></span></div>
+        <div class="row">Groq <span><span class="dot no" id="dotGroq"></span></span></div>
+        <div class="row">Redis <span><span class="dot no" id="dotRedis"></span></span></div>
+        <div class="row">صور <span><span class="dot no" id="dotImg"></span></span></div>
+        <div class="row">فيديو <span><span class="dot no" id="dotVid"></span></span></div>
+        <div class="row">Azure صوت <span><span class="dot no" id="dotAzure"></span></span></div>
+        <div class="row">صوت المتصفح <span><span class="dot ok" id="dotVoice"></span></span></div>
+    </div>
+    <div class="sb-footer">
+        <button onclick="checkStatus()">🔄 تحديث الحالة</button>
+        <button onclick="showStats()" style="margin-top:6px">📊 إحصائياتي</button>
+    </div>
+</aside>
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<div class="main">
+    <header class="header">
+        <div class="hl">
+            <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+            <div>
+                <h1>{{ ai_name }}</h1>
+                <div class="sub">مساعد صوتي - {{ developer_name }}</div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <div class="toggle-btn" id="ttsToggle" onclick="toggleTTS()" title="النطق التلقائي للردود">
+                🔊 <span>نطق الردود</span>
+            </div>
+            <div class="toggle-btn" id="liveModeBtn" onclick="toggleLiveMode()" title="محادثة صوتية مستمرة">
+                🎙️ <span>محادثة حية</span>
+            </div>
+            <div class="badge"><span class="dot-live"></span><span id="activeProvider">جاهز</span></div>
+        </div>
+    </header>
+
+    <div class="quick-bar">
+        <button onclick="quickPrompt('اكتب لعبة ثعبان Python كود كامل')">🐍 لعبة ثعبان</button>
+        <button onclick="quickPrompt('اكتب موقع شخصي HTML CSS JS كامل')">🌐 موقع</button>
+        <button onclick="quickPrompt('اكتب بوت تيليجرام Python كامل')">🤖 بوت تيليجرام</button>
+        <button onclick="quickPrompt('اكتب FastAPI API كامل')">⚡ FastAPI</button>
+        <button onclick="quickPrompt('اكتب آلة حاسبة Tkinter كود كامل')">🧮 آلة حاسبة</button>
+    </div>
+
+    <div class="chat" id="chat"></div>
+
+    <div class="input-area">
+        <div class="preview-area" id="previewArea">
+            <img id="previewImg" src="" alt="" />
+            <div class="info" id="previewInfo">صورة جاهزة</div>
+            <button class="remove" onclick="removeImage()">✖ إزالة</button>
+        </div>
+
+        <div class="voice-indicator" id="voiceIndicator">
+            <div class="voice-wave">
+                <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <span id="voiceStatusText">جاري الاستماع...</span>
+        </div>
+
+        <div class="input-row">
+            <button class="icon-btn" id="micBtn" onclick="toggleVoice()" title="اضغط للتحدث">🎤</button>
+            <button class="icon-btn" onclick="pickImage()" title="رفع صورة">🖼️</button>
+            <button class="icon-btn" onclick="openVideoModal()" title="توليد فيديو">🎬</button>
+            <textarea id="input" placeholder="اكتب أو اضغط 🎤 للتحدث..." rows="1"></textarea>
+            <button class="send-btn" id="sendBtn" onclick="sendMsg()">إرسال</button>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFileSelect(event)">
+    </div>
+</div>
+
+<div class="modal" id="videoModal">
+    <div class="modal-box">
+        <h3>🎬 توليد فيديو</h3>
+        <label>وصف الفيديو:</label>
+        <textarea id="videoPrompt" placeholder="مثال: قطة تلعب بكرة صوف..."></textarea>
+        <div class="actions">
+            <button class="cancel" onclick="closeVideoModal()">إلغاء</button>
+            <button class="primary" onclick="generateVideo()">توليد</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// الإعدادات العامة
+// ═══════════════════════════════════════════════════════
+const API_BASE = '/api/v1';
+
+let USER_ID = localStorage.getItem('khallaqi_user_id');
+if (!USER_ID) {
+    USER_ID = 'u_' + Math.random().toString(36).slice(2) + Date.now();
+    localStorage.setItem('khallaqi_user_id', USER_ID);
+}
+
+let currentChatId = null;
+let chats = [];
+let isSending = false;
+let selectedImage = null;
+let selectedImageType = 'image/jpeg';
+let streamAbort = null;
+
+let ttsEnabled = localStorage.getItem('khallaqi_tts') === 'true';
+let liveMode = false;
+let isRecording = false;
+let isSpeaking = false;
+let recognition = null;
+let currentAudio = null;
+let azureAvailable = false;
+
+const chatEl = document.getElementById('chat');
+const inputEl = document.getElementById('input');
+const sendBtn = document.getElementById('sendBtn');
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('overlay');
+const micBtn = document.getElementById('micBtn');
+const fileInput = document.getElementById('fileInput');
+const previewArea = document.getElementById('previewArea');
+const previewImg = document.getElementById('previewImg');
+const ttsToggle = document.getElementById('ttsToggle');
+const liveModeBtn = document.getElementById('liveModeBtn');
+const voiceIndicator = document.getElementById('voiceIndicator');
+const voiceStatusText = document.getElementById('voiceStatusText');
+
+// ═══════════════════════════════════════════════════════
+// API Helper — مع ترويسة X-User-ID
+// ═══════════════════════════════════════════════════════
+async function api(path, options = {}) {
+    options.headers = options.headers || {};
+    if (!options.headers['X-User-ID']) {
+        options.headers['X-User-ID'] = USER_ID;
+    }
+    if (options.body && typeof options.body === 'string' && !options.headers['Content-Type']) {
+        options.headers['Content-Type'] = 'application/json';
+    }
+    const r = await fetch(path, options);
+    const raw = await r.text();
+    let data;
+    try { data = raw ? JSON.parse(raw) : {}; }
+    catch (e) { throw new Error('رد غير متوقع من السيرفر'); }
+    if (!r.ok) {
+        const err = new Error(data.error || data.message || 'خطأ في الطلب');
+        err.status = r.status;
+        err.details = data.details;
+        throw err;
+    }
+    return data;
+}
+
+// ═══════════════════════════════════════════════════════
+// إعدادات صوت شاب سعودي
+// ═══════════════════════════════════════════════════════
+const VOICE_CONFIG = {
+    lang: 'ar-SA',
+    pitch: 0.95,
+    rate: 0.95,
+    volume: 1.0,
+    preferMale: true,
+    preferKeywords: ['hamed', 'hameed', 'حامد', 'male', 'رجل', 'majed', 'ماجد', 'naayf', 'shakir']
+};
+
+// ═══════════════════════════════════════════════════════
+// TTS
+// ═══════════════════════════════════════════════════════
+function updateTtsUI() {
+    ttsToggle.classList.toggle('active', ttsEnabled);
+}
+function toggleTTS() {
+    ttsEnabled = !ttsEnabled;
+    localStorage.setItem('khallaqi_tts', ttsEnabled ? 'true' : 'false');
+    updateTtsUI();
+    if (ttsEnabled) {
+        speakText('تم تفعيل النطق الصوتي');
+    } else {
+        stopSpeaking();
+    }
+}
+updateTtsUI();
+
+function pickArabicMaleVoice() {
+    if (!('speechSynthesis' in window)) return null;
+    const voices = window.speechSynthesis.getVoices();
+    if (!voices || voices.length === 0) return null;
+
+    let v = voices.find(x => {
+        const n = x.name.toLowerCase();
+        const l = x.lang.toLowerCase();
+        return (l.startsWith('ar-sa') || l.includes('sa')) &&
+               VOICE_CONFIG.preferKeywords.some(k => n.includes(k.toLowerCase()));
+    });
+    if (v) return v;
+
+    v = voices.find(x => {
+        const n = x.name.toLowerCase();
+        const l = x.lang.toLowerCase();
+        return l.startsWith('ar') &&
+               VOICE_CONFIG.preferKeywords.some(k => n.includes(k.toLowerCase()));
+    });
+    if (v) return v;
+
+    v = voices.find(x => x.lang.toLowerCase().startsWith('ar-sa'));
+    if (v) return v;
+
+    v = voices.find(x => x.lang.toLowerCase().startsWith('ar'));
+    return v || null;
+}
+
+if ('speechSynthesis' in window) {
+    window.speechSynthesis.onvoiceschanged = () => {
+        console.log('Voices loaded:', window.speechSynthesis.getVoices().length);
+    };
+}
+
+async function speakText(text) {
+    if (!text) return;
+    stopSpeaking();
+
+    if (azureAvailable) {
+        try {
+            const audioBlob = await fetchAzureTTS(text);
+            if (audioBlob) {
+                await playAudioBlob(audioBlob);
+                return;
+            }
+        } catch (e) {
+            console.warn('Azure TTS failed, falling back:', e);
+        }
+    }
+
+    speakWebSpeech(text);
+}
+
+async function fetchAzureTTS(text) {
+    try {
+        const r = await fetch(API_BASE + '/tts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-User-ID': USER_ID
+            },
+            body: JSON.stringify({text: text})
+        });
+        const contentType = r.headers.get('content-type') || '';
+        if (contentType.includes('audio')) {
+            return await r.blob();
+        }
+        return null;
+    } catch (e) {
+        console.warn('Azure TTS error:', e);
+        return null;
+    }
+}
+
+function playAudioBlob(blob) {
+    return new Promise((resolve) => {
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        currentAudio = audio;
+        isSpeaking = true;
+        micBtn.classList.add('speaking');
+
+        const done = () => {
+            isSpeaking = false;
+            micBtn.classList.remove('speaking');
+            URL.revokeObjectURL(url);
+            currentAudio = null;
+            resolve();
+            onSpeechEnd();
+        };
+        audio.onended = done;
+        audio.onerror = done;
+        audio.play().catch(e => {
+            console.warn('Audio play failed:', e);
+            done();
+        });
+    });
+}
+
+function speakWebSpeech(text) {
+    if (!('speechSynthesis' in window)) return;
+
+    let clean = text
+        .replace(/```[\s\S]*?```/g, ' (كود برمجي) ')
+        .replace(/`([^`]+)`/g, '$1')
+        .replace(/[#*_]/g, '')
+        .substring(0, 500);
+
+    const u = new SpeechSynthesisUtterance(clean);
+    u.lang = VOICE_CONFIG.lang;
+    u.pitch = VOICE_CONFIG.pitch;
+    u.rate = VOICE_CONFIG.rate;
+    u.volume = VOICE_CONFIG.volume;
+
+    const voice = pickArabicMaleVoice();
+    if (voice) u.voice = voice;
+
+    u.onstart = () => {
+        isSpeaking = true;
+        micBtn.classList.add('speaking');
+    };
+    u.onend = () => {
+        isSpeaking = false;
+        micBtn.classList.remove('speaking');
+        onSpeechEnd();
+    };
+    u.onerror = () => {
+        isSpeaking = false;
+        micBtn.classList.remove('speaking');
+        onSpeechEnd();
+    };
+
+    window.speechSynthesis.speak(u);
+}
+
+function stopSpeaking() {
+    if (currentAudio) {
+        try { currentAudio.pause(); currentAudio = null; } catch(e){}
+    }
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+    }
+    isSpeaking = false;
+    micBtn.classList.remove('speaking');
+}
+
+function onSpeechEnd() {
+    if (liveMode && !isRecording) {
+        setTimeout(() => {
+            if (liveMode && !isSending) startVoice();
+        }, 400);
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+// Speech-to-Text
+// ═══════════════════════════════════════════════════════
+function initRecognition() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return null;
+
+    const r = new SR();
+    r.lang = 'ar-SA';
+    r.continuous = false;
+    r.interimResults = true;
+    r.maxAlternatives = 1;
+
+    r.onresult = (e) => {
+        let interim = '';
+        let final = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+            const t = e.results[i][0].transcript;
+            if (e.results[i].isFinal) final += t;
+            else interim += t;
+        }
+        inputEl.value = final || interim;
+        autoResize();
+
+        if (final) {
+            voiceStatusText.textContent = 'تم الالتقاط، جاري الإرسال...';
+            setTimeout(() => {
+                if (!isSending) sendMsg();
+            }, 500);
+        }
+    };
+
+    r.onerror = (e) => {
+        console.error('Speech recognition error:', e.error);
+        if (e.error === 'not-allowed') {
+            showError('❌ يجب السماح بالوصول إلى الميكروفون.');
+        } else if (e.error === 'no-speech') {
+            showInfo('لم يتم التقاط صوت، حاول مرة أخرى.');
+        }
+        stopVoice();
+    };
+
+    r.onend = () => stopVoice();
+    return r;
+}
+
+function toggleVoice() {
+    if (isRecording) stopVoice();
+    else startVoice();
+}
+
+function startVoice() {
+    if (isSpeaking) {
+        stopSpeaking();
+        return;
+    }
+    if (!recognition) recognition = initRecognition();
+    if (!recognition) {
+        showError('❌ المتصفح لا يدعم التعرف على الصوت. استخدم Chrome أو Edge.');
+        return;
+    }
+    try {
+        recognition.start();
+        isRecording = true;
+        micBtn.classList.add('recording');
+        micBtn.textContent = '⏹️';
+        inputEl.placeholder = '🎤 جاري الاستماع...';
+        voiceIndicator.classList.add('show');
+        voiceStatusText.textContent = 'جاري الاستماع...';
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+function stopVoice() {
+    if (recognition && isRecording) {
+        try { recognition.stop(); } catch (e) {}
+    }
+    isRecording = false;
+    micBtn.classList.remove('recording');
+    micBtn.textContent = '🎤';
+    inputEl.placeholder = 'اكتب أو اضغط 🎤 للتحدث...';
+    voiceIndicator.classList.remove('show');
+}
+
+function toggleLiveMode() {
+    liveMode = !liveMode;
+    if (liveMode) {
+        liveModeBtn.classList.add('live');
+        liveModeBtn.querySelector('span').textContent = 'محادثة حية ⏺';
+        ttsEnabled = true;
+        localStorage.setItem('khallaqi_tts', 'true');
+        updateTtsUI();
+        showInfo('🎙️ تم تفعيل المحادثة الحية. تحدث الآن وسيرد عليك صوتياً.');
+        startVoice();
+    } else {
+        liveModeBtn.classList.remove('live');
+        liveModeBtn.querySelector('span').textContent = 'محادثة حية';
+        stopVoice();
+        stopSpeaking();
+        showInfo('تم إيقاف المحادثة الحية.');
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+// الصور
+// ═══════════════════════════════════════════════════════
+function pickImage() { fileInput.click(); }
+
+function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+        showError('❌ يرجى اختيار صورة.');
+        return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+        showError('❌ الصورة كبيرة (الحد 10 ميجا).');
+        return;
+    }
+    selectedImageType = file.type;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        selectedImage = e.target.result;
+        previewImg.src = selectedImage;
+        document.getElementById('previewInfo').textContent =
+            `صورة جاهزة (${(file.size / 1024).toFixed(1)} KB)`;
+        previewArea.classList.add('show');
+    };
+    reader.readAsDataURL(file);
+    fileInput.value = '';
+}
+
+function removeImage() {
+    selectedImage = null;
+    previewImg.src = '';
+    previewArea.classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════════════
+// الفيديو
+// ═══════════════════════════════════════════════════════
+function openVideoModal() {
+    document.getElementById('videoModal').classList.add('show');
+    document.getElementById('videoPrompt').focus();
+}
+function closeVideoModal() {
+    document.getElementById('videoModal').classList.remove('show');
+}
+
+async function generateVideo() {
+    const prompt = document.getElementById('videoPrompt').value.trim();
+    if (!prompt) { showError('❌ الوصف مطلوب'); return; }
+    if (!currentChatId) await newChat();
+
+    closeVideoModal();
+    addMsg('🎬 طلب فيديو: ' + prompt, 'user');
+    showTyping();
+
+    try {
+        const d = await api(API_BASE + '/generate-video', {
+            method: 'POST',
+            body: JSON.stringify({prompt, chat_id: currentChatId, user_id: USER_ID})
+        });
+        hideTyping();
+        if (d.error) {
+            addMsg('❌ ' + d.error + (d.hint ? '\n\n💡 ' + d.hint : ''), 'error');
+            return;
+        }
+        addMsg('🎬 تم بدء التوليد.\nالعملية: ' + d.operation + '\nالنموذج: ' + d.model, 'bot', d.model);
+        pollVideoStatus(d.operation);
+    } catch (e) {
+        hideTyping();
+        addMsg('❌ ' + e.message, 'error');
+    }
+}
+
+async function pollVideoStatus(opName, attempts = 0) {
+    if (attempts > 60) { showInfo('⏱️ الفيديو يستغرق وقتاً أطول.'); return; }
+    setTimeout(async () => {
+        try {
+            const d = await api(API_BASE + '/video-status', {
+                method: 'POST',
+                body: JSON.stringify({operation: opName})
+            });
+            if (d.done && d.video_url) {
+                addMsg('✅ تم توليد الفيديو!\n<a href="' + d.video_url + '" target="_blank">مشاهدة</a>', 'bot');
+            } else if (!d.done) {
+                pollVideoStatus(opName, attempts + 1);
+            }
+        } catch (e) {
+            pollVideoStatus(opName, attempts + 1);
+        }
+    }, 10000);
+}
+
+// ═══════════════════════════════════════════════════════
+// UI Helpers
+// ═══════════════════════════════════════════════════════
+function toggleSidebar() {
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('show');
+}
+
+function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
+}
+
+function showError(text) {
+    if (chatEl.querySelector('.empty')) chatEl.innerHTML = '';
+    const d = document.createElement('div');
+    d.className = 'msg error';
+    d.textContent = text;
+    chatEl.appendChild(d);
+    chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+function showInfo(text) {
+    const d = document.createElement('div');
+    d.className = 'msg info';
+    d.textContent = text;
+    chatEl.appendChild(d);
+    chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+// ═══════════════════════════════════════════════════════
+// المحادثات
+// ═══════════════════════════════════════════════════════
+async function loadChats() {
+    try {
+        const d = await api(API_BASE + '/chats');
+        chats = d.chats || [];
+        renderChats();
+    } catch (e) { console.error('loadChats:', e); }
+}
+
+function renderChats() {
+    const list = document.getElementById('chatsList');
+    if (chats.length === 0) {
+        list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:.8rem;padding:20px;">لا توجد محادثات</div>';
+        return;
+    }
+    list.innerHTML = '';
+    chats.forEach(c => {
+        const btn = document.createElement('div');
+        btn.className = 'chat-item' + (c.id === currentChatId ? ' active' : '');
+        const t = document.createElement('span');
+        t.className = 'title';
+        t.textContent = '💬 ' + (c.title || 'محادثة');
+        btn.appendChild(t);
+        const del = document.createElement('button');
+        del.className = 'del';
+        del.textContent = '🗑️';
+        del.onclick = (e) => { e.stopPropagation(); deleteChat(c.id); };
+        btn.appendChild(del);
+        btn.onclick = (e) => {
+            if (e.target.classList.contains('del')) return;
+            openChat(c.id);
+        };
+        list.appendChild(btn);
+    });
+}
+
+async function newChat() {
+    try {
+        const d = await api(API_BASE + '/chats/new', {
+            method: 'POST',
+            body: JSON.stringify({user_id: USER_ID})
+        });
+        if (!d.chat_id) { showError('❌ ' + (d.error || 'فشل')); return; }
+        currentChatId = d.chat_id;
+        await loadChats();
+        showEmptyChat();
+        if (window.innerWidth <= 768) toggleSidebar();
+    } catch (e) { showError('❌ ' + e.message); }
+}
+
+async function openChat(chatId) {
+    currentChatId = chatId;
+    await loadChats();
+    chatEl.innerHTML = '';
+    try {
+        const d = await api(API_BASE + '/chats/' + chatId);
+        if (d.messages && d.messages.length > 0) {
+            d.messages.forEach(m => {
+                addMsg(m.content, m.role === 'user' ? 'user' : 'bot', m.source, false, m.type, m.media);
+            });
+        } else {
+            showEmptyChat();
+        }
+    } catch (e) { showError('❌ ' + e.message); }
+    if (window.innerWidth <= 768) toggleSidebar();
+}
+
+async function deleteChat(chatId) {
+    if (!confirm('حذف هذه المحادثة؟')) return;
+    try {
+        await api(API_BASE + '/chats/' + chatId, {
+            method: 'DELETE',
+            body: JSON.stringify({user_id: USER_ID})
+        });
+        if (currentChatId === chatId) {
+            currentChatId = null;
+            showEmptyChat();
+        }
+        await loadChats();
+    } catch (e) { showError('❌ ' + e.message); }
+}
+
+// ═══════════════════════════════════════════════════════
+// عرض الرسائل
+// ═══════════════════════════════════════════════════════
+function showEmptyChat() {
+    chatEl.innerHTML = `
+        <div class="empty">
+            <h2>⚡ ${escapeHtml('{{ ai_name }}')}</h2>
+            <p>اكتب كود، ارفع صورة، تحدث بالصوت، أو وَلّد فيديو.</p>
+            <div class="chips">
+                <button onclick="quickPrompt('اكتب لعبة ثعبان Python كود كامل')">🐍 لعبة ثعبان</button>
+                <button onclick="quickPrompt('اكتب موقع شخصي كامل')">🌐 موقع</button>
+                <button onclick="pickImage()">🖼️ ارفع صورة</button>
+                <button onclick="toggleLiveMode()">🎙️ محادثة صوتية</button>
+            </div>
+        </div>`;
+}
+
+function renderContent(contentEl, text) {
+    const parts = text.split('```');
+    for (let i = 0; i < parts.length; i++) {
+        if (i % 2 === 0) {
+            const span = document.createElement('span');
+            const sub = parts[i].split('`');
+            sub.forEach((sp, j) => {
+                if (j % 2 === 0) span.appendChild(document.createTextNode(sp));
+                else {
+                    const c = document.createElement('span');
+                    c.className = 'inline-code';
+                    c.textContent = sp;
+                    span.appendChild(c);
+                }
+            });
+            contentEl.appendChild(span);
+        } else {
+            const pre = document.createElement('pre');
+            const codeText = parts[i].replace(/^[a-zA-Z0-9_+\-#]*\n/, '');
+            const cn = document.createElement('code');
+            cn.textContent = codeText;
+            pre.appendChild(cn);
+            const btn = document.createElement('button');
+            btn.className = 'copy-btn';
+            btn.textContent = 'نسخ';
+            btn.onclick = () => {
+                navigator.clipboard.writeText(codeText).then(() => {
+                    btn.textContent = '✓ تم';
+                    btn.classList.add('done');
+                    setTimeout(() => { btn.textContent = 'نسخ'; btn.classList.remove('done'); }, 1500);
+                });
+            };
+            pre.appendChild(btn);
+            contentEl.appendChild(pre);
+        }
+    }
+}
+
+function addMsg(text, who, source, save = true, msgType = 'text', media = null) {
+    if (chatEl.querySelector('.empty')) chatEl.innerHTML = '';
+    const div = document.createElement('div');
+    div.className = 'msg ' + who;
+
+    if (who !== 'error' && who !== 'info') {
+        const s = document.createElement('div');
+        s.className = 'sender';
+        s.textContent = who === 'user' ? 'أنت:' : 'الخلاقي:';
+        div.appendChild(s);
+    }
+
+    if (msgType === 'image' && media) {
+        const img = document.createElement('img');
+        img.className = 'attached';
+        img.src = media.startsWith('data:') ? media : 'data:image/jpeg;base64,' + media;
+        div.appendChild(img);
+    }
+
+    const content = document.createElement('div');
+    content.className = 'content';
+
+    if (who === 'error' || who === 'info') {
+        content.textContent = text;
+    } else {
+        renderContent(content, text);
+    }
+
+    div.appendChild(content);
+
+    if (source && who === 'bot') {
+        const sb = document.createElement('div');
+        sb.className = 'source-badge';
+        sb.textContent = '📡 ' + source;
+        div.appendChild(sb);
+    }
+
+    if (who === 'bot' && text && !text.startsWith('❌')) {
+        const speakBtn = document.createElement('button');
+        speakBtn.className = 'speak-btn';
+        speakBtn.textContent = '🔊 اسمع';
+        speakBtn.onclick = () => speakText(text);
+        div.appendChild(speakBtn);
+    }
+
+    chatEl.appendChild(div);
+    chatEl.scrollTop = chatEl.scrollHeight;
+
+    if (who === 'bot' && ttsEnabled && text && !text.startsWith('❌')) {
+        speakText(text);
+    }
+    return div;
+}
+
+function quickPrompt(text) {
+    inputEl.value = text;
+    inputEl.focus();
+    autoResize();
+}
+
+function showTyping() {
+    const d = document.createElement('div');
+    d.className = 'typing';
+    d.id = 'typingIndicator';
+    d.innerHTML = '<span></span><span></span><span></span>';
+    chatEl.appendChild(d);
+    chatEl.scrollTop = chatEl.scrollHeight;
+}
+function hideTyping() {
+    const e = document.getElementById('typingIndicator');
+    if (e) e.remove();
+}
+
+// ═══════════════════════════════════════════════════════
+// الإرسال — مع SSE Streaming جديد
+// ═══════════════════════════════════════════════════════
+async function sendMsg() {
+    if (isSending) {
+        // اضغط مرة أخرى → إيقاف البث
+        if (streamAbort) {
+            streamAbort.abort();
+            streamAbort = null;
+        }
+        return;
+    }
+    const text = inputEl.value.trim();
+    if (!text && !selectedImage) return;
+
+    stopSpeaking();
+
+    if (!currentChatId) {
+        try {
+            const d = await api(API_BASE + '/chats/new', {
+                method: 'POST',
+                body: JSON.stringify({user_id: USER_ID})
+            });
+            if (!d.chat_id) { showError('❌ ' + (d.error || 'فشل')); return; }
+            currentChatId = d.chat_id;
+            chatEl.innerHTML = '';
+            await loadChats();
+        } catch (e) { showError('❌ ' + e.message); return; }
+    }
+
+    isSending = true;
+
+    // صورة → استخدم /api/v1/chat العادي
+    if (selectedImage) {
+        await sendWithImage(text);
+        return;
+    }
+
+    // نص → Streaming
+    await sendWithStream(text);
+}
+
+async function sendWithImage(text) {
+    addMsg(text || 'حلل هذه الصورة', 'user', null, true, 'image', selectedImage);
+    const imgToSend = selectedImage;
+    const imgType = selectedImageType;
+
+    inputEl.value = '';
+    inputEl.style.height = 'auto';
+    sendBtn.disabled = true;
+    sendBtn.textContent = '...';
+    showTyping();
+    document.getElementById('activeProvider').textContent = 'يفكر...';
+
+    try {
+        const data = await api(API_BASE + '/chat', {
+            method: 'POST',
+            body: JSON.stringify({
+                message: text,
+                chat_id: currentChatId,
+                user_id: USER_ID,
+                image: imgToSend,
+                image_type: imgType
+            })
+        });
+
+        hideTyping();
+
+        if (data.response) {
+            addMsg(data.response, 'bot', data.source);
+            document.getElementById('activeProvider').textContent = data.source || 'جاهز';
+            loadChats();
+        } else if (data.error) {
+            showError('❌ ' + data.error);
+            document.getElementById('activeProvider').textContent = 'فشل';
+        }
+        removeImage();
+    } catch (e) {
+        hideTyping();
+        showError('❌ ' + e.message);
+    } finally {
+        isSending = false;
+        sendBtn.disabled = false;
+        sendBtn.textContent = 'إرسال';
+        sendBtn.classList.remove('stopping');
+        inputEl.focus();
+    }
+}
+
+async function sendWithStream(text) {
+    addMsg(text, 'user');
+    inputEl.value = '';
+    inputEl.style.height = 'auto';
+    sendBtn.textContent = '⏹️';
+    sendBtn.classList.add('stopping');
+    document.getElementById('activeProvider').textContent = 'يفكر...';
+
+    // أنشئ فقاعة بوت فارغة مع مؤشر
+    if (chatEl.querySelector('.empty')) chatEl.innerHTML = '';
+    const botDiv = document.createElement('div');
+    botDiv.className = 'msg bot';
+    const senderDiv = document.createElement('div');
+    senderDiv.className = 'sender';
+    senderDiv.textContent = 'الخلاقي:';
+    botDiv.appendChild(senderDiv);
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'content';
+    botDiv.appendChild(contentDiv);
+    const cursor = document.createElement('span');
+    cursor.className = 'streaming-cursor';
+    contentDiv.appendChild(cursor);
+    chatEl.appendChild(botDiv);
+    chatEl.scrollTop = chatEl.scrollHeight;
+
+    let fullText = '';
+    let streamSource = null;
+
+    try {
+        streamAbort = new AbortController();
+        const response = await fetch(API_BASE + '/chat/stream', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-User-ID': USER_ID
+            },
+            body: JSON.stringify({
+                message: text,
+                chat_id: currentChatId,
+                user_id: USER_ID
+            }),
+            signal: streamAbort.signal
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+            const {done, value} = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, {stream: true});
+            const lines = buffer.split('\n\n');
+            buffer = lines.pop();
+            for (const line of lines) {
+                if (!line.startsWith('data: ')) continue;
+                const dataStr = line.substring(6);
+                let evt;
+                try { evt = JSON.parse(dataStr); } catch(e) { continue; }
+
+                if (evt.provider) {
+                    streamSource = evt.provider;
+                    document.getElementById('activeProvider').textContent = evt.provider;
+                } else if (evt.chunk) {
+                    fullText += evt.chunk;
+                    cursor.remove();
+                    contentDiv.textContent = fullText;
+                    contentDiv.appendChild(cursor);
+                    chatEl.scrollTop = chatEl.scrollHeight;
+                } else if (evt.done) {
+                    cursor.remove();
+                    if (streamSource) {
+                        const sb = document.createElement('div');
+                        sb.className = 'source-badge';
+                        sb.textContent = '📡 ' + streamSource;
+                        botDiv.appendChild(sb);
+                    }
+                    // زر النطق
+                    const speakBtn = document.createElement('button');
+                    speakBtn.className = 'speak-btn';
+                    speakBtn.textContent = '🔊 اسمع';
+                    speakBtn.onclick = () => speakText(fullText);
+                    botDiv.appendChild(speakBtn);
+
+                    if (ttsEnabled && fullText) speakText(fullText);
+                    document.getElementById('activeProvider').textContent = streamSource || 'جاهز';
+                    loadChats();
+                } else if (evt.error) {
+                    cursor.remove();
+                    contentDiv.textContent = '❌ ' + evt.error;
+                    botDiv.className = 'msg error';
+                    document.getElementById('activeProvider').textContent = 'فشل';
+                }
+            }
+        }
+    } catch (e) {
+        cursor.remove();
+        if (e.name === 'AbortError') {
+            contentDiv.textContent = fullText + ' [تم الإيقاف]';
+        } else {
+            botDiv.className = 'msg error';
+            contentDiv.textContent = '❌ ' + e.message;
+        }
+    } finally {
+        streamAbort = null;
+        isSending = false;
+        sendBtn.disabled = false;
+        sendBtn.textContent = 'إرسال';
+        sendBtn.classList.remove('stopping');
+        inputEl.focus();
+    }
+}
+
+function autoResize() {
+    inputEl.style.height = 'auto';
+    inputEl.style.height = Math.min(inputEl.scrollHeight, 140) + 'px';
+}
+inputEl.addEventListener('input', autoResize);
+inputEl.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
+});
+
+// ═══════════════════════════════════════════════════════
+// الحالة والإحصائيات
+// ═══════════════════════════════════════════════════════
+async function checkStatus() {
+    try {
+        const d = await api(API_BASE + '/status');
+        const p = d.providers || {};
+        const f = d.features || {};
+        azureAvailable = !!f.voice_tts_azure;
+
+        const set = (id, ok) => {
+            const el = document.getElementById(id);
+            if (el) el.className = 'dot ' + (ok ? 'ok' : 'no');
+        };
+        set('dotGem', p.gemini);
+        set('dotGroq', p.groq);
+        set('dotRedis', d.redis_ok);
+        set('dotImg', f.vision);
+        set('dotVid', f.video);
+        set('dotAzure', f.voice_tts_azure);
+        set('dotVoice', true);
+
+        let names = [];
+        if (p.gemini) names.push('Gemini');
+        if (p.groq) names.push('Groq');
+        if (p.openrouter) names.push('OpenRouter');
+        if (d.redis_ok) names.push('Redis ✅');
+        if (f.voice_tts_azure) names.push('Azure TTS');
+
+        alert('الحالة:\n' + (names.length ? '• ' + names.join('\n• ') : 'لا يوجد مزود') +
+              '\n\n📦 قاعدة البيانات: ' + (d.db_ok ? '✅' : '❌') +
+              '\n⚡ Redis: ' + (d.redis_ok ? '✅' : '❌') +
+              '\n🎤 الميكروفون: متاح في Chrome/Edge' +
+              '\n🔊 النطق: ' + (azureAvailable ? 'Azure (احترافي)' : 'صوت المتصفح'));
+    } catch (e) { alert('❌ ' + e.message); }
+}
+
+async function showStats() {
+    try {
+        const d = await api(API_BASE + '/stats');
+        let txt = '📊 إحصائياتك:\n\n';
+        txt += '💬 المحادثات: ' + (d.chats_count || 0) + '\n';
+        txt += '📝 الرسائل: ' + (d.messages_count || 0) + '\n';
+        txt += '🤖 ردود الذكاء: ' + (d.assistant_count || 0) + '\n';
+        txt += '🧠 الذاكرة: ' + (d.memory_count || 0) + ' عنصر\n';
+        if (d.by_provider && Object.keys(d.by_provider).length > 0) {
+            txt += '\n📡 المزودون:\n';
+            for (const [k, v] of Object.entries(d.by_provider)) {
+                txt += '  • ' + k + ': ' + v + '\n';
+            }
+        }
+        alert(txt);
+    } catch (e) { alert('❌ ' + e.message); }
+}
+
+// ═══════════════════════════════════════════════════════
+// بدء التطبيق
+// ═══════════════════════════════════════════════════════
+window.addEventListener('load', async () => {
+    try {
+        const d = await api(API_BASE + '/status');
+        const p = d.providers || {};
+        const f = d.features || {};
+        azureAvailable = !!f.voice_tts_azure;
+
+        if (!p.gemini && !p.groq && !p.openrouter) {
+            showError('❌ لا يوجد مفتاح API. أضف GEMINI_API_KEY في Render.');
+            return;
+        }
+
+        const set = (id, ok) => {
+            const el = document.getElementById(id);
+            if (el) el.className = 'dot ' + (ok ? 'ok' : 'no');
+        };
+        set('dotGem', p.gemini);
+        set('dotGroq', p.groq);
+        set('dotRedis', d.redis_ok);
+        set('dotImg', f.vision);
+        set('dotVid', f.video);
+        set('dotAzure', f.voice_tts_azure);
+        set('dotVoice', true);
+    } catch (e) {
+        showError('❌ فشل الاتصال: ' + e.message);
+        return;
+    }
+
+    await loadChats();
+    if (chats.length > 0) {
+        await openChat(chats[0].id);
+    } else {
+        await newChat();
+    }
+});
+</script>
+</body>
+</html>
