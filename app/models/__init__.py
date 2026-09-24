@@ -1,0 +1,46 @@
+"""Models package — DB models + Pydantic schemas."""
+from app.models.db_models import (
+    Base,
+    Chat,
+    Message,
+    RateLimit,
+    StatsEvent,
+    UserMemory,
+)
+from app.models.schemas import (
+    ChatOut,
+    ChatRequest,
+    ErrorOut,
+    GenerateVideoRequest,
+    HealthOut,
+    MemoryOut,
+    MemorySetRequest,
+    NewChatRequest,
+    SearchResultOut,
+    StatsOut,
+    TTSRequest,
+    TTSVoicesOut,
+    VideoStatusRequest,
+)
+
+__all__ = [
+    "Base",
+    "Chat",
+    "Message",
+    "RateLimit",
+    "StatsEvent",
+    "UserMemory",
+    "ChatOut",
+    "ChatRequest",
+    "ErrorOut",
+    "GenerateVideoRequest",
+    "HealthOut",
+    "MemoryOut",
+    "MemorySetRequest",
+    "NewChatRequest",
+    "SearchResultOut",
+    "StatsOut",
+    "TTSRequest",
+    "TTSVoicesOut",
+    "VideoStatusRequest",
+]
