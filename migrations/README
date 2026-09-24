@@ -1,0 +1,27 @@
+# Alembic Migrations — الخلاقي
+
+## Commands
+
+# Create a new migration (auto-detect changes)
+alembic revision --autogenerate -m "add user_email column"
+
+# Apply all pending migrations
+alembic upgrade head
+
+# Rollback one migration
+alembic downgrade -1
+
+# See current revision
+alembic current
+
+# See history
+alembic history --verbose
+
+# Stamp DB with a revision without running it
+alembic stamp head
+
+## Notes
+
+- `env.py` reads `DATABASE_URL` from environment (via app.config).
+- In production, always run `alembic upgrade head` before starting the app.
+- For SQLite dev, use `alembic revision --autogenerate` after model changes.
