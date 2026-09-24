@@ -2,6 +2,7 @@
 from app.db.engine import (
     close_engine,
     get_engine,
+    get_session,
     get_session_factory,
     init_engine,
 )
@@ -9,6 +10,7 @@ from app.db.engine import (
 __all__ = [
     "close_engine",
     "get_engine",
+    "get_session",
     "get_session_factory",
     "init_engine",
 ]
