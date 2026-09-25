@@ -16,7 +16,9 @@ from app.services.ai.base import (
 from app.services.ai.gemini import GeminiProvider
 from app.services.ai.groq import GroqProvider
 from app.services.ai.openrouter import OpenRouterProvider
-
+from app.services.ai.venice import VeniceProvider
+from app.services.ai.abliteration import AbliterationProvider
+from app.services.ai.unfil import UnfilProvider
 log = get_logger(__name__)
 
 
