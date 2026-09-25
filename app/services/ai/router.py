@@ -70,19 +70,26 @@ def _humanize_error(provider_name: str, err: Exception) -> str:
     if "api_key" in low or "401" in low or "unauthorized" in low:
         return "مفتاح المزوّد غير صالح أو منتهي."
     if "connect" in low or "network" in low:
-        return "تعذّر الاتصال بخدمة الذكاء."
-    return f"فشل الاتصال بمزوّد {provider_name}."
-
+    return "تعذّر الاتصال بخدمة الذكاء."
+if "unfil" in provider_name.lower():
+    return "فشل الاتصال بمزوّد Unfil."
+if "venice" in provider_name.lower():
+    return "فشل الاتصال بمزوّد Venice."
+if "abliteration" in provider_name.lower():
+    return "فشل الاتصال بمزوّد Abliteration."
+return f"فشل الاتصال بمزوّد {provider_name}."
 
 class AIRouter:
     """Orchestrates multiple AI providers with fallback + circuit breaking."""
 
-    def __init__(self, providers: Optional[Dict[str, AIProvider]] = None) -> None:
-        self._providers: Dict[str, AIProvider] = providers or {
-            "gemini": GeminiProvider(),
-            "groq": GroqProvider(),
-            "openrouter": OpenRouterProvider(),
-        }
+    def __init__(self._providers: Dict[str, AIProvider] = providers or {
+    "venice": VeniceProvider(),
+    "abliteration": AbliterationProvider(),
+    "unfil": UnfilProvider(),
+    "openrouter": OpenRouterProvider(),
+    "gemini": GeminiProvider(),
+    "groq": GroqProvider(),
+    }
         self._breakers: Dict[str, CircuitBreaker] = {
             name: CircuitBreaker() for name in self._providers
         }
@@ -95,11 +102,19 @@ class AIRouter:
                 log.exception("provider.close_failed", provider=provider.name)
 
     def _order_for(self, capability: ProviderCapability) -> List[str]:
-        if capability == ProviderCapability.VISION:
-            return ["gemini"]
-        if capability == ProviderCapability.VIDEO:
-            return ["gemini"]
-        return ["gemini", "groq", "openrouter"]
+    if capability == ProviderCapability.VISION:
+        return ["gemini", "venice", "openrouter"]
+    if capability == ProviderCapability.VIDEO:
+        return ["gemini"]
+    # Uncensored providers first, then regular ones
+    return [
+        "venice",           # Dolphin 24B — 2.2% refusal
+        "abliteration",     # GLM-5.3 — no refusals
+        "unfil",            # Hermes 3 — no refusals
+        "openrouter",       # Dolphin free models
+        "gemini",           # Standard (has refusals)
+        "groq",             # Standard (has refusals)
+    ]
 
     def _candidates(self, capability: ProviderCapability) -> List[AIProvider]:
         out: List[AIProvider] = []
