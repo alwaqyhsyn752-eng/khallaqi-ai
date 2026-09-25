@@ -20,9 +20,6 @@ from app.services.ai.openrouter import OpenRouterProvider
 log = get_logger(__name__)
 
 
-# ─────────────────────────────────────────────────────────────────
-# Circuit breaker — per provider, prevents hammering dead services
-# ─────────────────────────────────────────────────────────────────
 class CircuitBreaker:
     """Simple circuit breaker with failure threshold + cooldown."""
 
@@ -34,23 +31,19 @@ class CircuitBreaker:
 
     @property
     def is_open(self) -> bool:
-        """True if the breaker is currently open (provider should be skipped)."""
         if self._open_until == 0.0:
             return False
         if time.time() >= self._open_until:
-            # cooldown expired — half-open
             self._open_until = 0.0
             self._failures = 0
             return False
         return True
 
     def record_success(self) -> None:
-        """Reset failure counter on success."""
         self._failures = 0
         self._open_until = 0.0
 
     def record_failure(self) -> None:
-        """Increment failure counter, open breaker if threshold exceeded."""
         self._failures += 1
         if self._failures >= self.failure_threshold:
             self._open_until = time.time() + self.cooldown_seconds
@@ -61,14 +54,26 @@ class CircuitBreaker:
             )
 
 
-# ─────────────────────────────────────────────────────────────────
-# Router
-# ─────────────────────────────────────────────────────────────────
-class AIRouter:
-    """Orchestrates multiple AI providers with fallback + circuit breaking.
+def _humanize_error(provider_name: str, err: Exception) -> str:
+    """Convert a provider error into a short Arabic-friendly hint."""
+    msg = str(err)
+    low = msg.lower()
 
-    Order of preference for each capability is defined in _order_for().
-    """
+    if "policy" in low or "safety" in low or "blocked" in low:
+        return "تم رفض الطلب من مزوّد الذكاء (سياسة الاستخدام)."
+    if "quota" in low or "rate" in low or "429" in low:
+        return "تجاوز الحد المسموح مؤقتاً (Rate Limit)."
+    if "timeout" in low or "timed out" in low:
+        return "انتهت مهلة الاتصال بمزوّد الذكاء."
+    if "api_key" in low or "401" in low or "unauthorized" in low:
+        return "مفتاح المزوّد غير صالح أو منتهي."
+    if "connect" in low or "network" in low:
+        return "تعذّر الاتصال بخدمة الذكاء."
+    return f"فشل الاتصال بمزوّد {provider_name}."
+
+
+class AIRouter:
+    """Orchestrates multiple AI providers with fallback + circuit breaking."""
 
     def __init__(self, providers: Optional[Dict[str, AIProvider]] = None) -> None:
         self._providers: Dict[str, AIProvider] = providers or {
@@ -81,27 +86,20 @@ class AIRouter:
         }
 
     async def close(self) -> None:
-        """Close all provider HTTP clients."""
         for provider in self._providers.values():
             try:
                 await provider.close()
             except Exception:
                 log.exception("provider.close_failed", provider=provider.name)
 
-    # ─── Provider selection ───
     def _order_for(self, capability: ProviderCapability) -> List[str]:
-        """Return provider names in preference order for a capability."""
         if capability == ProviderCapability.VISION:
             return ["gemini"]
         if capability == ProviderCapability.VIDEO:
             return ["gemini"]
-        # Default text/streaming order
         return ["gemini", "groq", "openrouter"]
 
-    def _candidates(
-        self, capability: ProviderCapability
-    ) -> List[AIProvider]:
-        """Return available + enabled + non-open providers for a capability."""
+    def _candidates(self, capability: ProviderCapability) -> List[AIProvider]:
         out: List[AIProvider] = []
         for name in self._order_for(capability):
             provider = self._providers.get(name)
@@ -117,7 +115,6 @@ class AIRouter:
             out.append(provider)
         return out
 
-    # ─── Text ───
     async def generate(
         self,
         history: List[ChatMessage],
@@ -126,8 +123,8 @@ class AIRouter:
         temperature: float = 0.8,
         max_tokens: int = 4096,
     ) -> AIResponse:
-        """Generate a response, trying providers in order."""
         errors: List[str] = []
+        hints: List[str] = []
         for provider in self._candidates(ProviderCapability.TEXT):
             try:
                 resp = await provider.generate(
@@ -141,14 +138,21 @@ class AIRouter:
             except Exception as e:
                 self._breakers[provider.name].record_failure()
                 errors.append(f"{provider.name}: {str(e)[:100]}")
-                log.warning("provider.generate_failed", provider=provider.name, error=str(e)[:120])
+                hints.append(_humanize_error(provider.name, e))
+                log.warning(
+                    "provider.generate_failed",
+                    provider=provider.name,
+                    error=str(e)[:120],
+                )
                 continue
+
         raise AllProvidersFailedError(
-            "جميع مزودي الذكاء الاصطناعي فشلوا",
+            "تعذّر الحصول على رد من مزوّدي الذكاء. "
+            + (hints[0] if hints else "حدث خطأ غير متوقّع. جرّب إعادة صياغة الطلب.")
+            + " إذا استمرت المشكلة، أعد صياغة الطلب أو انتظر دقيقة.",
             details={"errors": errors},
         )
 
-    # ─── Streaming ───
     async def stream(
         self,
         history: List[ChatMessage],
@@ -157,12 +161,8 @@ class AIRouter:
         temperature: float = 0.8,
         max_tokens: int = 4096,
     ) -> AsyncIterator[tuple[str, str]]:
-        """Stream from the first working provider.
-
-        Yields (provider_name, chunk) tuples. The provider name is only
-        yielded once, on the first chunk, so the caller can record source.
-        """
         errors: List[str] = []
+        hints: List[str] = []
         for provider in self._candidates(ProviderCapability.STREAMING):
             try:
                 first = True
@@ -174,7 +174,6 @@ class AIRouter:
                 ):
                     if first:
                         first = False
-                        # Emit provider marker
                         yield ("__provider__", provider.name)
                     yield ("chunk", chunk)
                 self._breakers[provider.name].record_success()
@@ -182,15 +181,21 @@ class AIRouter:
             except Exception as e:
                 self._breakers[provider.name].record_failure()
                 errors.append(f"{provider.name}: {str(e)[:100]}")
-                log.warning("provider.stream_failed", provider=provider.name, error=str(e)[:120])
+                hints.append(_humanize_error(provider.name, e))
+                log.warning(
+                    "provider.stream_failed",
+                    provider=provider.name,
+                    error=str(e)[:120],
+                )
                 continue
 
         raise AllProvidersFailedError(
-            "جميع مزودي البث فشلوا",
+            "تعذّر بدء البث من مزوّدي الذكاء. "
+            + (hints[0] if hints else "حدث خطأ غير متوقّع.")
+            + " جرّب إعادة صياغة الطلب.",
             details={"errors": errors},
         )
 
-    # ─── Vision ───
     async def vision(
         self,
         prompt: str,
@@ -198,7 +203,6 @@ class AIRouter:
         mime_type: str = "image/jpeg",
         system_prompt: str = "",
     ) -> AIResponse:
-        """Analyze an image via the first capable provider."""
         errors: List[str] = []
         for provider in self._candidates(ProviderCapability.VISION):
             try:
@@ -212,13 +216,11 @@ class AIRouter:
                 errors.append(f"{provider.name}: {str(e)[:100]}")
                 continue
         raise AllProvidersFailedError(
-            "لا يوجد مزود يدعم تحليل الصور متاح",
+            "لا يوجد مزوّد متاح لتحليل الصور حالياً. جرّب لاحقاً.",
             details={"errors": errors},
         )
 
-    # ─── Video ───
     async def video(self, prompt: str) -> dict:
-        """Start a video generation job."""
         errors: List[str] = []
         for provider in self._candidates(ProviderCapability.VIDEO):
             try:
@@ -230,28 +232,23 @@ class AIRouter:
                 errors.append(f"{provider.name}: {str(e)[:100]}")
                 continue
         raise AllProvidersFailedError(
-            "لا يوجد مزود يدعم توليد الفيديو متاح",
+            "خدمة توليد الفيديو غير مفعّلة على حسابك حالياً.",
             details={"errors": errors},
         )
 
     async def video_status(self, operation: str) -> dict:
-        """Check a video generation operation status."""
         for provider in self._candidates(ProviderCapability.VIDEO):
             try:
                 return await provider.video_status(operation)
             except Exception:
                 continue
-        raise AllProvidersFailedError("فشل الاستعلام عن حالة الفيديو")
+        raise AllProvidersFailedError("تعذّر الاستعلام عن حالة الفيديو.")
 
 
-# ─────────────────────────────────────────────────────────────────
-# Singleton
-# ─────────────────────────────────────────────────────────────────
 _router: Optional[AIRouter] = None
 
 
 def get_ai_router() -> AIRouter:
-    """Return the process-wide AIRouter singleton."""
     global _router
     if _router is None:
         _router = AIRouter()
