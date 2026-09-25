@@ -48,20 +48,20 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # ─── Startup ───
     await init_engine()
 
-    # Always ensure tables exist (idempotent, safe for all environments).
-    try:
-        from app.db.engine import get_engine
-        engine = get_engine()
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
-        log.info("db.tables.ready")
-    except Exception:
+ # Always ensure tables exist (idempotent, safe for all environments).
+try:
+    from app.db.engine import get_engine
+    engine = get_engine()
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    log.info("db.tables.ready")
+except Exception as e:
+    # Ignore race-condition between multiple gunicorn workers
+    # where two workers try to create the same table simultaneously.
+    if "already exists" in str(e).lower():
+        log.info("db.tables.already_exist")
+    else:
         log.exception("db.tables.failed")
-
-    await init_redis()
-    get_ai_router()  # Warm up providers
-
-    yield
 
     # ─── Shutdown ───
     log.info("app.shutdown.begin")
