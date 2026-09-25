@@ -4,11 +4,16 @@ from __future__ import annotations
 import json
 from typing import Any, AsyncIterator
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, status
 from fastapi.responses import StreamingResponse
 
-from app.db.repositories import ChatRepository, MemoryRepository, StatsRepository
+from app.db.repositories import (
+    ChatRepository,
+    MemoryRepository,
+    StatsRepository,
+)
 from app.db.repositories.chat import MessageRepository
+from app.db.repositories.stats import RateLimitRepository
 from app.dependencies import (
     ChatRepoDep,
     MemoryRepoDep,
@@ -16,7 +21,12 @@ from app.dependencies import (
     StatsRepoDep,
     UserIDDep,
 )
-from app.exceptions import NotFoundError, UnauthorizedError, ValidationError
+from app.exceptions import (
+    KhallaqiError,
+    NotFoundError,
+    UnauthorizedError,
+    ValidationError,
+)
 from app.logging_config import get_logger
 from app.models.schemas import (
     ChatListOut,
@@ -32,16 +42,12 @@ from app.services.chat_service import ChatService
 from app.services.memory_service import MemoryService
 from app.services.rate_limit_service import RateLimitService
 from app.cache.redis_client import get_redis
-from app.db.repositories.stats import RateLimitRepository
 
 log = get_logger(__name__)
 
 router = APIRouter(tags=["chat"])
 
 
-# ═══════════════════════════════════════════════════════════════════
-# Service factory
-# ═══════════════════════════════════════════════════════════════════
 def _build_chat_service(
     session,
     chat_repo: ChatRepository,
@@ -203,58 +209,106 @@ async def send_message(
 
 
 # ═══════════════════════════════════════════════════════════════════
-# Send message — streaming (SSE)
+# Send message — streaming (SSE) — opens its OWN session
 # ═══════════════════════════════════════════════════════════════════
 @router.post(
     "/chat/stream",
     summary="Send a message (SSE streaming)",
 )
-async def stream_message(
-    payload: ChatRequest,
-    session: SessionDep,
-    chat_repo: ChatRepoDep,
-    memory_repo: MemoryRepoDep,
-    stats_repo: StatsRepoDep,
-) -> StreamingResponse:
-    """Send a message and stream tokens via Server-Sent Events."""
+async def stream_message(payload: ChatRequest) -> StreamingResponse:
+    """Send a message and stream tokens via Server-Sent Events.
 
-    async def _sse_event(data: dict) -> str:
+    NOTE: This endpoint does NOT use FastAPI's SessionDep, because the
+    dependency-managed session would be closed before the streaming
+    generator finishes. Instead, we open our own session inside the
+    generator and close it when streaming completes.
+    """
+    from app.db.engine import get_session_factory
+
+    async def _sse(data: dict) -> str:
         return f"data: {json.dumps(data, ensure_ascii=False)}\n\n"
 
-    # ─── Preflight checks ───
+    # ─── Preflight validation (no DB) ───
     if not payload.message.strip():
         async def err_gen():
-            yield await _sse_event(
-                {"error": "الرسالة فارغة", "code": "validation_error"}
-            )
-        return StreamingResponse(err_gen(), media_type="text/event-stream")
+            yield await _sse({"error": "الرسالة فارغة", "code": "validation_error"})
+        return StreamingResponse(
+            err_gen(),
+            media_type="text/event-stream",
+            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+        )
 
-    # ─── Rate limit ───
-    try:
-        rl = _build_rate_limit_service(session)
-        rem_min, rem_hour = await rl.check(payload.user_id)
-    except Exception as e:
-        async def err_gen():
-            yield await _sse_event({"error": str(e)[:200], "code": "rate_limit"})
-        return StreamingResponse(err_gen(), media_type="text/event-stream")
-
-    ai_router = get_ai_router()
-    svc = _build_chat_service(session, chat_repo, memory_repo, stats_repo, ai_router)
-
-    # ─── Stream generator ───
+    # ─── Stream generator (owns its session) ───
     async def event_stream() -> AsyncIterator[str]:
+        session = None
         try:
+            factory = get_session_factory()
+            session = factory()
+
+            # Build repositories bound to THIS session
+            chat_repo = ChatRepository(session=session)
+            memory_repo = MemoryRepository(session=session)
+            stats_repo = StatsRepository(session=session)
+            message_repo = MessageRepository(session=session)
+
+            # ─── Rate limit ───
+            try:
+                rl = RateLimitService(
+                    redis=get_redis(),
+                    db_repo=RateLimitRepository(session=session),
+                )
+                rem_min, rem_hour = await rl.check(payload.user_id)
+            except Exception as e:
+                log.warning("stream.rate_limit_failed", error=str(e)[:150])
+                rem_min, rem_hour = 0, 0
+
+            # ─── Ownership ───
+            if not await chat_repo.belongs_to_user(payload.chat_id, payload.user_id):
+                yield await _sse({"error": "غير مصرح", "code": "unauthorized"})
+                return
+
+            # ─── First-message title ───
+            try:
+                count = await message_repo.count_for_chat(payload.chat_id)
+                if count == 0:
+                    title = payload.message.strip().replace("\n", " ")[:60]
+                    if len(payload.message) > 60:
+                        title += "..."
+                    await chat_repo.rename(payload.chat_id, payload.user_id, title)
+                    await session.commit()
+            except Exception:
+                log.exception("stream.title_failed")
+                await session.rollback()
+
+            # ─── Persist user message ───
+            await message_repo.add(
+                payload.chat_id, "user", payload.message, message_type="text"
+            )
+            await session.commit()
+
+            # ─── Prepare services ───
+            ai_router = get_ai_router()
+            memory_service = MemoryService(memory_repo)
+            svc = ChatService(
+                router=ai_router,
+                chat_repo=chat_repo,
+                message_repo=message_repo,
+                memory_service=memory_service,
+                stats_repo=stats_repo,
+            )
+
+            # ─── Stream tokens ───
             async for kind, value in svc.stream_text(
                 payload.chat_id,
                 payload.user_id,
                 payload.message,
             ):
                 if kind == "provider":
-                    yield await _sse_event({"provider": value})
+                    yield await _sse({"provider": value})
                 elif kind == "chunk":
-                    yield await _sse_event({"chunk": value})
+                    yield await _sse({"chunk": value})
                 elif kind == "done":
-                    yield await _sse_event(
+                    yield await _sse(
                         {
                             "done": True,
                             "length": value,
@@ -262,11 +316,21 @@ async def stream_message(
                             "remaining_hour": rem_hour,
                         }
                     )
+
+        except KhallaqiError as e:
+            log.warning("stream.khallaqi_error", code=e.error_code, msg=e.message)
+            yield await _sse({"error": e.message, "code": e.error_code})
         except Exception as e:
-            log.exception("stream_generator_failed")
-            yield await _sse_event(
-                {"error": str(e)[:200], "code": "stream_error"}
+            log.exception("stream.unexpected_error")
+            yield await _sse(
+                {"error": f"خطأ غير متوقع: {str(e)[:150]}", "code": "stream_error"}
             )
+        finally:
+            if session is not None:
+                try:
+                    await session.close()
+                except Exception:
+                    pass
 
     return StreamingResponse(
         event_stream(),
@@ -276,4 +340,4 @@ async def stream_message(
             "X-Accel-Buffering": "no",
             "Connection": "keep-alive",
         },
-  )
+    )
