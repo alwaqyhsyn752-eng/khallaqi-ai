@@ -48,16 +48,15 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # ─── Startup ───
     await init_engine()
 
-    # Create tables for dev/SQLite; use Alembic in production.
-    if not s.is_production:
-        try:
-            from app.db.engine import get_engine
-            engine = get_engine()
-            async with engine.begin() as conn:
-                await conn.run_sync(Base.metadata.create_all)
-            log.info("db.tables.created")
-        except Exception:
-            log.exception("db.tables.failed")
+    # Always ensure tables exist (idempotent, safe for all environments).
+    try:
+        from app.db.engine import get_engine
+        engine = get_engine()
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        log.info("db.tables.ready")
+    except Exception:
+        log.exception("db.tables.failed")
 
     await init_redis()
     get_ai_router()  # Warm up providers
