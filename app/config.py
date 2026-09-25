@@ -38,7 +38,9 @@ class Settings(BaseSettings):
     gemini_api_key: str = ""
     groq_api_key: str = ""
     openrouter_api_key: str = ""
-
+    venice_api_key: str = ""
+    abliteration_api_key: str = ""
+    unfil_api_key: str = ""
     # ─── Azure TTS ───
     azure_speech_key: str = ""
     azure_speech_region: str = "westeurope"
