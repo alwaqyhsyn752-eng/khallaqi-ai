@@ -1,4 +1,4 @@
-"""Async SQLAlchemy engine — production-grade configuration."""
+ """Async SQLAlchemy engine — production-grade configuration."""
 from __future__ import annotations
 
 from typing import Any, AsyncGenerator, Optional
@@ -39,16 +39,16 @@ def _build_engine_kwargs() -> dict[str, Any]:
             }
         )
     elif url.startswith("sqlite"):
-        # SQLite async doesn't support pool_size
         base.update({"pool_pre_ping": False})
 
     return base
 
 
 async def init_engine() -> None:
-    """Initialize the global async engine + session factory.
+    """Initialize the global async engine + session factory + tables.
 
     Must be called once at application startup.
+    Idempotent: safe to call from multiple workers.
     """
     global _engine, _session_factory
 
@@ -65,6 +65,18 @@ async def init_engine() -> None:
             autocommit=False,
         )
         log.info("db.engine.initialized", url_scheme=settings.database_url.split(":")[0])
+
+        from app.models.db_models import Base
+        try:
+            async with _engine.begin() as conn:
+                await conn.run_sync(Base.metadata.create_all)
+            log.info("db.tables.ready")
+        except Exception as e:
+            if "already exists" in str(e).lower():
+                log.info("db.tables.already_exist")
+            else:
+                log.exception("db.tables.failed")
+                raise
     except Exception as e:
         log.exception("db.engine.init_failed")
         raise DatabaseError(f"Failed to initialize engine: {e}") from e
@@ -100,13 +112,7 @@ def get_session_factory() -> async_sessionmaker[AsyncSession]:
 
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
-    """FastAPI dependency: yields an AsyncSession with auto-commit/rollback.
-
-    Usage:
-        @router.get("/foo")
-        async def foo(session: AsyncSession = Depends(get_session)):
-            ...
-    """
+    """FastAPI dependency: yields an AsyncSession with auto-commit/rollback."""
     factory = get_session_factory()
     async with factory() as session:
         try:
