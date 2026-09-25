@@ -1,4 +1,4 @@
- """Async SQLAlchemy engine — production-grade configuration."""
+"""Async SQLAlchemy engine — production-grade configuration."""
 from __future__ import annotations
 
 from typing import Any, AsyncGenerator, Optional
@@ -45,11 +45,7 @@ def _build_engine_kwargs() -> dict[str, Any]:
 
 
 async def init_engine() -> None:
-    """Initialize the global async engine + session factory + tables.
-
-    Must be called once at application startup.
-    Idempotent: safe to call from multiple workers.
-    """
+    """Initialize the global async engine + session factory + tables."""
     global _engine, _session_factory
 
     if _engine is not None:
