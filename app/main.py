@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import contextlib
+import os
 from typing import AsyncIterator
 
 from fastapi import FastAPI
@@ -14,7 +15,6 @@ from app.api.v1 import v1_router
 from app.cache.redis_client import close_redis, init_redis
 from app.config import get_settings
 from app.db.engine import close_engine, init_engine
-from app.exceptions import KhallaqiError
 from app.logging_config import configure_logging, get_logger
 from app.middleware import (
     RequestIDMiddleware,
@@ -22,7 +22,6 @@ from app.middleware import (
     TimingMiddleware,
     register_exception_handler,
 )
-from app.models.db_models import Base
 from app.services.ai.router import get_ai_router
 
 log = get_logger(__name__)
@@ -30,7 +29,7 @@ log = get_logger(__name__)
 
 @contextlib.asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    """Manage startup/shutdown: DB, Redis, AI clients, tables."""
+    """Manage startup/shutdown."""
     s = get_settings()
     log.info(
         "app.startup",
@@ -38,24 +37,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         env=s.environment,
         gemini=bool(s.gemini_api_key),
         groq=bool(s.groq_api_key),
-        openrouter=bool(s.openrouter_api_key),
-        azure=bool(s.azure_speech_key),
     )
 
     await init_engine()
-
-    try:
-        from app.db.engine import get_engine
-        engine = get_engine()
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
-        log.info("db.tables.ready")
-    except Exception as e:
-        if "already exists" in str(e).lower():
-            log.info("db.tables.already_exist")
-        else:
-            log.exception("db.tables.failed")
-
     await init_redis()
     get_ai_router()
 
@@ -92,7 +76,6 @@ def create_app() -> FastAPI:
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
-        expose_headers=["X-Request-ID", "X-Response-Time"],
     )
 
     app.add_middleware(GZipMiddleware, minimum_size=1000)
@@ -102,22 +85,11 @@ def create_app() -> FastAPI:
 
     register_exception_handler(app)
 
-    import os
     if os.path.isdir("app/static"):
         app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
     app.include_router(v1_router)
-    _register_legacy_routes(app)
 
-    @app.get("/favicon.ico", include_in_schema=False)
-    async def favicon():
-        return JSONResponse(content={}, status_code=204)
-
-    return app
-
-
-def _register_legacy_routes(app: FastAPI) -> None:
-    """Re-expose v1 routes at old unversioned paths."""
     from app.api.v1.endpoints import (
         chat as chat_ep,
         export as export_ep,
@@ -137,6 +109,12 @@ def _register_legacy_routes(app: FastAPI) -> None:
     app.include_router(export_ep.router, include_in_schema=False)
     app.include_router(tts_ep.router, include_in_schema=False)
     app.include_router(video_ep.router, include_in_schema=False)
+
+    @app.get("/favicon.ico", include_in_schema=False)
+    async def favicon():
+        return JSONResponse(content={}, status_code=204)
+
+    return app
 
 
 app = create_app()
