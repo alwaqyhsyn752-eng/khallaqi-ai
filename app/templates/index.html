@@ -239,9 +239,6 @@ textarea:focus{outline:none;border-color:var(--accent)}
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════
-// الإعدادات العامة
-// ═══════════════════════════════════════════════════════
 const API_BASE = '/api/v1';
 
 let USER_ID = localStorage.getItem('khallaqi_user_id');
@@ -279,9 +276,6 @@ const liveModeBtn = document.getElementById('liveModeBtn');
 const voiceIndicator = document.getElementById('voiceIndicator');
 const voiceStatusText = document.getElementById('voiceStatusText');
 
-// ═══════════════════════════════════════════════════════
-// API Helper — مع ترويسة X-User-ID
-// ═══════════════════════════════════════════════════════
 async function api(path, options = {}) {
     options.headers = options.headers || {};
     if (!options.headers['X-User-ID']) {
@@ -305,20 +299,17 @@ async function api(path, options = {}) {
 }
 
 // ═══════════════════════════════════════════════════════
-// إعدادات صوت شاب سعودي
+// ✅ إعدادات صوت شاب سعودي (pitch +8%, rate طبيعي)
 // ═══════════════════════════════════════════════════════
 const VOICE_CONFIG = {
     lang: 'ar-SA',
-    pitch: 0.95,
-    rate: 0.95,
+    pitch: 1.08,
+    rate: 1.0,
     volume: 1.0,
     preferMale: true,
     preferKeywords: ['hamed', 'hameed', 'حامد', 'male', 'رجل', 'majed', 'ماجد', 'naayf', 'shakir']
 };
 
-// ═══════════════════════════════════════════════════════
-// TTS
-// ═══════════════════════════════════════════════════════
 function updateTtsUI() {
     ttsToggle.classList.toggle('active', ttsEnabled);
 }
@@ -488,9 +479,6 @@ function onSpeechEnd() {
     }
 }
 
-// ═══════════════════════════════════════════════════════
-// Speech-to-Text
-// ═══════════════════════════════════════════════════════
 function initRecognition() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) return null;
@@ -592,9 +580,6 @@ function toggleLiveMode() {
     }
 }
 
-// ═══════════════════════════════════════════════════════
-// الصور
-// ═══════════════════════════════════════════════════════
 function pickImage() { fileInput.click(); }
 
 function handleFileSelect(event) {
@@ -627,9 +612,6 @@ function removeImage() {
     previewArea.classList.remove('show');
 }
 
-// ═══════════════════════════════════════════════════════
-// الفيديو
-// ═══════════════════════════════════════════════════════
 function openVideoModal() {
     document.getElementById('videoModal').classList.add('show');
     document.getElementById('videoPrompt').focus();
@@ -684,9 +666,6 @@ async function pollVideoStatus(opName, attempts = 0) {
     }, 10000);
 }
 
-// ═══════════════════════════════════════════════════════
-// UI Helpers
-// ═══════════════════════════════════════════════════════
 function toggleSidebar() {
     sidebar.classList.toggle('open');
     overlay.classList.toggle('show');
@@ -715,9 +694,6 @@ function showInfo(text) {
     chatEl.scrollTop = chatEl.scrollHeight;
 }
 
-// ═══════════════════════════════════════════════════════
-// المحادثات
-// ═══════════════════════════════════════════════════════
 async function loadChats() {
     try {
         const d = await api(API_BASE + '/chats');
@@ -799,9 +775,6 @@ async function deleteChat(chatId) {
     } catch (e) { showError('❌ ' + e.message); }
 }
 
-// ═══════════════════════════════════════════════════════
-// عرض الرسائل
-// ═══════════════════════════════════════════════════════
 function showEmptyChat() {
     chatEl.innerHTML = `
         <div class="empty">
@@ -927,9 +900,6 @@ function hideTyping() {
     if (e) e.remove();
 }
 
-// ═══════════════════════════════════════════════════════
-// الإرسال — مع SSE Streaming جديد
-// ═══════════════════════════════════════════════════════
 async function sendMsg() {
     if (isSending) {
         if (streamAbort) {
@@ -1087,7 +1057,6 @@ async function sendWithStream(text) {
                     chatEl.scrollTop = chatEl.scrollHeight;
                 } else if (evt.done) {
                     cursor.remove();
-                    // ✅ إعادة تنسيق الكود: تحويل النص إلى كود منسّق مع زر نسخ
                     contentDiv.innerHTML = '';
                     renderContent(contentDiv, fullText);
                     if (streamSource) {
@@ -1096,7 +1065,6 @@ async function sendWithStream(text) {
                         sb.textContent = '📡 ' + streamSource;
                         botDiv.appendChild(sb);
                     }
-                    // زر النطق
                     const speakBtn = document.createElement('button');
                     speakBtn.className = 'speak-btn';
                     speakBtn.textContent = '🔊 اسمع';
@@ -1141,9 +1109,6 @@ inputEl.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
 });
 
-// ═══════════════════════════════════════════════════════
-// الحالة والإحصائيات
-// ═══════════════════════════════════════════════════════
 async function checkStatus() {
     try {
         const d = await api(API_BASE + '/status');
@@ -1196,9 +1161,6 @@ async function showStats() {
     } catch (e) { alert('❌ ' + e.message); }
 }
 
-// ═══════════════════════════════════════════════════════
-// بدء التطبيق
-// ═══════════════════════════════════════════════════════
 window.addEventListener('load', async () => {
     try {
         const d = await api(API_BASE + '/status');
