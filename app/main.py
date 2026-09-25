@@ -28,9 +28,6 @@ from app.services.ai.router import get_ai_router
 log = get_logger(__name__)
 
 
-# ═══════════════════════════════════════════════════════════════════
-# Lifespan — startup / shutdown
-# ═══════════════════════════════════════════════════════════════════
 @contextlib.asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Manage startup/shutdown: DB, Redis, AI clients, tables."""
@@ -45,25 +42,25 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         azure=bool(s.azure_speech_key),
     )
 
-    # ─── Startup ───
     await init_engine()
 
- # Always ensure tables exist (idempotent, safe for all environments).
-try:
-    from app.db.engine import get_engine
-    engine = get_engine()
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    log.info("db.tables.ready")
-except Exception as e:
-    # Ignore race-condition between multiple gunicorn workers
-    # where two workers try to create the same table simultaneously.
-    if "already exists" in str(e).lower():
-        log.info("db.tables.already_exist")
-    else:
-        log.exception("db.tables.failed")
+    try:
+        from app.db.engine import get_engine
+        engine = get_engine()
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        log.info("db.tables.ready")
+    except Exception as e:
+        if "already exists" in str(e).lower():
+            log.info("db.tables.already_exist")
+        else:
+            log.exception("db.tables.failed")
 
-    # ─── Shutdown ───
+    await init_redis()
+    get_ai_router()
+
+    yield
+
     log.info("app.shutdown.begin")
     with contextlib.suppress(Exception):
         await get_ai_router().close()
@@ -74,9 +71,6 @@ except Exception as e:
     log.info("app.shutdown.done")
 
 
-# ═══════════════════════════════════════════════════════════════════
-# App factory
-# ═══════════════════════════════════════════════════════════════════
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
     configure_logging()
@@ -92,7 +86,6 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
-    # ─── CORS ───
     app.add_middleware(
         CORSMiddleware,
         allow_origins=s.origins_list,
@@ -102,29 +95,20 @@ def create_app() -> FastAPI:
         expose_headers=["X-Request-ID", "X-Response-Time"],
     )
 
-    # ─── GZip ───
     app.add_middleware(GZipMiddleware, minimum_size=1000)
-
-    # ─── Custom middlewares (order matters: outermost first) ───
     app.add_middleware(SecurityHeadersMiddleware)
     app.add_middleware(TimingMiddleware)
     app.add_middleware(RequestIDMiddleware)
 
-    # ─── Exception handlers ───
     register_exception_handler(app)
 
-    # ─── Static files (for CSS/JS assets if any) ───
     import os
     if os.path.isdir("app/static"):
         app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
-    # ─── Routers ───
     app.include_router(v1_router)
-
-    # ─── Legacy (unversioned) aliases to keep existing frontend working ───
     _register_legacy_routes(app)
 
-    # ─── Root health at `/` handled by system_ep; add favicon ───
     @app.get("/favicon.ico", include_in_schema=False)
     async def favicon():
         return JSONResponse(content={}, status_code=204)
@@ -132,11 +116,8 @@ def create_app() -> FastAPI:
     return app
 
 
-# ═══════════════════════════════════════════════════════════════════
-# Legacy aliases — map old paths to new v1 routes
-# ═══════════════════════════════════════════════════════════════════
 def _register_legacy_routes(app: FastAPI) -> None:
-    """Re-expose v1 routes at the old unversioned paths for compat."""
+    """Re-expose v1 routes at old unversioned paths."""
     from app.api.v1.endpoints import (
         chat as chat_ep,
         export as export_ep,
@@ -158,7 +139,4 @@ def _register_legacy_routes(app: FastAPI) -> None:
     app.include_router(video_ep.router, include_in_schema=False)
 
 
-# ═══════════════════════════════════════════════════════════════════
-# Root app for gunicorn (gunicorn app.main:app)
-# ═══════════════════════════════════════════════════════════════════
 app = create_app()
