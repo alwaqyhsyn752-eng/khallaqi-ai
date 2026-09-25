@@ -932,7 +932,6 @@ function hideTyping() {
 // ═══════════════════════════════════════════════════════
 async function sendMsg() {
     if (isSending) {
-        // اضغط مرة أخرى → إيقاف البث
         if (streamAbort) {
             streamAbort.abort();
             streamAbort = null;
@@ -959,13 +958,11 @@ async function sendMsg() {
 
     isSending = true;
 
-    // صورة → استخدم /api/v1/chat العادي
     if (selectedImage) {
         await sendWithImage(text);
         return;
     }
 
-    // نص → Streaming
     await sendWithStream(text);
 }
 
@@ -1024,7 +1021,6 @@ async function sendWithStream(text) {
     sendBtn.classList.add('stopping');
     document.getElementById('activeProvider').textContent = 'يفكر...';
 
-    // أنشئ فقاعة بوت فارغة مع مؤشر
     if (chatEl.querySelector('.empty')) chatEl.innerHTML = '';
     const botDiv = document.createElement('div');
     botDiv.className = 'msg bot';
@@ -1091,6 +1087,9 @@ async function sendWithStream(text) {
                     chatEl.scrollTop = chatEl.scrollHeight;
                 } else if (evt.done) {
                     cursor.remove();
+                    // ✅ إعادة تنسيق الكود: تحويل النص إلى كود منسّق مع زر نسخ
+                    contentDiv.innerHTML = '';
+                    renderContent(contentDiv, fullText);
                     if (streamSource) {
                         const sb = document.createElement('div');
                         sb.className = 'source-badge';
