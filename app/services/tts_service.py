@@ -1,4 +1,4 @@
-"""Text-to-Speech service — Azure Cognitive Services."""
+"""Text-to-Speech service — Azure Cognitive Services (Saudi young voice)."""
 from __future__ import annotations
 
 from typing import Optional
@@ -11,15 +11,30 @@ from app.logging_config import get_logger
 
 log = get_logger(__name__)
 
-_SSML_TEMPLATE = """<speak version='1.0' xml:lang='ar-SA'>
+# SSML with Saudi young male voice:
+#  - voice: ar-SA-HamedNeural (only Saudi male voice available on Azure)
+#  - style: "chat" (friendly, casual — makes him sound younger)
+#  - pitch: +8% (higher pitch = younger voice)
+#  - rate:  +5% (slightly faster = energetic young speaker)
+_SSML_TEMPLATE = """<speak version='1.0' xml:lang='ar-SA'
+    xmlns:mstts='https://www.w3.org/2001/mstts'>
     <voice xml:lang='ar-SA' name='{voice}'>
-        <prosody rate='0.95' pitch='0.95'>{text}</prosody>
+        <mstts:express-as style='chat' styledegree='1.2'>
+            <prosody rate='+5%' pitch='+8%'>{text}</prosody>
+        </mstts:express-as>
+    </voice>
+</speak>"""
+
+# Fallback SSML (in case Azure rejects the "chat" style for Saudi voice)
+_SSML_FALLBACK = """<speak version='1.0' xml:lang='ar-SA'>
+    <voice xml:lang='ar-SA' name='{voice}'>
+        <prosody rate='+5%' pitch='+8%'>{text}</prosody>
     </voice>
 </speak>"""
 
 
 class TTSService:
-    """Async Azure Text-to-Speech service."""
+    """Async Azure Text-to-Speech service with Saudi young male voice."""
 
     def __init__(self, client: Optional[httpx.AsyncClient] = None) -> None:
         s = get_settings()
@@ -41,16 +56,30 @@ class TTSService:
         if self._owns_client:
             await self._client.aclose()
 
+    def _build_ssml(self, voice: str, text: str) -> str:
+        """Build SSML with Saudi young voice settings."""
+        return _SSML_TEMPLATE.format(voice=voice, text=text)
+
+    def _build_fallback_ssml(self, voice: str, text: str) -> str:
+        """Build simplified SSML without style (if primary fails)."""
+        return _SSML_FALLBACK.format(voice=voice, text=text)
+
     async def synthesize(
         self,
         text: str,
         voice: Optional[str] = None,
     ) -> bytes:
-        """Convert text to MP3 audio. Raises TTSError on failure."""
+        """Convert text to MP3 audio with Saudi young male voice.
+
+        Raises:
+            TTSError: on any failure.
+        """
         if not self._key:
             raise TTSError("AZURE_SPEECH_KEY غير معيّن")
 
         voice = voice or self._default_voice
+
+        # Clean text: strip markdown and code blocks
         clean = (
             text.replace("```", " ")
             .replace("`", " ")
@@ -59,7 +88,6 @@ class TTSService:
             .replace("_", " ")
         )[:2000]
 
-        ssml = _SSML_TEMPLATE.format(voice=voice, text=clean)
         url = f"https://{self._region}.tts.speech.microsoft.com/cognitiveservices/v1"
         headers = {
             "Ocp-Apim-Subscription-Key": self._key,
@@ -68,13 +96,33 @@ class TTSService:
             "User-Agent": "KhallaqiAI/16.0",
         }
 
+        # Try with style first
         try:
-            r = await self._client.post(url, headers=headers, content=ssml.encode("utf-8"))
-            if r.status_code != 200:
-                raise TTSError(
-                    f"Azure TTS failed ({r.status_code}): {r.text[:200]}"
+            ssml = self._build_ssml(voice, clean)
+            r = await self._client.post(
+                url, headers=headers, content=ssml.encode("utf-8")
+            )
+            if r.status_code == 200:
+                log.info("tts.synthesized", voice=voice, styled=True, len=len(r.content))
+                return r.content
+
+            # If style not supported for this voice → fallback
+            if r.status_code == 400:
+                log.warning("tts.style_rejected", voice=voice, trying_fallback=True)
+                ssml = self._build_fallback_ssml(voice, clean)
+                r2 = await self._client.post(
+                    url, headers=headers, content=ssml.encode("utf-8")
                 )
-            return r.content
+                if r2.status_code == 200:
+                    log.info("tts.synthesized", voice=voice, styled=False, len=len(r2.content))
+                    return r2.content
+                raise TTSError(
+                    f"Azure TTS failed ({r2.status_code}): {r2.text[:200]}"
+                )
+
+            raise TTSError(
+                f"Azure TTS failed ({r.status_code}): {r.text[:200]}"
+            )
         except httpx.HTTPError as e:
             raise TTSError(f"Azure TTS error: {e}") from e
 
@@ -83,6 +131,7 @@ class TTSService:
         return {
             "azure_enabled": self.available,
             "current": self._default_voice,
+            "current_style": "شاب سعودي (chat + pitch +8% + rate +5%)",
             "saudi_male_voices": ["ar-SA-HamedNeural"],
             "other_arabic": [
                 "ar-EG-ShakirNeural",
