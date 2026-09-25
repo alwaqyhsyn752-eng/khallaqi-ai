@@ -63,6 +63,7 @@ async def init_engine() -> None:
         log.info("db.engine.initialized", url_scheme=settings.database_url.split(":")[0])
 
         from app.models.db_models import Base
+
         try:
             async with _engine.begin() as conn:
                 await conn.run_sync(Base.metadata.create_all)
