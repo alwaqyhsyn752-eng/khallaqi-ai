@@ -19,10 +19,18 @@ from app.services.ai.base import (
 log = get_logger(__name__)
 
 MODELS = [
+    # ═══ Uncensored models (highest priority — will be used first) ═══
+    "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
+    "cognitivecomputations/dolphin-mixtral-8x7b",
+    "cognitivecomputations/dolphin-mixtral-8x22b",
+    "nousresearch/hermes-3-llama-3.1-405b",
+    "gryphe/mythomax-l2-13b",
+    # ═══ Regular models (fallback) ═══
     "google/gemini-2.0-flash-exp:free",
     "meta-llama/llama-3.3-70b-instruct:free",
     "qwen/qwen-2.5-72b-instruct:free",
 ]
+
 
 _ENDPOINT = "https://openrouter.ai/api/v1/chat/completions"
 
