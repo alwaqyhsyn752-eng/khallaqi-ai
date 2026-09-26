@@ -36,12 +36,12 @@ class DeleteChatRequest(BaseSchema):
 
 class ChatRequest(BaseSchema):
     """Request to send a message."""
-
     message: str = Field(default="", max_length=8000)
     chat_id: str = Field(..., min_length=1, max_length=100)
     user_id: str = Field(..., min_length=1, max_length=64)
-    image: Optional[str] = Field(default=None, description="Base64 image")
+    image: Optional[str] = Field(default=None)
     image_type: str = Field(default="image/jpeg", max_length=50)
+    system_prompt: Optional[str] = Field(default=None, max_length=10000)  # ← جديد
 
     @field_validator("user_id")
     @classmethod
