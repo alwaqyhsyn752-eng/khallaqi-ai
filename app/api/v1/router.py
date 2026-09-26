@@ -3,7 +3,8 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import (
+from app.api.v1.endpoints import 
+from app.api.v1.endpoints import admin as admin_ep(
     chat as chat_ep,
     export as export_ep,
     memory as memory_ep,
@@ -26,3 +27,4 @@ v1_router.include_router(search_ep.router)
 v1_router.include_router(export_ep.router)
 v1_router.include_router(tts_ep.router)
 v1_router.include_router(video_ep.router)
+v1_router.include_router(admin_ep.router)
