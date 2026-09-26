@@ -850,6 +850,61 @@ body.chat-mode .hint{opacity:0;max-height:0;margin:0;overflow:hidden}
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast i{color:var(--purple-3);font-size:1rem}
+  /* ═══ Project Card ═══ */
+.project-card{
+  margin:16px 0 8px;
+  padding:16px 18px;
+  background:linear-gradient(135deg, rgba(168,85,247,.15), rgba(124,58,237,.1));
+  border:1px solid var(--stroke-2);
+  border-radius:18px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  flex-wrap:wrap;
+  box-shadow:0 8px 30px rgba(168,85,247,.2), inset 0 1px 0 rgba(255,255,255,.05);
+  position:relative;
+  overflow:hidden;
+}
+.project-card::before{
+  content:"";
+  position:absolute;inset:0;
+  background:linear-gradient(115deg, transparent 40%, rgba(255,255,255,.08) 50%, transparent 60%);
+  animation:btnShine 4s ease-in-out infinite;
+  pointer-events:none;
+}
+.project-card-icon{
+  width:52px;height:52px;border-radius:14px;
+  background:linear-gradient(135deg,var(--purple),var(--purple-2));
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:1.4rem;flex-shrink:0;
+  box-shadow:0 0 24px rgba(168,85,247,.5);
+}
+.project-card-info{flex:1;min-width:140px}
+.project-card-title{
+  font-size:1rem;font-weight:800;color:var(--text);
+  margin-bottom:4px;
+  letter-spacing:.3px;
+}
+.project-card-meta{
+  font-size:.75rem;color:var(--muted);
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+}
+.project-card-meta i{color:var(--purple-3);font-size:.7rem}
+.download-btn{
+  padding:10px 18px;
+  background:linear-gradient(135deg,var(--purple),var(--purple-2));
+  color:#fff;border:none;border-radius:12px;
+  cursor:pointer;font-family:inherit;font-weight:800;font-size:.85rem;
+  display:flex;align-items:center;gap:8px;
+  box-shadow:0 6px 20px rgba(168,85,247,.5);
+  transition:all .25s var(--ease-soft);
+  white-space:nowrap;
+}
+.download-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 32px rgba(168,85,247,.8);
+}
+.download-btn:active{transform:translateY(0)}
 .toast.success i{color:var(--success)}
 .toast.error i{color:var(--danger)}
 
@@ -1053,60 +1108,78 @@ const SYSTEM_PROMPT = [
 'أنت "الخلاقي" — مهندس برمجيات وتطبيقات محترف (Senior Full-Stack & Mobile Developer) من إعداد حسين غلاب.',
 '',
 '╔══════════════════════════════════════════════════════════════╗',
-'║  القواعد الصارمة (إلزامية في كل رد)                          ║',
+'║  ⚠️ القاعدة الذهبية — توليد التطبيقات                       ║',
 '╚══════════════════════════════════════════════════════════════╝',
 '',
-'📌 القاعدة 1 — دقة الأكواد والتوافق الشامل:',
+'📌 عندما يطلب المستخدم إنشاء تطبيق (APK / تطبيق أندرويد / موقع / أي برنامج)،',
+'   يجب أن تُخرج المشروع **كاملاً** بالتنسيق التالي بالضبط:',
+'',
+'```app-project',
+'{',
+'  "name": "اسم_التطبيق_بالإنجليزية",',
+'  "display_name": "اسم التطبيق بالعربية",',
+'  "framework": "kotlin",',
+'  "package": "com.hussein.myapp",',
+'  "version": "1.0.0",',
+'  "description": "وصف مختصر",',
+'  "build_instructions": ["خطوة 1", "خطوة 2"],',
+'  "files": [',
+'    {"path": "app/build.gradle", "content": "..."},',
+'    {"path": "app/src/main/AndroidManifest.xml", "content": "..."},',
+'    {"path": "app/src/main/java/com/hussein/myapp/MainActivity.kt", "content": "..."}',
+'  ]',
+'}',
+'```',
+'',
+'⚠️ قواعد صارمة لهذا التنسيق:',
+'1. استخدم ```app-project وليس ```json',
+'2. JSON يجب أن يكون صحيحاً 100% — لا فواصل زائدة، لا تعليقات',
+'3. اكتب كل ملف كاملاً — لا "..." ولا "# TODO"',
+'4. اكتب الملفات كاملة داخل الحقل "content" (استخدم \\n للأسطر الجديدة)',
+'5. framework يجب أن يكون: kotlin | java | flutter | react-native | html',
+'6. أضف كل الملفات المطلوبة للبناء: build.gradle, AndroidManifest.xml, MainActivity, res/, إلخ',
+'7. إذا كان التطبيق كبيراً، ابدأ بأهم 5-10 ملفات ثم قل "أكمل" لإضافة الباقي',
+'',
+'📌 أمثلة على أنواع التطبيقات التي يمكنك بناؤها:',
+'- تطبيق آلة حاسبة (Kotlin)',
+'- تطبيق قائمة مهام (Flutter)',
+'- تطبيق طقس يستدعي API (Kotlin + Retrofit)',
+'- لعبة بسيطة (Flutter)',
+'- تطبيق دردشة (React Native)',
+'- موقع شخصي (HTML/CSS/JS)',
+'',
+'╔══════════════════════════════════════════════════════════════╗',
+'║  القواعد العامة                                              ║',
+'╚══════════════════════════════════════════════════════════════╝',
+'',
+'📌 القاعدة 1 — دقة الأكواد:',
 '• اكتب كوداً نظيفاً، منظماً، خالياً من الأخطاء.',
-'• دعم التوافق العكسي (Backward Compatibility) لتطبيقات الأندرويد.',
-'• استخدم minSdkVersion 21 (Android 5.0) للتوافق الواسع.',
-'• استخدم targetSdkVersion 34 (Android 14) للحديث.',
+'• دعم minSdkVersion 21 و targetSdkVersion 34.',
 '• اختبر ذهنياً كل سطر قبل كتابته.',
 '',
 '📌 القاعدة 2 — تصحيح الأخطاء والثغرات:',
-'• عند استلام كود به أخطاء، افعل التالي:',
-'  1. افحص سطراً بسطر.',
-'  2. حدد الأخطاء: NullPointerException, Memory Leaks, SQL Injection, Insecure Storage, XSS, CSRF.',
-'  3. سد الثغرات الأمنية.',
-'  4. صحّح الأخطاء.',
-'  5. لا تُغيِّر الفكرة الأساسية للكود.',
-'  6. لا تُضعِف الأداء.',
+'• افحص سطراً بسطر.',
+'• حدد: NullPointerException, Memory Leaks, SQL Injection, Insecure Storage, XSS.',
+'• سد الثغرات الأمنية.',
 '• اشرح ما تم إصلاحه: (قبل → بعد).',
 '',
 '📌 القاعدة 3 — الاستئناف عند الانقطاع (الأهم):',
-'• إذا انقطع الكود بسبب طوله، وقال المستخدم "أكمل":',
+'• إذا انقطع الكود وقال المستخدم "أكمل":',
 '  ✓ ابحث عن آخر حرف أو سطر توقفت عنده.',
 '  ✓ أكمل من ذلك الحرف بالضبط.',
 '  ✗ لا تُعِد كتابة ما سبق.',
-'  ✗ لا تبدأ من البداية.',
 '  ✗ لا تعتذر عن الطول.',
-'• إذا كنت توقفت في منتصف دالة → أكمل من منتصفها.',
-'• إذا كنت توقفت في منتصف كود XML/JSON → أكمل من نفس الحرف.',
+'• إذا كنت في منتصف ملف JSON → أكمل من آخر حرف.',
+'• إذا كنت في منتصف دالة → أكمل من منتصفها.',
 '',
-'📌 القاعدة 4 — إطارات العمل:',
-'• Flutter — للتطبيقات الجميلة (iOS + Android)',
-'• Kotlin/Java — للأداء العالي والتحكم الكامل',
-'• React Native — لمشاركة الكود مع الويب',
-'• Kivy/BeeWare — إذا طُلب Python',
-'• اختر الأنسب حسب الطلب واذكر السبب.',
-'',
-'📌 القاعدة 5 — خطوات بناء APK:',
-'• بعد كل كود تطبيق، أعطِ الخطوات الدقيقة:',
-'  - للأوامر: اذكر الأمر الكامل.',
-'  - لمسار الملف: اذكر المسار الكامل.',
-'  - للمتطلبات: اذكر كل مكتبة وإصدارها.',
-'• إن أمكن البناء من الهاتف، اذكر الطريقة (GitHub Actions / EAS / AIDE).',
-'',
-'📌 القاعدة 6 — جودة الرد:',
+'📌 القاعدة 4 — جودة الرد:',
 '• اكتب الكود كاملاً — لا تقطع.',
-'• اشرح بإيجاز بعد الكود.',
-'• ضع الكود داخل ```لغة ```.',
-'• استخدم التعليقات المختصرة.',
+'• اشرح بإيجاز بعد المشروع.',
 '• لا تكتب "# TODO" ولا "..." في الكود.',
 '',
-'🎯 هدفك: إعطاء حسين كوداً يعمل فوراً، بدون أخطاء، وبدون ثغرات.',
+'🎯 هدفك: إعطاء حسين مشروعاً كاملاً جاهزاً للتحميل والبناء.',
 '',
-'المطور: حسين غلاب | الإصدار: 20.0'
+'المطور: حسين غلاب | الإصدار: 21.0'
 ].join('\n');
 
 const LS = {
@@ -1718,7 +1791,231 @@ function showWelcome() {
       </div>
     </div>`;
 }
+/* ═══════════════════════════════════════════════════════════════
+   APP PROJECT — Detection & ZIP Generation
+   ═══════════════════════════════════════════════════════════════ */
 
+/**
+ * Detect app-project blocks in AI response.
+ * Returns array of parsed project objects.
+ */
+function detectAppProjects(text) {
+  const projects = [];
+  const regex = /```app-project\s*\n([\s\S]*?)\n```/g;
+  let match;
+  while ((match = regex.exec(text)) !== null) {
+    try {
+      // Try to parse JSON
+      let jsonStr = match[1].trim();
+      // Fix common issues: trailing commas
+      jsonStr = jsonStr.replace(/,(\s*[}\]])/g, '$1');
+      const project = JSON.parse(jsonStr);
+      if (project && project.files && Array.isArray(project.files)) {
+        projects.push(project);
+      }
+    } catch (e) {
+      console.warn('Failed to parse app-project:', e);
+    }
+  }
+  return projects;
+}
+
+/**
+ * Generate ZIP from a project object and trigger download.
+ */
+async function downloadProject(project) {
+  try {
+    if (typeof JSZip === 'undefined') {
+      showToast('جاري تحميل مكتبة ZIP...', 'info');
+      await loadJSZip();
+    }
+    
+    const zip = new JSZip();
+    const rootFolder = zip.folder(project.name || 'app');
+    
+    // Add all files
+    project.files.forEach(file => {
+      const content = String(file.content || '');
+      rootFolder.file(file.path, content);
+    });
+    
+    // Add README
+    const readme = buildReadme(project);
+    rootFolder.file('README.md', readme);
+    
+    // Add build instructions
+    const instructions = buildInstructions(project);
+    rootFolder.file('BUILD_INSTRUCTIONS.txt', instructions);
+    
+    // Generate ZIP
+    const blob = await zip.generateAsync({
+      type: 'blob',
+      compression: 'DEFLATE',
+      compressionOptions: { level: 6 }
+    });
+    
+    // Trigger download
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (project.name || 'app') + '.zip';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    
+    showToast('✅ تم تحميل المشروع بنجاح', 'success');
+  } catch (e) {
+    console.error(e);
+    showToast('❌ فشل إنشاء ZIP: ' + e.message, 'error');
+  }
+}
+
+function loadJSZip() {
+  return new Promise((resolve, reject) => {
+    if (typeof JSZip !== 'undefined') return resolve();
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+function buildReadme(project) {
+  return [
+    '# ' + (project.display_name || project.name),
+    '',
+    project.description || '',
+    '',
+    '## المعلومات',
+    '- **الإطار**: ' + (project.framework || 'unknown'),
+    '- **Package**: ' + (project.package || 'unknown'),
+    '- **الإصدار**: ' + (project.version || '1.0.0'),
+    '',
+    '## الملفات',
+    project.files.map(f => '- `' + f.path + '`').join('\n'),
+    '',
+    '## طريقة البناء',
+    buildInstructions(project),
+    '',
+    '---',
+    'تم التوليد بواسطة الخلاقي — حسين غلاب'
+  ].join('\n');
+}
+
+function buildInstructions(project) {
+  const fw = (project.framework || '').toLowerCase();
+  
+  if (fw === 'kotlin' || fw === 'java') {
+    return [
+      'خطوات بناء APK:',
+      '',
+      '1. حمّل Android Studio من: https://developer.android.com/studio',
+      '2. افتح المجلد المستخرج من الـ ZIP (File → Open)',
+      '3. انتظر حتى ينهي Gradle التحميل (2-5 دقائق)',
+      '4. اذهب إلى: Build → Build Bundle(s) / APK(s) → Build APK(s)',
+      '5. انتظر انتهاء البناء',
+      '6. سيظهر رابط "locate" — اضغط عليه',
+      '',
+      'مسار APK:',
+      '  app/build/outputs/apk/debug/app-debug.apk',
+      '',
+      'لتثبيت APK على هاتفك:',
+      '  - انقل الملف للهاتف',
+      '  - فعّل "تثبيت من مصادر غير معروفة"',
+      '  - اضغط على الملف لتثبيته'
+    ].join('\n');
+  }
+  
+  if (fw === 'flutter') {
+    return [
+      'خطوات بناء APK:',
+      '',
+      '1. حمّل Flutter من: https://flutter.dev',
+      '2. ثبّت Flutter: flutter doctor',
+      '3. افتح Terminal في مجلد المشروع',
+      '4. نفّذ: flutter pub get',
+      '5. نفّذ: flutter build apk --release',
+      '',
+      'مسار APK:',
+      '  build/app/outputs/flutter-apk/app-release.apk'
+    ].join('\n');
+  }
+  
+  if (fw === 'react-native') {
+    return [
+      'خطوات بناء APK:',
+      '',
+      '1. ثبّت Node.js و React Native CLI',
+      '2. في المجلد: npm install',
+      '3. cd android && ./gradlew assembleRelease',
+      '',
+      'مسار APK:',
+      '  android/app/build/outputs/apk/release/app-release.apk'
+    ].join('\n');
+  }
+  
+  if (fw === 'html') {
+    return [
+      'هذا مشروع ويب:',
+      '',
+      '1. افتح index.html في المتصفح مباشرة',
+      '2. أو استخدم Live Server في VS Code',
+      '3. للنشر: ارفع الملفات على أي استضافة'
+    ].join('\n');
+  }
+  
+  return (project.build_instructions || ['راجع README']).join('\n');
+}
+
+/**
+ * Render a beautiful "Download Project" card in the chat.
+ */
+function renderProjectCard(project) {
+  const card = document.createElement('div');
+  card.className = 'project-card';
+  
+  const icon = document.createElement('div');
+  icon.className = 'project-card-icon';
+  icon.innerHTML = '<i class="fa-solid fa-cube"></i>';
+  
+  const info = document.createElement('div');
+  info.className = 'project-card-info';
+  
+  const title = document.createElement('div');
+  title.className = 'project-card-title';
+  title.textContent = project.display_name || project.name || 'تطبيق';
+  
+  const meta = document.createElement('div');
+  meta.className = 'project-card-meta';
+  const frameworkLabel = {
+    'kotlin': 'Kotlin (Android)',
+    'java': 'Java (Android)',
+    'flutter': 'Flutter',
+    'react-native': 'React Native',
+    'html': 'Web App'
+  }[project.framework] || project.framework || 'App';
+  
+  meta.innerHTML = 
+    '<i class="fa-solid fa-code"></i> ' + frameworkLabel +
+    ' • <i class="fa-solid fa-file"></i> ' + project.files.length + ' ملف';
+  
+  info.appendChild(title);
+  info.appendChild(meta);
+  
+  const btn = document.createElement('button');
+  btn.className = 'download-btn';
+  btn.type = 'button';
+  btn.innerHTML = '<i class="fa-solid fa-download"></i> تحميل المشروع (ZIP)';
+  btn.onclick = () => downloadProject(project);
+  
+  card.appendChild(icon);
+  card.appendChild(info);
+  card.appendChild(btn);
+  
+  return card;
+}
 function renderContent(el, text) {
   const parts = String(text).split('```');
   for (let i = 0; i < parts.length; i++) {
@@ -1798,10 +2095,21 @@ function addMessage(text, role, source, save = true, type = 'text', media = null
     sb.innerHTML = '<i class="fa-solid fa-satellite-dish"></i> ' + source;
     msg.appendChild(sb);
   }
+// Detect and render app projects
+if (role === 'bot' && text) {
+  const projects = detectAppProjects(text);
+  projects.forEach(project => {
+    const card = renderProjectCard(project);
+    msg.appendChild(card);
+  });
+}
 
+if (role === 'bot' && text && !String(text).startsWith('❌')) {
+  const spk = document.createElement('button');
+  spk.className = 'speak-btn';
   if (role === 'bot' && text && !String(text).startsWith('❌')) {
-    const spk = document.createElement('button');
-    spk.className = 'speak-btn';
+  const spk = document.createElement('button');
+  spk.className = 'speak-btn';
     spk.type = 'button';
     spk.title = 'اسمع الرد';
     spk.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
