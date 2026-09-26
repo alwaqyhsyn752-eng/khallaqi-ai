@@ -12,14 +12,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
-:root{
-  --bg:#05060c;--g1:rgba(19,24,38,.55);--g2:rgba(26,33,56,.45);--g3:rgba(40,50,80,.35);
-  --text:#eef1ff;--soft:#c8cfe0;--muted:#8b95a9;
-  --p:#a855f7;--p2:#7c3aed;--p3:#c084fc;--pglow:rgba(168,85,247,.55);
-  --ok:#10b981;--bad:#ef4444;--warn:#f59e0b;
-  --bd:rgba(168,85,247,.20);--bd2:rgba(168,85,247,.45);--bd3:rgba(192,132,252,.75);
-  --e:cubic-bezier(.22,1.2,.36,1);--es:cubic-bezier(.4,0,.2,1);
-}
+:root{--bg:#05060c;--g1:rgba(19,24,38,.55);--g2:rgba(26,33,56,.45);--g3:rgba(40,50,80,.35);--text:#eef1ff;--soft:#c8cfe0;--muted:#8b95a9;--p:#a855f7;--p2:#7c3aed;--p3:#c084fc;--pglow:rgba(168,85,247,.55);--ok:#10b981;--bad:#ef4444;--warn:#f59e0b;--bd:rgba(168,85,247,.20);--bd2:rgba(168,85,247,.45);--bd3:rgba(192,132,252,.75);--e:cubic-bezier(.22,1.2,.36,1);--es:cubic-bezier(.4,0,.2,1)}
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;width:100%;overflow:hidden}
 body{font-family:'Cairo',system-ui,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
@@ -27,8 +20,6 @@ body{font-family:'Cairo',system-ui,sans-serif;background:var(--bg);color:var(--t
 .bg.aur{background:radial-gradient(ellipse 60% 50% at 15% 10%,rgba(168,85,247,.22),transparent 55%),radial-gradient(ellipse 55% 60% at 85% 90%,rgba(124,58,237,.18),transparent 55%),radial-gradient(ellipse 70% 60% at 50% 50%,rgba(192,132,252,.08),transparent 60%);animation:aur 24s ease-in-out infinite alternate}
 @keyframes aur{0%{transform:translate(0,0) scale(1)}100%{transform:translate(-2%,2%) scale(1.08)}}
 .bg.gr{background-image:linear-gradient(rgba(168,85,247,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(168,85,247,.045) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse at center,black 20%,transparent 75%);-webkit-mask-image:radial-gradient(ellipse at center,black 20%,transparent 75%)}
-
-/* ═══ SPLASH ═══ */
 .splash{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:36px;background:radial-gradient(ellipse at center,#0a0d18 0%,#05060c 75%);transition:opacity .9s var(--es),transform 1s var(--es),filter .9s}
 .splash.leave{opacity:0;transform:scale(1.15);filter:blur(18px);pointer-events:none}
 .sp-par{position:absolute;inset:0;overflow:hidden;pointer-events:none}
@@ -51,12 +42,8 @@ body{font-family:'Cairo',system-ui,sans-serif;background:var(--bg);color:var(--t
 @keyframes spStart{to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes spPulse{0%,100%{box-shadow:0 0 24px rgba(168,85,247,.5)}50%{box-shadow:0 0 40px rgba(168,85,247,.85)}}
 .sp-start:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 0 40px rgba(168,85,247,.85)}
-
-/* ═══ APP ═══ */
 .app{position:relative;z-index:1;display:flex;height:100vh;width:100vw;opacity:0;pointer-events:none;transition:opacity .8s var(--es) .2s}
 .app.vis{opacity:1;pointer-events:auto}
-
-/* Sidebar */
 .sb{width:300px;flex-shrink:0;background:linear-gradient(180deg,rgba(10,13,24,.72),rgba(10,13,24,.55));backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-left:1px solid var(--bd);display:flex;flex-direction:column;transition:transform .4s var(--es);z-index:60}
 .sb-h{padding:22px 20px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center}
 .br{display:flex;align-items:center;gap:12px}
@@ -85,8 +72,6 @@ body{font-family:'Cairo',system-ui,sans-serif;background:var(--bg);color:var(--t
 .sbf{padding:12px;border-top:1px solid var(--bd);display:flex;flex-direction:column;gap:6px}
 .sbf button{width:100%;padding:11px 14px;background:var(--g2);color:var(--soft);border:1px solid var(--bd);border-radius:12px;cursor:pointer;font-family:inherit;font-size:.82rem;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .25s var(--es)}
 .sbf button:hover{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;border-color:transparent}
-
-/* Main */
 .main{flex:1;display:flex;flex-direction:column;min-width:0;position:relative}
 .tbar{padding:14px 22px;background:linear-gradient(180deg,rgba(19,24,38,.65),rgba(19,24,38,.35));backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;z-index:30;transition:padding .35s var(--es),min-height .35s var(--es);min-height:70px}
 .tbar-l{display:flex;align-items:center;gap:14px}
@@ -104,7 +89,6 @@ body{font-family:'Cairo',system-ui,sans-serif;background:var(--bg);color:var(--t
 .sbar{display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--g2);border:1px solid var(--bd);border-radius:50px;font-size:.72rem;color:var(--muted)}
 .ldot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok);animation:db 2s infinite}
 @keyframes db{0%,100%{opacity:1}50%{opacity:.45}}
-
 .quick{padding:10px 18px;background:rgba(10,13,24,.4);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--bd);display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;transition:max-height .4s var(--es),padding .4s var(--es),opacity .3s;max-height:80px;opacity:1}
 .quick::-webkit-scrollbar{display:none}
 .quick button{padding:8px 16px;background:var(--g2);color:var(--soft);border:1px solid var(--bd);border-radius:50px;cursor:pointer;font-size:.77rem;font-family:inherit;white-space:nowrap;transition:all .3s var(--es);display:flex;align-items:center;gap:8px;flex-shrink:0}
@@ -115,19 +99,16 @@ body.cmode .pg-s{display:none}
 body.cmode .quick{max-height:0;padding:0 18px;opacity:0;pointer-events:none;overflow:hidden}
 body.cmode .tbar-r .pill span{display:none}
 body.cmode .tbar-r .sbar span:last-child{display:none}
-
 .chat{flex:1;overflow-y:auto;padding:26px 22px 20px;display:flex;flex-direction:column;gap:16px;scroll-behavior:smooth}
 body.cmode .chat{padding:22px 18px 16px}
 .chat::-webkit-scrollbar{width:8px}
 .chat::-webkit-scrollbar-thumb{background:rgba(168,85,247,.28);border-radius:4px}
-
 .welcome{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;text-align:center;padding:40px 20px}
 .wl-logo{font-size:clamp(2.2rem,7vw,3.4rem);font-weight:900;letter-spacing:2px;background:linear-gradient(135deg,#f3e8ff 0%,var(--p3) 40%,var(--p) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 26px rgba(168,85,247,.5))}
 .welcome p{color:var(--muted);max-width:520px;line-height:1.9;font-size:.98rem}
 .wl-chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:8px}
 .wl-chips button{padding:12px 20px;background:var(--g2);color:var(--soft);border:1px solid var(--bd);border-radius:16px;cursor:pointer;font-family:inherit;font-size:.85rem;display:flex;align-items:center;gap:10px;transition:all .3s var(--es)}
 .wl-chips button:hover{background:linear-gradient(135deg,rgba(168,85,247,.28),rgba(124,58,237,.28));border-color:var(--bd3);color:#fff;transform:translateY(-3px)}
-
 .msg{max-width:82%;padding:16px 20px;border-radius:20px;line-height:1.75;word-wrap:break-word;position:relative;animation:mIn .55s var(--e);font-size:.94rem}
 @keyframes mIn{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
 .msg.user{align-self:flex-end;background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;border-bottom-left-radius:6px;box-shadow:0 8px 30px rgba(168,85,247,.35)}
@@ -155,7 +136,6 @@ pre code{display:block;white-space:pre;color:#d8e0f0}
 .typing span:nth-child(2){animation-delay:.18s}
 .typing span:nth-child(3){animation-delay:.36s}
 @keyframes tDot{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-9px);opacity:1}}
-
 .iwrap{background:linear-gradient(180deg,rgba(10,13,24,.35),rgba(10,13,24,.75));backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px);border-top:1px solid var(--bd);padding:16px 22px 18px;transition:padding .3s var(--es)}
 body.cmode .iwrap{padding:12px 18px 14px}
 .iinner{max-width:1080px;margin:0 auto;position:relative}
@@ -197,7 +177,6 @@ body.cmode textarea:focus{min-height:150px}
 body.cmode .hint{opacity:0;max-height:0;margin:0;overflow:hidden}
 .hint .keys{display:flex;gap:6px;align-items:center}
 .kbd{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:22px;padding:0 8px;background:var(--g2);border:1px solid var(--bd);border-radius:7px;font-family:monospace;font-size:.7rem;color:var(--p3)}
-
 .ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:55}
 .ov.show{display:block}
 .modal{position:fixed;inset:0;background:rgba(5,6,12,.85);display:none;align-items:center;justify-content:center;padding:22px;z-index:300}
@@ -210,13 +189,11 @@ body.cmode .hint{opacity:0;max-height:0;margin:0;overflow:hidden}
 .macts button{flex:1;padding:13px;border-radius:14px;border:none;font-family:inherit;font-weight:800;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
 .macts .cx{background:var(--g2);color:var(--soft);border:1px solid var(--bd)}
 .macts .pr{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff}
-
 .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);padding:14px 24px;background:var(--g1);backdrop-filter:blur(24px);border:1px solid var(--bd2);border-radius:16px;color:var(--text);font-size:.88rem;font-weight:600;opacity:0;pointer-events:none;transition:all .35s var(--e);z-index:400;display:flex;align-items:center;gap:10px;max-width:90%}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast i{color:var(--p3);font-size:1rem}
 .toast.success i{color:var(--ok)}
 .toast.error i{color:var(--bad)}
-
 .pcard{margin:16px 0 8px;padding:16px 18px;background:linear-gradient(135deg,rgba(168,85,247,.15),rgba(124,58,237,.1));border:1px solid var(--bd2);border-radius:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;box-shadow:0 8px 30px rgba(168,85,247,.2)}
 .pcard-ic{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--p),var(--p2));display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.4rem;flex-shrink:0;box-shadow:0 0 24px rgba(168,85,247,.5)}
 .pcard-i{flex:1;min-width:140px}
@@ -225,24 +202,13 @@ body.cmode .hint{opacity:0;max-height:0;margin:0;overflow:hidden}
 .pcard-m i{color:var(--p3);font-size:.7rem}
 .dlbtn{padding:10px 18px;background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;border:none;border-radius:12px;cursor:pointer;font-family:inherit;font-weight:800;font-size:.85rem;display:flex;align-items:center;gap:8px;box-shadow:0 6px 20px rgba(168,85,247,.5);transition:all .25s var(--es);white-space:nowrap}
 .dlbtn:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(168,85,247,.8)}
-
-@media(max-width:880px){
-  .sb{position:fixed;top:0;bottom:0;right:0;width:82%;max-width:330px;transform:translateX(105%)}
-  .sb.open{transform:translateX(0)}
-  .sb-x{display:flex}
-  .mbtn{display:flex}
-  .chat{padding:18px 14px}
-  .iwrap{padding:12px 14px 16px}
-  .ibtn{width:40px;height:40px;font-size:.9rem}
-  .msg{max-width:92%}
-}
+@media(max-width:880px){.sb{position:fixed;top:0;bottom:0;right:0;width:82%;max-width:330px;transform:translateX(105%)}.sb.open{transform:translateX(0)}.sb-x{display:flex}.mbtn{display:flex}.chat{padding:18px 14px}.iwrap{padding:12px 14px 16px}.ibtn{width:40px;height:40px;font-size:.9rem}.msg{max-width:92%}}
 </style>
 </head>
 <body>
 <div class="bg aur"></div>
 <div class="bg gr"></div>
 
-<!-- SPLASH -->
 <section class="splash" id="splash">
   <div class="sp-par" id="sppar"></div>
   <div class="sp-rings">
@@ -258,25 +224,17 @@ body.cmode .hint{opacity:0;max-height:0;margin:0;overflow:hidden}
   </button>
 </section>
 
-<!-- APP -->
 <section class="app" id="app">
   <aside class="sb" id="sb">
     <div class="sb-h">
       <div class="br">
         <div class="br-m"><i class="fa-solid fa-bolt"></i></div>
-        <div class="br-i">
-          <h1>الخلاقي</h1>
-          <p>الإصدار 21.0</p>
-        </div>
+        <div class="br-i"><h1>الخلاقي</h1><p>الإصدار 21.0</p></div>
       </div>
       <button class="sb-x" onclick="tglSb()"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    <button class="newc" onclick="newChat()" type="button">
-      <i class="fa-solid fa-plus"></i> محادثة جديدة
-    </button>
-    <div class="chats" id="chatsList">
-      <div class="chats-empty">لا توجد محادثات بعد</div>
-    </div>
+    <button class="newc" onclick="newChat()" type="button"><i class="fa-solid fa-plus"></i> محادثة جديدة</button>
+    <div class="chats" id="chatsList"><div class="chats-empty">لا توجد محادثات بعد</div></div>
     <div class="provs">
       <div class="r"><span>Gemini</span><span class="sdot" id="dotGem"></span></div>
       <div class="r"><span>Groq</span><span class="sdot" id="dotGroq"></span></div>
@@ -305,10 +263,7 @@ body.cmode .hint{opacity:0;max-height:0;margin:0;overflow:hidden}
       <div class="tbar-r">
         <button class="pill" id="ttsBtn" onclick="tglTTS()" type="button"><i class="fa-solid fa-volume-high"></i> <span>قراءة</span></button>
         <button class="pill" id="liveBtn" onclick="tglLive()" type="button"><i class="fa-solid fa-headset"></i> <span>صوتي</span></button>
-        <div class="sbar">
-          <span class="ldot"></span>
-          <span id="activeProv">جاهز</span>
-        </div>
+        <div class="sbar"><span class="ldot"></span><span id="activeProv">جاهز</span></div>
       </div>
     </header>
 
@@ -330,12 +285,10 @@ body.cmode .hint{opacity:0;max-height:0;margin:0;overflow:hidden}
           <div class="inf" id="prevInfo">صورة جاهزة</div>
           <button class="rm" onclick="rmImg()" type="button"><i class="fa-solid fa-xmark"></i> إزالة</button>
         </div>
-
         <div class="vpill" id="vind">
           <div class="vwave"><span></span><span></span><span></span><span></span><span></span></div>
           <span id="vstatus">جاري الاستماع...</span>
         </div>
-
         <div class="ibox">
           <textarea id="input" rows="1" placeholder="اكتب رسالتك هنا... Enter لسطر جديد | Shift+Enter للإرسال"></textarea>
           <div class="iasc">
@@ -350,12 +303,10 @@ body.cmode .hint{opacity:0;max-height:0;margin:0;overflow:hidden}
             </button>
           </div>
         </div>
-
         <div class="hint">
           <span class="keys"><span class="kbd">Enter</span> سطر جديد</span>
           <span class="keys"><span class="kbd">Shift</span> + <span class="kbd">Enter</span> إرسال</span>
         </div>
-
         <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="onFile(event)">
       </div>
     </div>
@@ -380,17 +331,11 @@ body.cmode .hint{opacity:0;max-height:0;margin:0;overflow:hidden}
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════════════════
-   CONFIG
-   ═══════════════════════════════════════════════════════════ */
 const API = '/api/v1';
 const IS_FILE = location.protocol === 'file:';
 let DEMO = IS_FILE;
 let REACHABLE = false;
 
-/* ═══════════════════════════════════════════════════════════
-   SYSTEM PROMPT
-   ═══════════════════════════════════════════════════════════ */
 const SYSTEM_PROMPT = [
 'أنت "الخلاقي" — مهندس برمجيات وتطبيقات محترف من إعداد حسين غلاب.',
 '',
@@ -411,8 +356,7 @@ const SYSTEM_PROMPT = [
 '  "description": "آلة حاسبة بسيطة",',
 '  "files": [',
 '    {"path": "app/build.gradle", "content": "..."},',
-'    {"path": "app/src/main/AndroidManifest.xml", "content": "..."},',
-'    {"path": "app/src/main/java/com/hussein/calculator/MainActivity.kt", "content": "..."}',
+'    {"path": "app/src/main/AndroidManifest.xml", "content": "..."}',
 '  ]',
 '}',
 '```',
@@ -423,7 +367,6 @@ const SYSTEM_PROMPT = [
 '3. اكتب كل ملف كاملاً داخل "content"',
 '4. استخدم \\n للأسطر الجديدة داخل content',
 '5. framework: kotlin | java | flutter | react-native | html',
-'6. أضف كل ملفات البناء',
 '',
 '📌 القواعد العامة:',
 '• دقة الأكواد — نظيف، متوافق، minSdk 21 و targetSdk 34',
@@ -436,15 +379,8 @@ const SYSTEM_PROMPT = [
 'المطور: حسين غلاب | الإصدار: 21.0'
 ].join('\n');
 
-const LS = {
-  UID:'khallaqi_user_id',
-  CHATS:'khallaqi_chats',
-  MSGS:'khallaqi_msgs_',
-  CUR:'khallaqi_current_chat',
-  TTS:'khallaqi_tts'
-};
+const LS = {UID:'khallaqi_user_id',CHATS:'khallaqi_chats',MSGS:'khallaqi_msgs_',CUR:'khallaqi_current_chat',TTS:'khallaqi_tts'};
 
-/* ═══ State ═══ */
 let USER_ID = localStorage.getItem(LS.UID) || (() => {
   const id = 'u_' + Math.random().toString(36).slice(2) + Date.now();
   localStorage.setItem(LS.UID, id);
@@ -464,7 +400,6 @@ let recog = null;
 let audioEl = null;
 let azureOk = false;
 
-/* ═══ DOM ═══ */
 const $ = id => document.getElementById(id);
 const splash = $('splash'), app = $('app'), chatEl = $('chat');
 const inputEl = $('input'), sBtn = $('sendBtn'), sLbl = $('sendLabel');
@@ -474,407 +409,92 @@ const ttsBtn = $('ttsBtn'), liveBtn = $('liveBtn');
 const vind = $('vind'), vstatus = $('vstatus');
 const toastEl = $('toast'), toastTxt = $('toastText');
 
-/* ═══ Splash particles ═══ */
-(function() {
-  const c = $('sppar');
-  for (let i = 0; i < 70; i++) {
-    const p = document.createElement('span');
-    const a = Math.random() * Math.PI * 2;
-    const d = 480 + Math.random() * 640;
-    p.style.setProperty('--px', (Math.cos(a) * d) + 'px');
-    p.style.setProperty('--py', (Math.sin(a) * d) + 'px');
-    p.style.setProperty('--pd', (Math.random() * 1.2) + 's');
-    const s = 2 + Math.random() * 4;
-    p.style.width = s + 'px';
-    p.style.height = s + 'px';
-    c.appendChild(p);
-  }
-})();
+(function(){const c=$('sppar');for(let i=0;i<70;i++){const p=document.createElement('span');const a=Math.random()*Math.PI*2;const d=480+Math.random()*640;p.style.setProperty('--px',(Math.cos(a)*d)+'px');p.style.setProperty('--py',(Math.sin(a)*d)+'px');p.style.setProperty('--pd',(Math.random()*1.2)+'s');const s=2+Math.random()*4;p.style.width=s+'px';p.style.height=s+'px';c.appendChild(p);}})();
 
-/* ═══ Sound ═══ */
-function playSound() {
-  try {
-    const a = new Audio('intro-sound.mp3');
-    a.volume = 0.65;
-    a.play().catch(() => chime());
-  } catch (e) { chime(); }
-}
-function chime() {
-  try {
-    const Ctx = window.AudioContext || window.webkitAudioContext;
-    if (!Ctx) return;
-    const ctx = new Ctx();
-    [440, 554.37, 659.25, 880].forEach((f, i) => {
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.type = 'sine';
-      o.frequency.value = f;
-      const t0 = ctx.currentTime + i * 0.11;
-      g.gain.setValueAtTime(0, t0);
-      g.gain.linearRampToValueAtTime(0.14, t0 + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.001, t0 + 0.9);
-      o.connect(g).connect(ctx.destination);
-      o.start(t0);
-      o.stop(t0 + 1.0);
-    });
-  } catch (e) {}
-}
-setTimeout(playSound, 2900);
+function playSound(){try{const a=new Audio('intro-sound.mp3');a.volume=.65;a.play().catch(()=>chime());}catch(e){chime();}}
+function chime(){try{const Ctx=window.AudioContext||window.webkitAudioContext;if(!Ctx)return;const ctx=new Ctx();[440,554.37,659.25,880].forEach((f,i)=>{const o=ctx.createOscillator();const g=ctx.createGain();o.type='sine';o.frequency.value=f;const t0=ctx.currentTime+i*.11;g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(.14,t0+.02);g.gain.exponentialRampToValueAtTime(.001,t0+.9);o.connect(g).connect(ctx.destination);o.start(t0);o.stop(t0+1);});}catch(e){}}
+setTimeout(playSound,2900);
 
-$('startBtn').addEventListener('click', () => {
-  splash.classList.add('leave');
-  setTimeout(() => {
-    splash.style.display = 'none';
-    app.classList.add('vis');
-    initApp();
-  }, 700);
-});
+$('startBtn').addEventListener('click',()=>{splash.classList.add('leave');setTimeout(()=>{splash.style.display='none';app.classList.add('vis');initApp();},700);});
 
-/* ═══ Toast ═══ */
-let toastT = null;
-function toast(txt, kind = 'success') {
-  toastTxt.textContent = txt;
-  toastEl.className = 'toast show ' + kind;
-  const ic = toastEl.querySelector('i');
-  if (kind === 'error') ic.className = 'fa-solid fa-circle-exclamation';
-  else if (kind === 'info') ic.className = 'fa-solid fa-circle-info';
-  else ic.className = 'fa-solid fa-circle-check';
-  clearTimeout(toastT);
-  toastT = setTimeout(() => toastEl.classList.remove('show'), 2600);
-}
+let toastT=null;
+function toast(txt,kind='success'){toastTxt.textContent=txt;toastEl.className='toast show '+kind;const ic=toastEl.querySelector('i');if(kind==='error')ic.className='fa-solid fa-circle-exclamation';else if(kind==='info')ic.className='fa-solid fa-circle-info';else ic.className='fa-solid fa-circle-check';clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove('show'),2600);}
 
-/* ═══ Storage ═══ */
-function loadChats() {
-  try { return JSON.parse(localStorage.getItem(LS.CHATS) || '[]'); }
-  catch (e) { return []; }
-}
-function saveChats() {
-  try { localStorage.setItem(LS.CHATS, JSON.stringify(chats)); } catch (e) {}
-}
-function loadMsgs(id) {
-  try { return JSON.parse(localStorage.getItem(LS.MSGS + id) || '[]'); }
-  catch (e) { return []; }
-}
-function saveMsgs(id, m) {
-  try { localStorage.setItem(LS.MSGS + id, JSON.stringify(m)); } catch (e) {}
-}
-function pushMsg(id, m) {
-  const l = loadMsgs(id); l.push(m); saveMsgs(id, l);
-}
-function rmMsgs(id) {
-  try { localStorage.removeItem(LS.MSGS + id); } catch (e) {}
-}
+function loadChats(){try{return JSON.parse(localStorage.getItem(LS.CHATS)||'[]');}catch(e){return[];}}
+function saveChats(){try{localStorage.setItem(LS.CHATS,JSON.stringify(chats));}catch(e){}}
+function loadMsgs(id){try{return JSON.parse(localStorage.getItem(LS.MSGS+id)||'[]');}catch(e){return[];}}
+function saveMsgs(id,m){try{localStorage.setItem(LS.MSGS+id,JSON.stringify(m));}catch(e){}}
+function pushMsg(id,m){const l=loadMsgs(id);l.push(m);saveMsgs(id,l);}
+function rmMsgs(id){try{localStorage.removeItem(LS.MSGS+id);}catch(e){}}
 
-/* ═══ API ═══ */
-async function api(path, opt = {}) {
-  opt.headers = opt.headers || {};
-  if (!opt.headers['X-User-ID']) opt.headers['X-User-ID'] = USER_ID;
-  if (opt.body && typeof opt.body === 'string' && !opt.headers['Content-Type']) {
-    opt.headers['Content-Type'] = 'application/json';
-  }
-  const r = await fetch(path, opt);
-  const raw = await r.text();
-  let d;
-  try { d = raw ? JSON.parse(raw) : {}; } catch (e) { throw new Error('رد غير متوقع'); }
-  if (!r.ok) { throw new Error(d.error || d.message || ('HTTP ' + r.status)); }
-  return d;
-}
-async function detect() {
-  if (IS_FILE) { DEMO = true; return; }
-  try {
-    const r = await fetch(API + '/status');
-    if (r.ok) { REACHABLE = true; DEMO = false; return; }
-  } catch (e) {}
-  DEMO = true;
-}
+async function api(path,opt={}){opt.headers=opt.headers||{};if(!opt.headers['X-User-ID'])opt.headers['X-User-ID']=USER_ID;if(opt.body&&typeof opt.body==='string'&&!opt.headers['Content-Type'])opt.headers['Content-Type']='application/json';const r=await fetch(path,opt);const raw=await r.text();let d;try{d=raw?JSON.parse(raw):{};}catch(e){throw new Error('رد غير متوقع');}if(!r.ok){throw new Error(d.error||d.message||('HTTP '+r.status));}return d;}
+async function detect(){if(IS_FILE){DEMO=true;return;}try{const r=await fetch(API+'/status');if(r.ok){REACHABLE=true;DEMO=false;return;}}catch(e){}DEMO=true;}
 
-/* ═══ TTS ═══ */
-const VC = { lang:'ar-SA', pitch:1.08, rate:1.0, vol:1.0, kw:['hamed','hameed','حامد','male','majed','naayf','shakir','رجل'] };
-function upTtsUI() { ttsBtn.classList.toggle('on', ttsOn); }
-function tglTTS() {
-  ttsOn = !ttsOn;
-  localStorage.setItem(LS.TTS, ttsOn ? 'true' : 'false');
-  upTtsUI();
-  if (ttsOn) speakTxt('تم تفعيل قراءة الردود');
-  else stopSpeak();
-}
+const VC={lang:'ar-SA',pitch:1.08,rate:1.0,vol:1.0,kw:['hamed','hameed','حامد','male','majed','naayf','shakir','رجل']};
+function upTtsUI(){ttsBtn.classList.toggle('on',ttsOn);}
+function tglTTS(){ttsOn=!ttsOn;localStorage.setItem(LS.TTS,ttsOn?'true':'false');upTtsUI();if(ttsOn)speakTxt('تم تفعيل قراءة الردود');else stopSpeak();}
 upTtsUI();
 
-function pickVoice() {
-  if (!('speechSynthesis' in window)) return null;
-  const vs = window.speechSynthesis.getVoices();
-  if (!vs || !vs.length) return null;
-  const saudi = vs.find(v => {
-    const n = v.name.toLowerCase(), l = v.lang.toLowerCase();
-    return (l.startsWith('ar-sa') || l.includes('sa')) && VC.kw.some(k => n.includes(k.toLowerCase()));
-  });
-  if (saudi) return saudi;
-  const ar = vs.find(v => {
-    const n = v.name.toLowerCase(), l = v.lang.toLowerCase();
-    return l.startsWith('ar') && VC.kw.some(k => n.includes(k.toLowerCase()));
-  });
-  if (ar) return ar;
-  return vs.find(v => v.lang.toLowerCase().startsWith('ar-sa')) ||
-         vs.find(v => v.lang.toLowerCase().startsWith('ar')) || null;
-}
+function pickVoice(){if(!('speechSynthesis'in window))return null;const vs=window.speechSynthesis.getVoices();if(!vs||!vs.length)return null;const saudi=vs.find(v=>{const n=v.name.toLowerCase(),l=v.lang.toLowerCase();return(l.startsWith('ar-sa')||l.includes('sa'))&&VC.kw.some(k=>n.includes(k.toLowerCase()));});if(saudi)return saudi;const ar=vs.find(v=>{const n=v.name.toLowerCase(),l=v.lang.toLowerCase();return l.startsWith('ar')&&VC.kw.some(k=>n.includes(k.toLowerCase()));});if(ar)return ar;return vs.find(v=>v.lang.toLowerCase().startsWith('ar-sa'))||vs.find(v=>v.lang.toLowerCase().startsWith('ar'))||null;}
 
-async function speakTxt(text) {
-  if (!text) return;
+// ═══ التعديل 2-ب: speakTxt مع Native Android TTS ═══
+async function speakTxt(text){
+  if(!text)return;
   stopSpeak();
-  if (azureOk && !DEMO) {
-    try {
-      const b = await fetchAzure(text);
-      if (b) { await playBlob(b); return; }
-    } catch (e) {}
+  if(typeof AndroidTTS!=='undefined'&&AndroidTTS){
+    try{AndroidTTS.speak(text);speak=true;micBtn.classList.add('speaking');return;}catch(e){}
   }
+  if(azureOk&&!DEMO){try{const b=await fetchAzure(text);if(b){await playBlob(b);return;}}catch(e){}}
   webSpeak(text);
 }
-async function fetchAzure(text) {
-  try {
-    const r = await fetch(API + '/tts', {
-      method:'POST',
-      headers:{ 'Content-Type':'application/json', 'X-User-ID': USER_ID },
-      body: JSON.stringify({ text })
-    });
-    if ((r.headers.get('content-type') || '').includes('audio')) return await r.blob();
-    return null;
-  } catch (e) { return null; }
-}
-function playBlob(b) {
-  return new Promise(res => {
-    const u = URL.createObjectURL(b);
-    const a = new Audio(u);
-    audioEl = a;
-    speak = true;
-    micBtn.classList.add('speaking');
-    const done = () => {
-      speak = false;
-      micBtn.classList.remove('speaking');
-      URL.revokeObjectURL(u);
-      audioEl = null;
-      res();
-      onSpeakEnd();
-    };
-    a.onended = done;
-    a.onerror = done;
-    a.play().catch(done);
-  });
-}
-function webSpeak(text) {
-  if (!('speechSynthesis' in window)) return;
-  const clean = text.replace(/```[\s\S]*?```/g, ' كود ').replace(/`([^`]+)`/g, '$1').replace(/[#*_]/g, '').substring(0, 600);
-  const u = new SpeechSynthesisUtterance(clean);
-  u.lang = VC.lang;
-  u.pitch = VC.pitch;
-  u.rate = VC.rate;
-  u.volume = VC.vol;
-  const v = pickVoice();
-  if (v) u.voice = v;
-  u.onstart = () => { speak = true; micBtn.classList.add('speaking'); };
-  u.onend = () => { speak = false; micBtn.classList.remove('speaking'); onSpeakEnd(); };
-  u.onerror = () => { speak = false; micBtn.classList.remove('speaking'); onSpeakEnd(); };
-  window.speechSynthesis.speak(u);
-}
-function stopSpeak() {
-  if (audioEl) { try { audioEl.pause(); } catch (e) {} audioEl = null; }
-  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-  speak = false;
+async function fetchAzure(text){try{const r=await fetch(API+'/tts',{method:'POST',headers:{'Content-Type':'application/json','X-User-ID':USER_ID},body:JSON.stringify({text})});if((r.headers.get('content-type')||'').includes('audio'))return await r.blob();return null;}catch(e){return null;}}
+function playBlob(b){return new Promise(res=>{const u=URL.createObjectURL(b);const a=new Audio(u);audioEl=a;speak=true;micBtn.classList.add('speaking');const done=()=>{speak=false;micBtn.classList.remove('speaking');URL.revokeObjectURL(u);audioEl=null;res();onSpeakEnd();};a.onended=done;a.onerror=done;a.play().catch(done);});}
+function webSpeak(text){if(!('speechSynthesis'in window))return;const clean=text.replace(/```[\s\S]*?```/g,' كود ').replace(/`([^`]+)`/g,'$1').replace(/[#*_]/g,'').substring(0,600);const u=new SpeechSynthesisUtterance(clean);u.lang=VC.lang;u.pitch=VC.pitch;u.rate=VC.rate;u.volume=VC.vol;const v=pickVoice();if(v)u.voice=v;u.onstart=()=>{speak=true;micBtn.classList.add('speaking');};u.onend=()=>{speak=false;micBtn.classList.remove('speaking');onSpeakEnd();};u.onerror=()=>{speak=false;micBtn.classList.remove('speaking');onSpeakEnd();};window.speechSynthesis.speak(u);}
+
+// ═══ التعديل 2-ب: stopSpeak مع Native Android ═══
+function stopSpeak(){
+  if(audioEl){try{audioEl.pause();}catch(e){}audioEl=null;}
+  if(typeof AndroidTTS!=='undefined'&&AndroidTTS){try{AndroidTTS.stop();}catch(e){}}
+  if('speechSynthesis'in window)window.speechSynthesis.cancel();
+  speak=false;
   micBtn.classList.remove('speaking');
 }
-function onSpeakEnd() {
-  if (live && !rec) setTimeout(() => { if (live && !isSending) startVoice(); }, 500);
-}
+function onSpeakEnd(){if(live&&!rec)setTimeout(()=>{if(live&&!isSending)startVoice();},500);}
 
-/* ═══ STT ═══ */
-function initRecog() {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) return null;
-  const r = new SR();
-  r.lang = 'ar-SA';
-  r.continuous = false;
-  r.interimResults = true;
-  r.onresult = e => {
-    let it = '', fi = '';
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      const t = e.results[i][0].transcript;
-      if (e.results[i].isFinal) fi += t; else it += t;
-    }
-    inputEl.value = fi || it;
-    if (fi) {
-      vstatus.textContent = 'تم الالتقاط...';
-      setTimeout(() => { if (!isSending) sendMsg(); }, 500);
-    }
-  };
-  r.onerror = e => {
-    if (e.error === 'not-allowed') toast('يجب السماح بالميكروفون', 'error');
-    else if (e.error === 'no-speech') toast('لم يتم التقاط صوت', 'info');
-    stopVoice();
-  };
-  r.onend = () => stopVoice();
-  return r;
-}
-function tglVoice() { rec ? stopVoice() : startVoice(); }
-function startVoice() {
-  if (speak) { stopSpeak(); return; }
-  if (!recog) recog = initRecog();
-  if (!recog) { toast('المتصفح لا يدعم الصوت', 'error'); return; }
-  try {
-    recog.start();
-    rec = true;
-    micBtn.classList.add('rec');
-    micBtn.innerHTML = '<i class="fa-solid fa-stop"></i>';
-    vind.classList.add('show');
-    vstatus.textContent = 'جاري الاستماع...';
-  } catch (e) {}
-}
-function stopVoice() {
-  if (recog && rec) { try { recog.stop(); } catch (e) {} }
-  rec = false;
-  micBtn.classList.remove('rec');
-  micBtn.innerHTML = '<i class="fa-solid fa-microphone"></i>';
-  vind.classList.remove('show');
-}
-function tglLive() {
-  live = !live;
-  if (live) {
-    liveBtn.classList.add('live');
-    ttsOn = true;
-    localStorage.setItem(LS.TTS, 'true');
-    upTtsUI();
-    toast('المحادثة الصوتية مفعّلة', 'info');
-    startVoice();
-  } else {
-    liveBtn.classList.remove('live');
-    stopVoice();
-    stopSpeak();
-    toast('تم إيقاف المحادثة الصوتية', 'info');
-  }
-}
+function initRecog(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return null;const r=new SR();r.lang='ar-SA';r.continuous=false;r.interimResults=true;r.onresult=e=>{let it='',fi='';for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)fi+=t;else it+=t;}inputEl.value=fi||it;if(fi){vstatus.textContent='تم الالتقاط...';setTimeout(()=>{if(!isSending)sendMsg();},500);}};r.onerror=e=>{if(e.error==='not-allowed')toast('يجب السماح بالميكروفون','error');else if(e.error==='no-speech')toast('لم يتم التقاط صوت','info');stopVoice();};r.onend=()=>stopVoice();return r;}
+function tglVoice(){rec?stopVoice():startVoice();}
+function startVoice(){if(speak){stopSpeak();return;}if(!recog)recog=initRecog();if(!recog){toast('المتصفح لا يدعم الصوت','error');return;}try{recog.start();rec=true;micBtn.classList.add('rec');micBtn.innerHTML='<i class="fa-solid fa-stop"></i>';vind.classList.add('show');vstatus.textContent='جاري الاستماع...';}catch(e){}}
+function stopVoice(){if(recog&&rec){try{recog.stop();}catch(e){}}rec=false;micBtn.classList.remove('rec');micBtn.innerHTML='<i class="fa-solid fa-microphone"></i>';vind.classList.remove('show');}
+function tglLive(){live=!live;if(live){liveBtn.classList.add('live');ttsOn=true;localStorage.setItem(LS.TTS,'true');upTtsUI();toast('المحادثة الصوتية مفعّلة','info');startVoice();}else{liveBtn.classList.remove('live');stopVoice();stopSpeak();toast('تم إيقاف المحادثة الصوتية','info');}}
 
-/* ═══ Image ═══ */
-function pickImg() { fileIn.click(); }
-function onFile(e) {
-  const f = e.target.files[0];
-  if (!f) return;
-  if (!f.type.startsWith('image/')) { toast('اختر صورة صحيحة', 'error'); return; }
-  if (f.size > 10*1024*1024) { toast('الصورة كبيرة (10MB)', 'error'); return; }
-  selImgType = f.type;
-  const rd = new FileReader();
-  rd.onload = ev => {
-    selImg = ev.target.result;
-    prevImg.src = selImg;
-    $('prevInfo').textContent = `${(f.size/1024).toFixed(1)} KB`;
-    prevBox.classList.add('show');
-  };
-  rd.readAsDataURL(f);
-  fileIn.value = '';
-}
-function rmImg() { selImg = null; prevImg.src = ''; prevBox.classList.remove('show'); }
+function pickImg(){fileIn.click();}
+function onFile(e){const f=e.target.files[0];if(!f)return;if(!f.type.startsWith('image/')){toast('اختر صورة صحيحة','error');return;}if(f.size>10*1024*1024){toast('الصورة كبيرة (10MB)','error');return;}selImgType=f.type;const rd=new FileReader();rd.onload=ev=>{selImg=ev.target.result;prevImg.src=selImg;$('prevInfo').textContent=`${(f.size/1024).toFixed(1)} KB`;prevBox.classList.add('show');};rd.readAsDataURL(f);fileIn.value='';}
+function rmImg(){selImg=null;prevImg.src='';prevBox.classList.remove('show');}
 
-/* ═══ Video ═══ */
-function openVid() { $('vidModal').classList.add('show'); }
-function closeVid() { $('vidModal').classList.remove('show'); }
-async function genVid() {
-  const p = $('vidPrompt').value.trim();
-  if (!p) { toast('الوصف مطلوب', 'error'); return; }
-  if (!currentChatId) await newChat();
-  closeVid();
-  addMsg('طلب توليد فيديو: ' + p, 'user');
-  if (DEMO) { setTimeout(() => addMsg('الوضع التجريبي: لا يمكن توليد الفيديو.', 'info'), 700); return; }
-  showTyping();
-  try {
-    const d = await api(API + '/generate-video', { method:'POST', body: JSON.stringify({ prompt:p, chat_id:currentChatId, user_id:USER_ID }) });
-    hideTyping();
-    if (d.error) { addMsg(d.error, 'error'); return; }
-    addMsg('تم بدء التوليد، رقم العملية: ' + d.operation, 'bot', d.model);
-    pollVid(d.operation);
-  } catch (e) { hideTyping(); addMsg(e.message, 'error'); }
-}
-function pollVid(op, n = 0) {
-  if (n > 60) { addMsg('الفيديو يستغرق وقتاً', 'info'); return; }
-  setTimeout(async () => {
-    try {
-      const d = await api(API + '/video-status', { method:'POST', body: JSON.stringify({ operation:op }) });
-      if (d.done && d.video_url) addMsg('تم التوليد: ' + d.video_url, 'bot');
-      else if (!d.done) pollVid(op, n + 1);
-    } catch (e) { pollVid(op, n + 1); }
-  }, 10000);
-}
+function openVid(){$('vidModal').classList.add('show');}
+function closeVid(){$('vidModal').classList.remove('show');}
+async function genVid(){const p=$('vidPrompt').value.trim();if(!p){toast('الوصف مطلوب','error');return;}if(!currentChatId)await newChat();closeVid();addMsg('طلب توليد فيديو: '+p,'user');if(DEMO){setTimeout(()=>addMsg('الوضع التجريبي: لا يمكن توليد الفيديو.','info'),700);return;}showTyping();try{const d=await api(API+'/generate-video',{method:'POST',body:JSON.stringify({prompt:p,chat_id:currentChatId,user_id:USER_ID})});hideTyping();if(d.error){addMsg(d.error,'error');return;}addMsg('تم بدء التوليد، رقم العملية: '+d.operation,'bot',d.model);pollVid(d.operation);}catch(e){hideTyping();addMsg(e.message,'error');}}
+function pollVid(op,n=0){if(n>60){addMsg('الفيديو يستغرق وقتاً','info');return;}setTimeout(async()=>{try{const d=await api(API+'/video-status',{method:'POST',body:JSON.stringify({operation:op})});if(d.done&&d.video_url)addMsg('تم التوليد: '+d.video_url,'bot');else if(!d.done)pollVid(op,n+1);}catch(e){pollVid(op,n+1);}},10000);}
 
-/* ═══ Sidebar ═══ */
-function tglSb() { sb.classList.toggle('open'); ov.classList.toggle('show'); }
-function cMode() { document.body.classList.add('cmode'); }
-function unCmode() { document.body.classList.remove('cmode'); }
+function tglSb(){sb.classList.toggle('open');ov.classList.toggle('show');}
+function cMode(){document.body.classList.add('cmode');}
+function unCmode(){document.body.classList.remove('cmode');}
 
-/* ═══ Chats ═══ */
-async function loadAllChats() {
-  if (DEMO) { chats = loadChats(); renderChats(); return; }
-  try {
-    const d = await api(API + '/chats');
-    chats = d.chats || [];
-    renderChats();
-    saveChats();
-  } catch (e) { chats = loadChats(); renderChats(); }
-}
-function renderChats() {
-  const l = $('chatsList');
-  if (!chats.length) { l.innerHTML = '<div class="chats-empty">لا توجد محادثات بعد</div>'; return; }
-  l.innerHTML = '';
-  chats.forEach(c => {
-    const it = document.createElement('div');
-    it.className = 'ci' + (c.id === currentChatId ? ' on' : '');
-    const ic = document.createElement('i');
-    ic.className = 'fa-regular fa-comment ic';
-    const t = document.createElement('span');
-    t.className = 't';
-    t.textContent = c.title || 'محادثة';
-    const x = document.createElement('button');
-    x.className = 'x';
-    x.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
-    x.onclick = ev => { ev.stopPropagation(); delChat(c.id); };
-    it.appendChild(ic);
-    it.appendChild(t);
-    it.appendChild(x);
-    it.onclick = ev => { if (!ev.target.closest('.x')) openChat(c.id); };
-    l.appendChild(it);
-  });
-}
-async function newChat() {
-  if (DEMO) {
-    const id = 'demo-' + Date.now();
-    chats = [{ id, title:'محادثة جديدة', created_at:new Date().toISOString(), updated_at:new Date().toISOString() }, ...chats];
-    saveChats();
-    currentChatId = id;
-    localStorage.setItem(LS.CUR, id);
-    renderChats();
-    showWelcome();
-    unCmode();
-    if (window.innerWidth <= 880) tglSb();
-    return;
-  }
-  try {
-    const d = await api(API + '/chats/new', { method:'POST', body: JSON.stringify({ user_id:USER_ID }) });
-    if (!d.chat_id) { toast('فشل إنشاء محادثة', 'error'); return; }
-    currentChatId = d.chat_id;
-    localStorage.setItem(LS.CUR, currentChatId);
-    await loadAllChats();
-    showWelcome();
-    unCmode();
-    if (window.innerWidth <= 880) tglSb();
-  } catch (e) { toast(e.message, 'error'); }
-}
-async function openChat(id) {
+async function loadAllChats(){if(DEMO){chats=loadChats();renderChats();return;}try{const d=await api(API+'/chats');chats=d.chats||[];renderChats();saveChats();}catch(e){chats=loadChats();renderChats();}}
+function renderChats(){const l=$('chatsList');if(!chats.length){l.innerHTML='<div class="chats-empty">لا توجد محادثات بعد</div>';return;}l.innerHTML='';chats.forEach(c=>{const it=document.createElement('div');it.className='ci'+(c.id===currentChatId?' on':'');const ic=document.createElement('i');ic.className='fa-regular fa-comment ic';const t=document.createElement('span');t.className='t';t.textContent=c.title||'محادثة';const x=document.createElement('button');x.className='x';x.innerHTML='<i class="fa-solid fa-trash-can"></i>';x.onclick=ev=>{ev.stopPropagation();delChat(c.id);};it.appendChild(ic);it.appendChild(t);it.appendChild(x);it.onclick=ev=>{if(!ev.target.closest('.x'))openChat(c.id);};l.appendChild(it);});}
+
+async function newChat(){if(DEMO){const id='demo-'+Date.now();chats=[{id,title:'محادثة جديدة',created_at:new Date().toISOString(),updated_at:new Date().toISOString()},...chats];saveChats();currentChatId=id;localStorage.setItem(LS.CUR,id);renderChats();showWelcome();unCmode();if(window.innerWidth<=880)tglSb();return;}try{const d=await api(API+'/chats/new',{method:'POST',body:JSON.stringify({user_id:USER_ID})});if(!d.chat_id){toast('فشل إنشاء محادثة','error');return;}currentChatId=d.chat_id;localStorage.setItem(LS.CUR,currentChatId);await loadAllChats();showWelcome();unCmode();if(window.innerWidth<=880)tglSb();}catch(e){toast(e.message,'error');}}
+
+// ═══ التعديل 2-أ: openChat — لا تمسح رسائل الذكاء ═══
+async function openChat(id){
   currentChatId = id;
   localStorage.setItem(LS.CUR, id);
   await loadAllChats();
   chatEl.innerHTML = '';
   if (DEMO) {
     const msgs = loadMsgs(id);
-    if (msgs.length) {
-      cMode();
-      msgs.forEach(m => addMsg(m.content, m.role, m.source, false, m.type, m.media));
-      chatEl.scrollTop = chatEl.scrollHeight;
-    } else { unCmode(); showWelcome(); }
+    if (msgs.length) { cMode(); msgs.forEach(m => addMsg(m.content, m.role, m.source, false, m.type, m.media)); chatEl.scrollTop = chatEl.scrollHeight; }
+    else { unCmode(); showWelcome(); }
     if (window.innerWidth <= 880) tglSb();
     return;
   }
@@ -882,9 +502,16 @@ async function openChat(id) {
     const d = await api(API + '/chats/' + id);
     if (d.messages && d.messages.length) {
       cMode();
-      d.messages.forEach(m => addMsg(m.content, m.role === 'user' ? 'user' : 'bot', m.source, false, m.type, m.media));
+      const serverMsgs = d.messages.map(m => ({ role:m.role, content:m.content, source:m.source, type:m.type, media:m.media }));
+      const localMsgs = loadMsgs(id);
+      // ✅ لا تمسح — استخدم الأطول
+      if (serverMsgs.length > localMsgs.length) {
+        saveMsgs(id, serverMsgs);
+        serverMsgs.forEach(m => addMsg(m.content, m.role === 'user' ? 'user' : 'bot', m.source, false, m.type, m.media));
+      } else {
+        localMsgs.forEach(m => addMsg(m.content, m.role === 'user' ? 'user' : 'bot', m.source, false, m.type, m.media));
+      }
       chatEl.scrollTop = chatEl.scrollHeight;
-      saveMsgs(id, d.messages.map(m => ({ role:m.role, content:m.content, source:m.source, type:m.type, media:m.media })));
     } else {
       const lc = loadMsgs(id);
       if (lc.length) { cMode(); lc.forEach(m => addMsg(m.content, m.role, m.source, false, m.type, m.media)); }
@@ -897,550 +524,61 @@ async function openChat(id) {
   }
   if (window.innerWidth <= 880) tglSb();
 }
-async function delChat(id) {
-  if (!confirm('حذف هذه المحادثة نهائياً؟')) return;
-  if (DEMO) {
-    chats = chats.filter(c => c.id !== id);
-    saveChats();
-    rmMsgs(id);
-    if (currentChatId === id) { currentChatId = null; localStorage.removeItem(LS.CUR); unCmode(); showWelcome(); }
-    renderChats();
-    toast('تم الحذف');
-    return;
-  }
-  try {
-    await api(API + '/chats/' + id, { method:'DELETE', body: JSON.stringify({ user_id:USER_ID }) });
-    rmMsgs(id);
-    if (currentChatId === id) { currentChatId = null; localStorage.removeItem(LS.CUR); unCmode(); showWelcome(); }
-    await loadAllChats();
-    toast('تم الحذف');
-  } catch (e) {
-    chats = chats.filter(c => c.id !== id);
-    saveChats();
-    rmMsgs(id);
-    if (currentChatId === id) { currentChatId = null; unCmode(); showWelcome(); }
-    renderChats();
-    toast('تم الحذف محلياً', 'info');
-  }
-}
-function clearCur() {
-  if (!currentChatId) { toast('لا توجد محادثة مفتوحة', 'info'); return; }
-  if (!confirm('سيتم حذف رسائل هذه المحادثة فقط. متابعة؟')) return;
-  chatEl.innerHTML = '';
-  rmMsgs(currentChatId);
-  unCmode();
-  showWelcome();
-  toast('تم تفريغ المحادثة');
-}
 
-/* ═══ Welcome ═══ */
-function showWelcome() {
+async function delChat(id){if(!confirm('حذف هذه المحادثة نهائياً؟'))return;if(DEMO){chats=chats.filter(c=>c.id!==id);saveChats();rmMsgs(id);if(currentChatId===id){currentChatId=null;localStorage.removeItem(LS.CUR);unCmode();showWelcome();}renderChats();toast('تم الحذف');return;}try{await api(API+'/chats/'+id,{method:'DELETE',body:JSON.stringify({user_id:USER_ID})});rmMsgs(id);if(currentChatId===id){currentChatId=null;localStorage.removeItem(LS.CUR);unCmode();showWelcome();}await loadAllChats();toast('تم الحذف');}catch(e){chats=chats.filter(c=>c.id!==id);saveChats();rmMsgs(id);if(currentChatId===id){currentChatId=null;unCmode();showWelcome();}renderChats();toast('تم الحذف محلياً','info');}}
+function clearCur(){if(!currentChatId){toast('لا توجد محادثة مفتوحة','info');return;}if(!confirm('سيتم حذف رسائل هذه المحادثة فقط. متابعة؟'))return;chatEl.innerHTML='';rmMsgs(currentChatId);unCmode();showWelcome();toast('تم تفريغ المحادثة');}
+
+function showWelcome(){
   chatEl.innerHTML = `
     <div class="welcome">
       <div class="wl-logo">الخلاقي</div>
       <p>مساعدك الذكي العربي. اطلب تطبيقاً كاملاً، ارفع صورة، تحدث بصوتك، أو اطلب فيديو.</p>
       <div class="wl-chips">
-        <button onclick="qp('اكتب تطبيق أندرويد APK بلغة Kotlin كامل')">
-          <i class="fa-brands fa-android"></i> تطبيق APK
-        </button>
-        <button onclick="qp('اكتب تطبيق Flutter كامل')">
-          <i class="fa-solid fa-mobile-screen"></i> تطبيق Flutter
-        </button>
-        <button onclick="pickImg()">
-          <i class="fa-solid fa-image"></i> ارفع صورة
-        </button>
-        <button onclick="tglLive()">
-          <i class="fa-solid fa-headset"></i> محادثة صوتية
-        </button>
+        <button onclick="qp('اكتب تطبيق أندرويد APK بلغة Kotlin كامل')"><i class="fa-brands fa-android"></i> تطبيق APK</button>
+        <button onclick="qp('اكتب تطبيق Flutter كامل')"><i class="fa-solid fa-mobile-screen"></i> تطبيق Flutter</button>
+        <button onclick="pickImg()"><i class="fa-solid fa-image"></i> ارفع صورة</button>
+        <button onclick="tglLive()"><i class="fa-solid fa-headset"></i> محادثة صوتية</button>
       </div>
     </div>`;
 }
 
-/* ═══ APP PROJECT ═══ */
-function detectProjects(text) {
-  const list = [];
-  const re = /```app-project\s*\n([\s\S]*?)\n```/g;
-  let m;
-  while ((m = re.exec(text)) !== null) {
-    try {
-      let s = m[1].trim().replace(/,(\s*[}\]])/g, '$1');
-      const p = JSON.parse(s);
-      if (p && p.files && Array.isArray(p.files)) list.push(p);
-    } catch (e) { console.warn('parse fail', e); }
-  }
-  return list;
-}
-async function dlProject(p) {
-  try {
-    if (typeof JSZip === 'undefined') { await loadZip(); }
-    const zip = new JSZip();
-    const root = zip.folder(p.name || 'app');
-    p.files.forEach(f => root.file(f.path, String(f.content || '')));
-    root.file('README.md', buildReadme(p));
-    root.file('BUILD_INSTRUCTIONS.txt', buildInstr(p));
-    const b = await zip.generateAsync({ type:'blob', compression:'DEFLATE' });
-    const u = URL.createObjectURL(b);
-    const a = document.createElement('a');
-    a.href = u;
-    a.download = (p.name || 'app') + '.zip';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(u), 5000);
-    toast('تم تحميل المشروع', 'success');
-  } catch (e) { toast('فشل: ' + e.message, 'error'); }
-}
-function loadZip() {
-  return new Promise((res, rej) => {
-    if (typeof JSZip !== 'undefined') return res();
-    const s = document.createElement('script');
-    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
-    s.onload = res; s.onerror = rej;
-    document.head.appendChild(s);
-  });
-}
-function buildReadme(p) {
-  return ['# ' + (p.display_name || p.name), '', p.description || '', '',
-    '## المعلومات',
-    '- الإطار: ' + (p.framework || 'unknown'),
-    '- Package: ' + (p.package || 'unknown'),
-    '- الإصدار: ' + (p.version || '1.0.0'), '',
-    '## الملفات',
-    p.files.map(f => '- `' + f.path + '`').join('\n'), '',
-    '## البناء', buildInstr(p), '',
-    '---', 'تم التوليد بواسطة الخلاقي'].join('\n');
-}
-function buildInstr(p) {
-  const fw = (p.framework || '').toLowerCase();
-  if (fw === 'kotlin' || fw === 'java') {
-    return ['خطوات بناء APK:', '',
-      '1. حمّل Android Studio من developer.android.com/studio',
-      '2. افتح المجلد المستخرج',
-      '3. انتظر Gradle',
-      '4. Build → Build APK(s)',
-      '5. app/build/outputs/apk/debug/app-debug.apk'].join('\n');
-  }
-  if (fw === 'flutter') {
-    return ['1. flutter pub get', '2. flutter build apk --release',
-      'المسار: build/app/outputs/flutter-apk/app-release.apk'].join('\n');
-  }
-  if (fw === 'react-native') {
-    return ['1. npm install', '2. cd android && ./gradlew assembleRelease'].join('\n');
-  }
-  if (fw === 'html') {
-    return ['افتح index.html في المتصفح مباشرة'].join('\n');
-  }
-  return (p.build_instructions || ['راجع README']).join('\n');
-}
-function projectCard(p) {
-  const c = document.createElement('div');
-  c.className = 'pcard';
-  const ic = document.createElement('div');
-  ic.className = 'pcard-ic';
-  ic.innerHTML = '<i class="fa-solid fa-cube"></i>';
-  const inf = document.createElement('div');
-  inf.className = 'pcard-i';
-  const t = document.createElement('div');
-  t.className = 'pcard-t';
-  t.textContent = p.display_name || p.name || 'تطبيق';
-  const m = document.createElement('div');
-  m.className = 'pcard-m';
-  const lbl = { kotlin:'Kotlin (Android)', java:'Java (Android)', flutter:'Flutter', 'react-native':'React Native', html:'Web App' }[p.framework] || p.framework || 'App';
-  m.innerHTML = '<i class="fa-solid fa-code"></i> ' + lbl + ' • <i class="fa-solid fa-file"></i> ' + p.files.length + ' ملف';
-  inf.appendChild(t);
-  inf.appendChild(m);
-  const b = document.createElement('button');
-  b.className = 'dlbtn';
-  b.type = 'button';
-  b.innerHTML = '<i class="fa-solid fa-download"></i> تحميل ZIP';
-  b.onclick = () => dlProject(p);
-  c.appendChild(ic);
-  c.appendChild(inf);
-  c.appendChild(b);
-  return c;
-}
+function detectProjects(text){const list=[];const re=/```app-project\s*\n([\s\S]*?)\n```/g;let m;while((m=re.exec(text))!==null){try{let s=m[1].trim().replace(/,(\s*[}\]])/g,'$1');const p=JSON.parse(s);if(p&&p.files&&Array.isArray(p.files))list.push(p);}catch(e){console.warn('parse fail',e);}}return list;}
+async function dlProject(p){try{if(typeof JSZip==='undefined'){await loadZip();}const zip=new JSZip();const root=zip.folder(p.name||'app');p.files.forEach(f=>root.file(f.path,String(f.content||'')));root.file('README.md',buildReadme(p));root.file('BUILD_INSTRUCTIONS.txt',buildInstr(p));const b=await zip.generateAsync({type:'blob',compression:'DEFLATE'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=(p.name||'app')+'.zip';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(()=>URL.revokeObjectURL(u),5000);toast('تم تحميل المشروع','success');}catch(e){toast('فشل: '+e.message,'error');}}
+function loadZip(){return new Promise((res,rej)=>{if(typeof JSZip!=='undefined')return res();const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
+function buildReadme(p){return['# '+(p.display_name||p.name),'',p.description||'','','## المعلومات','- الإطار: '+(p.framework||'unknown'),'- Package: '+(p.package||'unknown'),'- الإصدار: '+(p.version||'1.0.0'),'','## الملفات',p.files.map(f=>'- `'+f.path+'`').join('\n'),'','## البناء',buildInstr(p),'','---','تم التوليد بواسطة الخلاقي'].join('\n');}
+function buildInstr(p){const fw=(p.framework||'').toLowerCase();if(fw==='kotlin'||fw==='java'){return['خطوات بناء APK:','','1. حمّل Android Studio من developer.android.com/studio','2. افتح المجلد المستخرج','3. انتظر Gradle','4. Build → Build APK(s)','5. app/build/outputs/apk/debug/app-debug.apk'].join('\n');}if(fw==='flutter'){return['1. flutter pub get','2. flutter build apk --release','المسار: build/app/outputs/flutter-apk/app-release.apk'].join('\n');}if(fw==='react-native'){return['1. npm install','2. cd android && ./gradlew assembleRelease'].join('\n');}if(fw==='html'){return['افتح index.html في المتصفح مباشرة'].join('\n');}return(p.build_instructions||['راجع README']).join('\n');}
+function projectCard(p){const c=document.createElement('div');c.className='pcard';const ic=document.createElement('div');ic.className='pcard-ic';ic.innerHTML='<i class="fa-solid fa-cube"></i>';const inf=document.createElement('div');inf.className='pcard-i';const t=document.createElement('div');t.className='pcard-t';t.textContent=p.display_name||p.name||'تطبيق';const m=document.createElement('div');m.className='pcard-m';const lbl={kotlin:'Kotlin (Android)',java:'Java (Android)',flutter:'Flutter','react-native':'React Native',html:'Web App'}[p.framework]||p.framework||'App';m.innerHTML='<i class="fa-solid fa-code"></i> '+lbl+' • <i class="fa-solid fa-file"></i> '+p.files.length+' ملف';inf.appendChild(t);inf.appendChild(m);const b=document.createElement('button');b.className='dlbtn';b.type='button';b.innerHTML='<i class="fa-solid fa-download"></i> تحميل ZIP';b.onclick=()=>dlProject(p);c.appendChild(ic);c.appendChild(inf);c.appendChild(b);return c;}
 
-/* ═══ Render ═══ */
-function renderContent(el, text) {
-  const parts = String(text).split('```');
-  for (let i = 0; i < parts.length; i++) {
-    if (i % 2 === 0) {
-      const sub = parts[i].split('`');
-      sub.forEach((sp, j) => {
-        if (j % 2 === 0) { if (sp) el.appendChild(document.createTextNode(sp)); }
-        else {
-          const c = document.createElement('span');
-          c.className = 'ic';
-          c.textContent = sp;
-          el.appendChild(c);
-        }
-      });
-    } else {
-      const pre = document.createElement('pre');
-      const codeText = parts[i].replace(/^[a-zA-Z0-9_+\-#\.]*\n/, '');
-      const cd = document.createElement('code');
-      cd.textContent = codeText;
-      pre.appendChild(cd);
-      const b = document.createElement('button');
-      b.className = 'cbtn';
-      b.type = 'button';
-      b.innerHTML = '<i class="fa-regular fa-copy"></i> نسخ';
-      b.onclick = () => {
-        navigator.clipboard.writeText(codeText).then(() => {
-          b.innerHTML = '<i class="fa-solid fa-check"></i> تم';
-          b.classList.add('done');
-          setTimeout(() => {
-            b.innerHTML = '<i class="fa-regular fa-copy"></i> نسخ';
-            b.classList.remove('done');
-          }, 1600);
-        }).catch(() => toast('فشل النسخ', 'error'));
-      };
-      pre.appendChild(b);
-      el.appendChild(pre);
-    }
-  }
-}
+function renderContent(el,text){const parts=String(text).split('```');for(let i=0;i<parts.length;i++){if(i%2===0){const sub=parts[i].split('`');sub.forEach((sp,j)=>{if(j%2===0){if(sp)el.appendChild(document.createTextNode(sp));}else{const c=document.createElement('span');c.className='ic';c.textContent=sp;el.appendChild(c);}});}else{const pre=document.createElement('pre');const codeText=parts[i].replace(/^[a-zA-Z0-9_+\-#\.]*\n/,'');const cd=document.createElement('code');cd.textContent=codeText;pre.appendChild(cd);const b=document.createElement('button');b.className='cbtn';b.type='button';b.innerHTML='<i class="fa-regular fa-copy"></i> نسخ';b.onclick=()=>{navigator.clipboard.writeText(codeText).then(()=>{b.innerHTML='<i class="fa-solid fa-check"></i> تم';b.classList.add('done');setTimeout(()=>{b.innerHTML='<i class="fa-regular fa-copy"></i> نسخ';b.classList.remove('done');},1600);}).catch(()=>toast('فشل النسخ','error'));};pre.appendChild(b);el.appendChild(pre);}}}
 
-function addMsg(text, role, source, save = true, type = 'text', media = null) {
-  if (chatEl.querySelector('.welcome')) chatEl.innerHTML = '';
-  const msg = document.createElement('div');
-  msg.className = 'msg ' + role;
-  if (role !== 'error' && role !== 'info') {
-    const s = document.createElement('div');
-    s.className = 'sender';
-    const av = document.createElement('span');
-    av.className = 'av';
-    av.innerHTML = role === 'user' ? '<i class="fa-solid fa-user"></i>' : '<i class="fa-solid fa-bolt"></i>';
-    s.appendChild(av);
-    const lb = document.createElement('span');
-    lb.textContent = role === 'user' ? 'أنت' : 'الخلاقي';
-    s.appendChild(lb);
-    msg.appendChild(s);
-  }
-  if (type === 'image' && media) {
-    const im = document.createElement('img');
-    im.className = 'attached';
-    im.src = media.startsWith('data:') ? media : 'data:image/jpeg;base64,' + media;
-    msg.appendChild(im);
-  }
-  const ct = document.createElement('div');
-  ct.className = 'content';
-  if (role === 'error' || role === 'info') ct.textContent = text;
-  else renderContent(ct, text);
-  msg.appendChild(ct);
+function addMsg(text,role,source,save=true,type='text',media=null){if(chatEl.querySelector('.welcome'))chatEl.innerHTML='';const msg=document.createElement('div');msg.className='msg '+role;if(role!=='error'&&role!=='info'){const s=document.createElement('div');s.className='sender';const av=document.createElement('span');av.className='av';av.innerHTML=role==='user'?'<i class="fa-solid fa-user"></i>':'<i class="fa-solid fa-bolt"></i>';s.appendChild(av);const lb=document.createElement('span');lb.textContent=role==='user'?'أنت':'الخلاقي';s.appendChild(lb);msg.appendChild(s);}if(type==='image'&&media){const im=document.createElement('img');im.className='attached';im.src=media.startsWith('data:')?media:'data:image/jpeg;base64,'+media;msg.appendChild(im);}const ct=document.createElement('div');ct.className='content';if(role==='error'||role==='info')ct.textContent=text;else renderContent(ct,text);msg.appendChild(ct);if(role==='bot'&&text){const prjs=detectProjects(text);prjs.forEach(p=>msg.appendChild(projectCard(p)));}if(source&&role==='bot'){const s=document.createElement('div');s.className='src';s.innerHTML='<i class="fa-solid fa-satellite-dish"></i> '+source;msg.appendChild(s);}if(role==='bot'&&text&&!String(text).startsWith('❌')){const sp=document.createElement('button');sp.className='spk';sp.type='button';sp.innerHTML='<i class="fa-solid fa-volume-high"></i>';sp.onclick=()=>speakTxt(text);msg.appendChild(sp);}chatEl.appendChild(msg);chatEl.scrollTop=chatEl.scrollHeight;if(role==='bot'&&ttsOn&&text&&!String(text).startsWith('❌'))speakTxt(text);if(save&&currentChatId){pushMsg(currentChatId,{role,content:text,source,type,media});if(role==='user'){const ch=chats.find(c=>c.id===currentChatId);if(ch){const msgs=loadMsgs(currentChatId);if(msgs.length===1){ch.title=String(text).slice(0,40)||'محادثة';ch.updated_at=new Date().toISOString();saveChats();renderChats();}}}}return msg;}
+function showTyping(){const d=document.createElement('div');d.className='typing';d.id='typingI';d.innerHTML='<span></span><span></span><span></span>';chatEl.appendChild(d);chatEl.scrollTop=chatEl.scrollHeight;}
+function hideTyping(){const e=$('typingI');if(e)e.remove();}
+function qp(t){inputEl.value=t;inputEl.focus();inputEl.setSelectionRange(t.length,t.length);inputEl.style.height='auto';inputEl.style.height=Math.min(inputEl.scrollHeight,360)+'px';}
 
-  if (role === 'bot' && text) {
-    const prjs = detectProjects(text);
-    prjs.forEach(p => msg.appendChild(projectCard(p)));
-  }
+async function sendMsg(){if(isSending){if(abort){abort.abort();abort=null;}return;}const text=inputEl.value.trim();if(!text&&!selImg)return;stopSpeak();if(!currentChatId)await newChat();if(!currentChatId)return;cMode();isSending=true;if(selImg)await sendImg(text);else if(DEMO)await sendDemo(text);else await sendStream(text);}
+async function sendDemo(text){addMsg(text,'user');inputEl.value='';inputEl.style.height='auto';showTyping();await new Promise(r=>setTimeout(r,700));hideTyping();const reply='أنا الخلاقي في الوضع التجريبي.\n\nاستلمت: "'+text.slice(0,80)+'"\n\nلتفعيل الردود الحقيقية شغّل الخادم.\n\nمثال:\n```python\nprint("Hello")\n```';addMsg(reply,'bot','demo');isSending=false;inputEl.focus();}
+async function sendImg(text){const im=selImg,tp=selImgType;addMsg(text||'حلل هذه الصورة','user',null,true,'image',im);inputEl.value='';inputEl.style.height='auto';sBtn.disabled=true;sLbl.textContent='...';showTyping();$('activeProv').textContent='يفكر...';try{if(DEMO){await new Promise(r=>setTimeout(r,900));hideTyping();addMsg('الوضع التجريبي: تم استلام الصورة.','bot','demo');}else{const d=await api(API+'/chat',{method:'POST',body:JSON.stringify({message:text,chat_id:currentChatId,user_id:USER_ID,image:im,image_type:tp,system_prompt:SYSTEM_PROMPT})});hideTyping();if(d.response){addMsg(d.response,'bot',d.source);$('activeProv').textContent=d.source||'جاهز';loadAllChats();}else if(d.error)addMsg(d.error,'error');}rmImg();}catch(e){hideTyping();addMsg(e.message,'error');}finally{isSending=false;sBtn.disabled=false;sLbl.textContent='إرسال';inputEl.focus();}}
+async function sendStream(text){addMsg(text,'user');inputEl.value='';inputEl.style.height='auto';sLbl.textContent='إيقاف';sBtn.classList.add('stop');$('activeProv').textContent='يفكر...';if(chatEl.querySelector('.welcome'))chatEl.innerHTML='';const bd=document.createElement('div');bd.className='msg bot';const sn=document.createElement('div');sn.className='sender';sn.innerHTML='<span class="av"><i class="fa-solid fa-bolt"></i></span><span>الخلاقي</span>';bd.appendChild(sn);const cd=document.createElement('div');cd.className='content';bd.appendChild(cd);const cu=document.createElement('span');cu.className='scursor';cd.appendChild(cu);chatEl.appendChild(bd);chatEl.scrollTop=chatEl.scrollHeight;let full='';let src=null;try{abort=new AbortController();const r=await fetch(API+'/chat/stream',{method:'POST',headers:{'Content-Type':'application/json','X-User-ID':USER_ID},body:JSON.stringify({message:text,chat_id:currentChatId,user_id:USER_ID,system_prompt:SYSTEM_PROMPT}),signal:abort.signal});if(!r.ok)throw new Error('HTTP '+r.status);const rd=r.body.getReader();const dc=new TextDecoder();let buf='';while(true){const{done,value}=await rd.read();if(done)break;buf+=dc.decode(value,{stream:true});const lines=buf.split('\n\n');buf=lines.pop();for(const line of lines){if(!line.startsWith('data: '))continue;let ev;try{ev=JSON.parse(line.substring(6));}catch(e){continue;}if(ev.provider){src=ev.provider;$('activeProv').textContent=ev.provider;}else if(ev.chunk){full+=ev.chunk;cu.remove();cd.textContent=full;cd.appendChild(cu);chatEl.scrollTop=chatEl.scrollHeight;}else if(ev.done){cu.remove();cd.innerHTML='';renderContent(cd,full);const prjs=detectProjects(full);prjs.forEach(p=>bd.appendChild(projectCard(p)));if(src){const s=document.createElement('div');s.className='src';s.innerHTML='<i class="fa-solid fa-satellite-dish"></i> '+src;bd.appendChild(s);}const sp=document.createElement('button');sp.className='spk';sp.type='button';sp.innerHTML='<i class="fa-solid fa-volume-high"></i>';sp.onclick=()=>speakTxt(full);bd.appendChild(sp);if(ttsOn&&full)speakTxt(full);$('activeProv').textContent=src||'جاهز';if(currentChatId){pushMsg(currentChatId,{role:'bot',content:full,source:src,type:'text',media:null});}loadAllChats();}else if(ev.error){cu.remove();cd.textContent=ev.error;bd.className='msg error';$('activeProv').textContent='فشل';}}}}catch(e){cu.remove();if(e.name==='AbortError'){cd.innerHTML='';renderContent(cd,full+'\n\n[تم الإيقاف]');if(currentChatId&&full){pushMsg(currentChatId,{role:'bot',content:full+'\n\n[تم الإيقاف]',source:src,type:'text',media:null});}}else{bd.className='msg error';cd.textContent=e.message;}}finally{abort=null;isSending=false;sBtn.disabled=false;sLbl.textContent='إرسال';sBtn.classList.remove('stop');inputEl.focus();}}
 
-  if (source && role === 'bot') {
-    const s = document.createElement('div');
-    s.className = 'src';
-    s.innerHTML = '<i class="fa-solid fa-satellite-dish"></i> ' + source;
-    msg.appendChild(s);
-  }
-  if (role === 'bot' && text && !String(text).startsWith('❌')) {
-    const sp = document.createElement('button');
-    sp.className = 'spk';
-    sp.type = 'button';
-    sp.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
-    sp.onclick = () => speakTxt(text);
-    msg.appendChild(sp);
-  }
-  chatEl.appendChild(msg);
-  chatEl.scrollTop = chatEl.scrollHeight;
-  if (role === 'bot' && ttsOn && text && !String(text).startsWith('❌')) speakTxt(text);
-  if (save && currentChatId) {
-    pushMsg(currentChatId, { role, content: text, source, type, media });
-    if (role === 'user') {
-      const ch = chats.find(c => c.id === currentChatId);
-      if (ch) {
-        const msgs = loadMsgs(currentChatId);
-        if (msgs.length === 1) {
-          ch.title = String(text).slice(0, 40) || 'محادثة';
-          ch.updated_at = new Date().toISOString();
-          saveChats();
-          renderChats();
-        }
-      }
-    }
-  }
-  return msg;
-}
-function showTyping() {
-  const d = document.createElement('div');
-  d.className = 'typing';
-  d.id = 'typingI';
-  d.innerHTML = '<span></span><span></span><span></span>';
-  chatEl.appendChild(d);
-  chatEl.scrollTop = chatEl.scrollHeight;
-}
-function hideTyping() {
-  const e = $('typingI');
-  if (e) e.remove();
-}
-function qp(t) {
-  inputEl.value = t;
-  inputEl.focus();
-  inputEl.setSelectionRange(t.length, t.length);
-  inputEl.style.height = 'auto';
-  inputEl.style.height = Math.min(inputEl.scrollHeight, 360) + 'px';
-}
+inputEl.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.shiftKey||e.ctrlKey||e.metaKey)){e.preventDefault();sendMsg();}});
+inputEl.addEventListener('input',()=>{inputEl.style.height='auto';inputEl.style.height=Math.min(inputEl.scrollHeight,360)+'px';});
 
-/* ═══ Send ═══ */
-async function sendMsg() {
-  if (isSending) { if (abort) { abort.abort(); abort = null; } return; }
-  const text = inputEl.value.trim();
-  if (!text && !selImg) return;
-  stopSpeak();
-  if (!currentChatId) await newChat();
-  if (!currentChatId) return;
-  cMode();
-  isSending = true;
-  if (selImg) await sendImg(text);
-  else if (DEMO) await sendDemo(text);
-  else await sendStream(text);
-}
-async function sendDemo(text) {
-  addMsg(text, 'user');
-  inputEl.value = '';
-  inputEl.style.height = 'auto';
-  showTyping();
-  await new Promise(r => setTimeout(r, 700));
-  hideTyping();
-  const reply = 'أنا الخلاقي في الوضع التجريبي.\n\nاستلمت: "' + text.slice(0, 80) + '"\n\nلتفعيل الردود الحقيقية شغّل الخادم.\n\nمثال:\n```python\nprint("Hello")\n```';
-  addMsg(reply, 'bot', 'demo');
-  isSending = false;
-  inputEl.focus();
-}
-async function sendImg(text) {
-  const im = selImg, tp = selImgType;
-  addMsg(text || 'حلل هذه الصورة', 'user', null, true, 'image', im);
-  inputEl.value = '';
-  inputEl.style.height = 'auto';
-  sBtn.disabled = true;
-  sLbl.textContent = '...';
-  showTyping();
-  $('activeProv').textContent = 'يفكر...';
-  try {
-    if (DEMO) {
-      await new Promise(r => setTimeout(r, 900));
-      hideTyping();
-      addMsg('الوضع التجريبي: تم استلام الصورة.', 'bot', 'demo');
-    } else {
-      const d = await api(API + '/chat', {
-        method:'POST',
-        body: JSON.stringify({ message:text, chat_id:currentChatId, user_id:USER_ID, image:im, image_type:tp, system_prompt:SYSTEM_PROMPT })
-      });
-      hideTyping();
-      if (d.response) {
-        addMsg(d.response, 'bot', d.source);
-        $('activeProv').textContent = d.source || 'جاهز';
-        loadAllChats();
-      } else if (d.error) addMsg(d.error, 'error');
-    }
-    rmImg();
-  } catch (e) {
-    hideTyping();
-    addMsg(e.message, 'error');
-  } finally {
-    isSending = false;
-    sBtn.disabled = false;
-    sLbl.textContent = 'إرسال';
-    inputEl.focus();
-  }
-}
-async function sendStream(text) {
-  addMsg(text, 'user');
-  inputEl.value = '';
-  inputEl.style.height = 'auto';
-  sLbl.textContent = 'إيقاف';
-  sBtn.classList.add('stop');
-  $('activeProv').textContent = 'يفكر...';
-  if (chatEl.querySelector('.welcome')) chatEl.innerHTML = '';
-  const bd = document.createElement('div');
-  bd.className = 'msg bot';
-  const sn = document.createElement('div');
-  sn.className = 'sender';
-  sn.innerHTML = '<span class="av"><i class="fa-solid fa-bolt"></i></span><span>الخلاقي</span>';
-  bd.appendChild(sn);
-  const cd = document.createElement('div');
-  cd.className = 'content';
-  bd.appendChild(cd);
-  const cu = document.createElement('span');
-  cu.className = 'scursor';
-  cd.appendChild(cu);
-  chatEl.appendChild(bd);
-  chatEl.scrollTop = chatEl.scrollHeight;
+function setDot(id,ok,warn=false){const e=$(id);if(!e)return;e.className='sdot '+(ok?'ok':(warn?'warn':''));}
+async function chkStatus(){if(DEMO){toast('الوضع التجريبي','info');return;}try{const d=await api(API+'/status');const p=d.providers||{},f=d.features||{};azureOk=!!f.voice_tts_azure;setDot('dotGem',p.gemini);setDot('dotGroq',p.groq);setDot('dotRedis',d.redis_ok,!d.redis_ok);setDot('dotImg',f.vision);setDot('dotVid',f.video);setDot('dotTts',f.voice_tts_azure||f.voice_tts_local);toast('تم التحديث');}catch(e){toast(e.message,'error');}}
+async function showStats(){if(DEMO){let tot=0;chats.forEach(c=>{try{tot+=loadMsgs(c.id).length;}catch(e){}});alert('إحصائيات الوضع التجريبي\n\nالمحادثات: '+chats.length+'\nالرسائل: '+tot);return;}try{const d=await api(API+'/stats');alert('إحصائياتك\n\nالمحادثات: '+(d.chats_count||0)+'\nالرسائل: '+(d.messages_count||0)+'\nردود الذكاء: '+(d.assistant_count||0));}catch(e){toast(e.message,'error');}}
 
-  let full = '';
-  let src = null;
-  try {
-    abort = new AbortController();
-    const r = await fetch(API + '/chat/stream', {
-      method:'POST',
-      headers:{ 'Content-Type':'application/json', 'X-User-ID': USER_ID },
-      body: JSON.stringify({ message:text, chat_id:currentChatId, user_id:USER_ID, system_prompt:SYSTEM_PROMPT }),
-      signal: abort.signal
-    });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const rd = r.body.getReader();
-    const dc = new TextDecoder();
-    let buf = '';
-    while (true) {
-      const { done, value } = await rd.read();
-      if (done) break;
-      buf += dc.decode(value, { stream:true });
-      const lines = buf.split('\n\n');
-      buf = lines.pop();
-      for (const line of lines) {
-        if (!line.startsWith('data: ')) continue;
-        let ev;
-        try { ev = JSON.parse(line.substring(6)); } catch (e) { continue; }
-        if (ev.provider) {
-          src = ev.provider;
-          $('activeProv').textContent = ev.provider;
-        } else if (ev.chunk) {
-          full += ev.chunk;
-          cu.remove();
-          cd.textContent = full;
-          cd.appendChild(cu);
-          chatEl.scrollTop = chatEl.scrollHeight;
-        } else if (ev.done) {
-          cu.remove();
-          cd.innerHTML = '';
-          renderContent(cd, full);
-          const prjs = detectProjects(full);
-          prjs.forEach(p => bd.appendChild(projectCard(p)));
-          if (src) {
-            const s = document.createElement('div');
-            s.className = 'src';
-            s.innerHTML = '<i class="fa-solid fa-satellite-dish"></i> ' + src;
-            bd.appendChild(s);
-          }
-          const sp = document.createElement('button');
-          sp.className = 'spk';
-          sp.type = 'button';
-          sp.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
-          sp.onclick = () => speakTxt(full);
-          bd.appendChild(sp);
-          if (ttsOn && full) speakTxt(full);
-          $('activeProv').textContent = src || 'جاهز';
-          if (currentChatId) {
-            pushMsg(currentChatId, { role:'bot', content:full, source:src, type:'text', media:null });
-          }
-          loadAllChats();
-        } else if (ev.error) {
-          cu.remove();
-          cd.textContent = ev.error;
-          bd.className = 'msg error';
-          $('activeProv').textContent = 'فشل';
-        }
-      }
-    }
-  } catch (e) {
-    cu.remove();
-    if (e.name === 'AbortError') {
-      cd.innerHTML = '';
-      renderContent(cd, full + '\n\n[تم الإيقاف]');
-      if (currentChatId && full) {
-        pushMsg(currentChatId, { role:'bot', content:full + '\n\n[تم الإيقاف]', source:src, type:'text', media:null });
-      }
-    } else {
-      bd.className = 'msg error';
-      cd.textContent = e.message;
-    }
-  } finally {
-    abort = null;
-    isSending = false;
-    sBtn.disabled = false;
-    sLbl.textContent = 'إرسال';
-    sBtn.classList.remove('stop');
-    inputEl.focus();
-  }
-}
-
-/* ═══ Keyboard ═══ */
-inputEl.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && (e.shiftKey || e.ctrlKey || e.metaKey)) {
-    e.preventDefault();
-    sendMsg();
-  }
-});
-inputEl.addEventListener('input', () => {
-  inputEl.style.height = 'auto';
-  inputEl.style.height = Math.min(inputEl.scrollHeight, 360) + 'px';
-});
-
-/* ═══ Status ═══ */
-function setDot(id, ok, warn = false) {
-  const e = $(id);
-  if (!e) return;
-  e.className = 'sdot ' + (ok ? 'ok' : (warn ? 'warn' : ''));
-}
-async function chkStatus() {
-  if (DEMO) { toast('الوضع التجريبي', 'info'); return; }
-  try {
-    const d = await api(API + '/status');
-    const p = d.providers || {}, f = d.features || {};
-    azureOk = !!f.voice_tts_azure;
-    setDot('dotGem', p.gemini);
-    setDot('dotGroq', p.groq);
-    setDot('dotRedis', d.redis_ok, !d.redis_ok);
-    setDot('dotImg', f.vision);
-    setDot('dotVid', f.video);
-    setDot('dotTts', f.voice_tts_azure || f.voice_tts_local);
-    toast('تم التحديث');
-  } catch (e) { toast(e.message, 'error'); }
-}
-async function showStats() {
-  if (DEMO) {
-    let tot = 0;
-    chats.forEach(c => { try { tot += loadMsgs(c.id).length; } catch (e) {} });
-    alert('إحصائيات الوضع التجريبي\n\nالمحادثات: ' + chats.length + '\nالرسائل: ' + tot);
-    return;
-  }
-  try {
-    const d = await api(API + '/stats');
-    alert('إحصائياتك\n\nالمحادثات: ' + (d.chats_count || 0) + '\nالرسائل: ' + (d.messages_count || 0) + '\nردود الذكاء: ' + (d.assistant_count || 0));
-  } catch (e) { toast(e.message, 'error'); }
-}
-
-/* ═══ Init ═══ */
-async function initApp() {
+async function initApp(){
   await detect();
-  if (DEMO) {
-    $('activeProv').textContent = 'تجريبي';
-  } else {
-    try {
-      const d = await api(API + '/status');
-      const p = d.providers || {}, f = d.features || {};
-      azureOk = !!f.voice_tts_azure;
-      setDot('dotGem', p.gemini);
-      setDot('dotGroq', p.groq);
-      setDot('dotRedis', d.redis_ok, !d.redis_ok);
-      setDot('dotImg', f.vision);
-      setDot('dotVid', f.video);
-      setDot('dotTts', f.voice_tts_azure || f.voice_tts_local);
-    } catch (e) {}
-  }
+  if(DEMO){$('activeProv').textContent='تجريبي';}
+  else{try{const d=await api(API+'/status');const p=d.providers||{},f=d.features||{};azureOk=!!f.voice_tts_azure;setDot('dotGem',p.gemini);setDot('dotGroq',p.groq);setDot('dotRedis',d.redis_ok,!d.redis_ok);setDot('dotImg',f.vision);setDot('dotVid',f.video);setDot('dotTts',f.voice_tts_azure||f.voice_tts_local);}catch(e){}}
   await loadAllChats();
-  const saved = localStorage.getItem(LS.CUR);
-  let target = null;
-  if (saved && chats.find(c => c.id === saved)) target = saved;
-  else if (chats.length > 0) target = chats[0].id;
-  if (target) {
-    const hasM = loadMsgs(target).length > 0;
-    if (hasM) await openChat(target);
-    else if (DEMO || !REACHABLE) {
-      currentChatId = target;
-      localStorage.setItem(LS.CUR, target);
-      showWelcome();
-      unCmode();
-    } else await openChat(target);
-  } else await newChat();
-  setTimeout(() => inputEl.focus(), 400);
+  const saved=localStorage.getItem(LS.CUR);
+  let target=null;
+  if(saved&&chats.find(c=>c.id===saved))target=saved;
+  else if(chats.length>0)target=chats[0].id;
+  if(target){const hasM=loadMsgs(target).length>0;if(hasM)await openChat(target);else if(DEMO||!REACHABLE){currentChatId=target;localStorage.setItem(LS.CUR,target);showWelcome();unCmode();}else await openChat(target);}else await newChat();
+  setTimeout(()=>inputEl.focus(),400);
 }
 </script>
 </body>
