@@ -40,9 +40,9 @@ class ChatService:
         """Create a new chat."""
         return await self._chats.create_chat(user_id)
 
-    async def list_chats(self, user_id: str):
+    async def list_chats(self, user_id: str) -> List[Chat]:
         """List chats for a user."""
-        return await self._chats.list_by_user(user_id)
+        return list(await self._chats.list_by_user(user_id))
 
     async def delete_chat(self, chat_id: str, user_id: str) -> bool:
         """Delete a chat owned by the user."""
@@ -54,20 +54,20 @@ class ChatService:
             raise UnauthorizedError("غير مصرح بالوصول لهذه المحادثة")
         return list(await self._messages.list_for_chat(chat_id, limit=200))
 
-    async def search(self, user_id: str, query: str):
+    async def search(self, user_id: str, query: str) -> List[dict]:
         """Full-text-ish search."""
         return await self._chats.search(user_id, query)
 
     # ═══════════════════════════════════════════════════════════════
     # Send message — non-streaming
     # ═══════════════════════════════════════════════════════════════
-    async def stream_text(
-    self,
-    chat_id: str,
-    user_id: str,
-    message: str,
-    custom_system_prompt: Optional[str] = None,   # ← جديد
-) -> AsyncIterator[Tuple[str, str]]:
+    async def send_text(
+        self,
+        chat_id: str,
+        user_id: str,
+        message: str,
+        custom_system_prompt: Optional[str] = None,
+    ) -> Tuple[AIResponse, str]:
         """Handle a plain text message.
 
         Returns:
@@ -86,12 +86,16 @@ class ChatService:
         # Build the conversation history
         history = await self._build_history(chat_id)
         memory_ctx = await self._memory.build_context(user_id)
+
+        # Build system prompt (custom overrides default)
         if custom_system_prompt and custom_system_prompt.strip():
-        system_prompt = custom_system_prompt.strip()
-else:
-        system_prompt = get_system_prompt()
-            "\n\n" + memory_ctx if memory_ctx else ""
-        )
+            system_prompt = custom_system_prompt.strip()
+            if memory_ctx:
+                system_prompt += "\n\n" + memory_ctx
+        else:
+            system_prompt = get_system_prompt()
+            if memory_ctx:
+                system_prompt += "\n\n" + memory_ctx
 
         # Call the AI
         response = await self._router.generate(history, system_prompt)
@@ -131,8 +135,12 @@ else:
         chat_id: str,
         user_id: str,
         message: str,
+        custom_system_prompt: Optional[str] = None,
     ) -> AsyncIterator[Tuple[str, str]]:
         """Handle a text message with streaming.
+
+        Args:
+            custom_system_prompt: Optional override for the system prompt.
 
         Yields:
             (event, data) tuples where event is one of:
@@ -149,9 +157,16 @@ else:
 
         history = await self._build_history(chat_id)
         memory_ctx = await self._memory.build_context(user_id)
-        system_prompt = get_system_prompt() + (
-            "\n\n" + memory_ctx if memory_ctx else ""
-        )
+
+        # Build system prompt (custom overrides default)
+        if custom_system_prompt and custom_system_prompt.strip():
+            system_prompt = custom_system_prompt.strip()
+            if memory_ctx:
+                system_prompt += "\n\n" + memory_ctx
+        else:
+            system_prompt = get_system_prompt()
+            if memory_ctx:
+                system_prompt += "\n\n" + memory_ctx
 
         full_text_parts: List[str] = []
         provider_name: Optional[str] = None
@@ -202,6 +217,7 @@ else:
         message: str,
         image_base64: str,
         image_type: str = "image/jpeg",
+        custom_system_prompt: Optional[str] = None,
     ) -> Tuple[AIResponse, str]:
         """Handle an image message."""
         await self._ensure_owned(chat_id, user_id)
@@ -218,9 +234,16 @@ else:
         )
 
         memory_ctx = await self._memory.build_context(user_id)
-        system_prompt = get_system_prompt() + (
-            "\n\n" + memory_ctx if memory_ctx else ""
-        )
+
+        # Build system prompt (custom overrides default)
+        if custom_system_prompt and custom_system_prompt.strip():
+            system_prompt = custom_system_prompt.strip()
+            if memory_ctx:
+                system_prompt += "\n\n" + memory_ctx
+        else:
+            system_prompt = get_system_prompt()
+            if memory_ctx:
+                system_prompt += "\n\n" + memory_ctx
 
         response = await self._router.vision(
             text,
@@ -279,6 +302,6 @@ else:
             if m.role not in ("user", "assistant"):
                 continue
             if m.message_type == "video_pending":
-                continue  # skip internal states
+                continue
             out.append(ChatMessage(role=m.role, content=m.content))
         return out
