@@ -35,7 +35,6 @@ class VeniceProvider(AIProvider):
     capabilities = frozenset({
         ProviderCapability.TEXT,
         ProviderCapability.STREAMING,
-        ProviderCapability.VISION,
     })
 
     def __init__(self, client: Optional[httpx.AsyncClient] = None) -> None:
