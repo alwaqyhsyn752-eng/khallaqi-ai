@@ -299,10 +299,11 @@ async def stream_message(payload: ChatRequest) -> StreamingResponse:
 
             # ─── Stream tokens ───
             async for kind, value in svc.stream_text(
-                payload.chat_id,
-                payload.user_id,
-                payload.message,
-            ):
+    payload.chat_id,
+    payload.user_id,
+    payload.message,
+    custom_system_prompt=payload.system_prompt,
+):
                 if kind == "provider":
                     yield await _sse({"provider": value})
                 elif kind == "chunk":
