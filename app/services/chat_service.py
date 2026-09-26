@@ -61,12 +61,13 @@ class ChatService:
     # ═══════════════════════════════════════════════════════════════
     # Send message — non-streaming
     # ═══════════════════════════════════════════════════════════════
-    async def send_text(
-        self,
-        chat_id: str,
-        user_id: str,
-        message: str,
-    ) -> Tuple[AIResponse, str]:
+    async def stream_text(
+    self,
+    chat_id: str,
+    user_id: str,
+    message: str,
+    custom_system_prompt: Optional[str] = None,   # ← جديد
+) -> AsyncIterator[Tuple[str, str]]:
         """Handle a plain text message.
 
         Returns:
@@ -85,7 +86,10 @@ class ChatService:
         # Build the conversation history
         history = await self._build_history(chat_id)
         memory_ctx = await self._memory.build_context(user_id)
-        system_prompt = get_system_prompt() + (
+        if custom_system_prompt and custom_system_prompt.strip():
+        system_prompt = custom_system_prompt.strip()
+else:
+        system_prompt = get_system_prompt()
             "\n\n" + memory_ctx if memory_ctx else ""
         )
 
