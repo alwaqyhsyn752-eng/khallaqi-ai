@@ -144,7 +144,7 @@ class AIRouter:
         system_prompt: str,
         *,
         temperature: float = 0.8,
-        max_tokens: int = 4096,
+        max_tokens: int = 16384,
     ) -> AIResponse:
         errors: List[str] = []
         hints: List[str] = []
