@@ -19,6 +19,7 @@ from app.services.ai.openrouter import OpenRouterProvider
 from app.services.ai.venice import VeniceProvider
 from app.services.ai.abliteration import AbliterationProvider
 from app.services.ai.unfil import UnfilProvider
+
 log = get_logger(__name__)
 
 
@@ -70,26 +71,32 @@ def _humanize_error(provider_name: str, err: Exception) -> str:
     if "api_key" in low or "401" in low or "unauthorized" in low:
         return "مفتاح المزوّد غير صالح أو منتهي."
     if "connect" in low or "network" in low:
-    return "تعذّر الاتصال بخدمة الذكاء."
-if "unfil" in provider_name.lower():
-    return "فشل الاتصال بمزوّد Unfil."
-if "venice" in provider_name.lower():
-    return "فشل الاتصال بمزوّد Venice."
-if "abliteration" in provider_name.lower():
-    return "فشل الاتصال بمزوّد Abliteration."
-return f"فشل الاتصال بمزوّد {provider_name}."
+        return "تعذّر الاتصال بخدمة الذكاء."
+    if "venice" in provider_name.lower():
+        return "فشل الاتصال بمزوّد Venice."
+    if "abliteration" in provider_name.lower():
+        return "فشل الاتصال بمزوّد Abliteration."
+    if "unfil" in provider_name.lower():
+        return "فشل الاتصال بمزوّد Unfil."
+    return f"فشل الاتصال بمزوّد {provider_name}."
+
 
 class AIRouter:
-    """Orchestrates multiple AI providers with fallback + circuit breaking."""
+    """Orchestrates multiple AI providers with fallback + circuit breaking.
 
-    def __init__(self._providers: Dict[str, AIProvider] = providers or {
-    "venice": VeniceProvider(),
-    "abliteration": AbliterationProvider(),
-    "unfil": UnfilProvider(),
-    "openrouter": OpenRouterProvider(),
-    "gemini": GeminiProvider(),
-    "groq": GroqProvider(),
-    }
+    Uncensored providers (Venice, Abliteration, Unfil, OpenRouter-Dolphin)
+    are tried first. Gemini and Groq are fallbacks.
+    """
+
+    def __init__(self, providers: Optional[Dict[str, AIProvider]] = None) -> None:
+        self._providers: Dict[str, AIProvider] = providers or {
+            "venice": VeniceProvider(),
+            "abliteration": AbliterationProvider(),
+            "unfil": UnfilProvider(),
+            "openrouter": OpenRouterProvider(),
+            "gemini": GeminiProvider(),
+            "groq": GroqProvider(),
+        }
         self._breakers: Dict[str, CircuitBreaker] = {
             name: CircuitBreaker() for name in self._providers
         }
@@ -102,19 +109,18 @@ class AIRouter:
                 log.exception("provider.close_failed", provider=provider.name)
 
     def _order_for(self, capability: ProviderCapability) -> List[str]:
-    if capability == ProviderCapability.VISION:
-        return ["gemini", "venice", "openrouter"]
-    if capability == ProviderCapability.VIDEO:
-        return ["gemini"]
-    # Uncensored providers first, then regular ones
-    return [
-        "venice",           # Dolphin 24B — 2.2% refusal
-        "abliteration",     # GLM-5.3 — no refusals
-        "unfil",            # Hermes 3 — no refusals
-        "openrouter",       # Dolphin free models
-        "gemini",           # Standard (has refusals)
-        "groq",             # Standard (has refusals)
-    ]
+        if capability == ProviderCapability.VISION:
+            return ["gemini", "venice", "openrouter"]
+        if capability == ProviderCapability.VIDEO:
+            return ["gemini"]
+        return [
+            "venice",
+            "abliteration",
+            "unfil",
+            "openrouter",
+            "gemini",
+            "groq",
+        ]
 
     def _candidates(self, capability: ProviderCapability) -> List[AIProvider]:
         out: List[AIProvider] = []
@@ -165,8 +171,8 @@ class AIRouter:
 
         raise AllProvidersFailedError(
             "تعذّر الحصول على رد من مزوّدي الذكاء. "
-            + (hints[0] if hints else "حدث خطأ غير متوقّع. جرّب إعادة صياغة الطلب.")
-            + " إذا استمرت المشكلة، أعد صياغة الطلب أو انتظر دقيقة.",
+            + (hints[0] if hints else "حدث خطأ غير متوقّع.")
+            + " جرّب إعادة صياغة الطلب.",
             details={"errors": errors},
         )
 
@@ -272,8 +278,11 @@ def get_ai_router() -> AIRouter:
         s = get_settings()
         log.info(
             "ai_router.initialized",
+            venice=bool(getattr(s, "venice_api_key", "")),
+            abliteration=bool(getattr(s, "abliteration_api_key", "")),
+            unfil=bool(getattr(s, "unfil_api_key", "")),
+            openrouter=bool(s.openrouter_api_key),
             gemini=bool(s.gemini_api_key),
             groq=bool(s.groq_api_key),
-            openrouter=bool(s.openrouter_api_key),
         )
     return _router
