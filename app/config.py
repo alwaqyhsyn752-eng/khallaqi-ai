@@ -41,6 +41,7 @@ class Settings(BaseSettings):
     venice_api_key: str = ""
     abliteration_api_key: str = ""
     unfil_api_key: str = ""
+
     # ─── Azure TTS ───
     azure_speech_key: str = ""
     azure_speech_region: str = "westeurope"
@@ -68,6 +69,12 @@ class Settings(BaseSettings):
     sentry_dsn: Optional[str] = None
     otel_enabled: bool = False
 
+    # ─── Admin Panel ───
+    admin_username: str = Field(default="admin", min_length=3, max_length=64)
+    admin_password: str = Field(default="change-me-now", min_length=8)
+    admin_session_hours: int = Field(default=24, ge=1, le=720)
+    admin_panel_path: str = "/admin"
+
     @property
     def origins_list(self) -> List[str]:
         """Parse ALLOWED_ORIGINS as a list."""
@@ -86,6 +93,11 @@ class Settings(BaseSettings):
         return bool(
             self.gemini_api_key or self.groq_api_key or self.openrouter_api_key
         )
+
+    @property
+    def admin_enabled(self) -> bool:
+        """True when admin panel is properly configured."""
+        return bool(self.admin_username and self.admin_password)
 
 
 @lru_cache(maxsize=1)
