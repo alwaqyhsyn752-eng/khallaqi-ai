@@ -42,7 +42,6 @@ body{
   position:relative;
 }
 
-/* ═══ Ambient Background ═══ */
 .bg-layer{position:fixed;inset:0;pointer-events:none;z-index:0}
 .bg-layer.aurora{
   background:
@@ -64,7 +63,6 @@ body{
   -webkit-mask-image:radial-gradient(ellipse at center, black 20%, transparent 75%);
 }
 
-/* ═══ Splash ═══ */
 .splash{
   position:fixed;inset:0;z-index:1000;
   display:flex;align-items:center;justify-content:center;
@@ -158,11 +156,9 @@ body{
   50%{box-shadow:0 0 40px rgba(168,85,247,.8), 0 0 90px rgba(168,85,247,.4), inset 0 0 30px rgba(255,255,255,.22)}
 }
 
-/* ═══ App Layout ═══ */
 .app{position:relative;z-index:1;display:flex;height:100vh;width:100vw;opacity:0;pointer-events:none;transition:opacity .8s var(--ease-soft) .2s}
 .app.visible{opacity:1;pointer-events:auto}
 
-/* Sidebar */
 .sidebar{
   width:300px;flex-shrink:0;
   background:linear-gradient(180deg, rgba(10,13,24,.72), rgba(10,13,24,.55));
@@ -273,10 +269,8 @@ body{
   box-shadow:0 0 24px rgba(168,85,247,.5);
 }
 
-/* Main */
 .main{flex:1;display:flex;flex-direction:column;min-width:0;position:relative}
 
-/* ═══ Topbar — dynamic collapse in chat mode ═══ */
 .topbar{
   padding:14px 22px;
   background:linear-gradient(180deg, rgba(19,24,38,.65), rgba(19,24,38,.35));
@@ -341,7 +335,6 @@ body{
 }
 @keyframes dotBlink{0%,100%{opacity:1}50%{opacity:.45}}
 
-/* ═══ Quick chips — hidden when in chat mode ═══ */
 .quick{
   padding:10px 18px;
   background:rgba(10,13,24,.4);
@@ -372,7 +365,6 @@ body{
   transform:translateY(-1px);
 }
 
-/* ═══ Chat Mode (activated on first message) ═══ */
 body.chat-mode .topbar{
   padding:8px 22px;
   min-height:52px;
@@ -391,7 +383,6 @@ body.chat-mode .quick{
 body.chat-mode .topbar-right .pill span{display:none}
 body.chat-mode .topbar-right .status-pill span:last-child{display:none}
 
-/* ═══ Chat area ═══ */
 .chat{
   flex:1;overflow-y:auto;
   padding:26px 22px 20px;
@@ -405,7 +396,6 @@ body.chat-mode .chat{padding:22px 18px 16px}
 .chat::-webkit-scrollbar{width:8px}
 .chat::-webkit-scrollbar-thumb{background:rgba(168,85,247,.28);border-radius:4px}
 
-/* Welcome */
 .welcome{
   flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:22px;text-align:center;padding:40px 20px;
@@ -443,7 +433,6 @@ body.chat-mode .chat{padding:22px 18px 16px}
   box-shadow:0 12px 32px rgba(168,85,247,.35);
 }
 
-/* Messages */
 .msg{
   max-width:82%;padding:16px 20px;
   border-radius:20px;line-height:1.75;word-wrap:break-word;
@@ -593,7 +582,6 @@ pre code{display:block;white-space:pre;color:#d8e0f0}
 .typing span:nth-child(3){animation-delay:.36s}
 @keyframes typingDot{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-9px);opacity:1}}
 
-/* ═══ Input area ═══ */
 .input-wrap{
   background:linear-gradient(180deg, rgba(10,13,24,.35), rgba(10,13,24,.75));
   backdrop-filter:blur(26px) saturate(160%);
@@ -644,7 +632,6 @@ body.chat-mode .input-wrap{padding:12px 18px 14px}
 .voice-wave span:nth-child(5){animation-delay:.4s;height:10px}
 @keyframes wave{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1)}}
 
-/* ═══ Dynamic textarea — small idle, expands on focus ═══ */
 .input-box{
   background:var(--glass-1);
   backdrop-filter:blur(28px) saturate(170%);
@@ -670,10 +657,9 @@ body.chat-mode .input-wrap{padding:12px 18px 14px}
 }
 .input-box:focus-within::before{opacity:1}
 
-/* textarea — dynamic min-height */
 textarea{
   width:100%;
-  min-height:44px;                 /* ← small idle */
+  min-height:44px;
   max-height:360px;
   background:transparent;
   border:none;outline:none;resize:none;
@@ -687,12 +673,10 @@ textarea::-webkit-scrollbar{width:6px}
 textarea::-webkit-scrollbar-thumb{background:rgba(168,85,247,.28);border-radius:3px}
 textarea::placeholder{color:var(--muted);opacity:.7}
 
-/* When focused OR has content → expand */
 textarea:focus,
 textarea:not(:placeholder-shown){
-  min-height:130px;                /* ← expanded */
+  min-height:130px;
 }
-/* In chat mode, expand a bit more */
 body.chat-mode textarea:focus{min-height:150px}
 
 @media(max-width:640px){
@@ -890,7 +874,6 @@ body.chat-mode .hint{opacity:0;max-height:0;margin:0;overflow:hidden}
 <div class="bg-layer aurora"></div>
 <div class="bg-layer grid"></div>
 
-<!-- ═══ Splash ═══ -->
 <section class="splash" id="splash">
   <div class="splash-particles" id="splashParticles"></div>
   <div class="splash-rings">
@@ -906,7 +889,6 @@ body.chat-mode .hint{opacity:0;max-height:0;margin:0;overflow:hidden}
   </button>
 </section>
 
-<!-- ═══ App ═══ -->
 <section class="app" id="app">
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-head">
@@ -914,7 +896,7 @@ body.chat-mode .hint{opacity:0;max-height:0;margin:0;overflow:hidden}
         <div class="brand-mark"><i class="fa-solid fa-bolt"></i></div>
         <div class="brand-info">
           <h1>الخلاقي</h1>
-          <p>الإصدار 19.0</p>
+          <p>الإصدار 20.0</p>
         </div>
       </div>
       <button class="sidebar-close" onclick="toggleSidebar()" aria-label="إغلاق">
@@ -979,11 +961,11 @@ body.chat-mode .hint{opacity:0;max-height:0;margin:0;overflow:hidden}
       <button onclick="quickPrompt('اكتب بوت تيليجرام كامل بلغة بايثون')" type="button">
         <i class="fa-brands fa-telegram"></i> بوت تيليجرام
       </button>
+      <button onclick="quickPrompt('اكتب تطبيق أندرويد APK بلغة Kotlin')" type="button">
+        <i class="fa-brands fa-android"></i> تطبيق APK
+      </button>
       <button onclick="quickPrompt('اكتب FastAPI API كامل مع قاعدة بيانات')" type="button">
         <i class="fa-solid fa-bolt"></i> FastAPI
-      </button>
-      <button onclick="quickPrompt('اشرح لي OWASP Top 10 بالتفصيل')" type="button">
-        <i class="fa-solid fa-shield-halved"></i> OWASP
       </button>
     </div>
 
@@ -1062,6 +1044,70 @@ const IS_STANDALONE = location.protocol === 'file:';
 let DEMO_MODE = IS_STANDALONE;
 let API_REACHABLE = false;
 
+/* ═══════════════════════════════════════════════════════════════
+   SYSTEM PROMPT — عقل الذكاء الاصطناعي
+   يُرسل مع كل طلب لتوجيه النموذج
+   ═══════════════════════════════════════════════════════════════ */
+const SYSTEM_PROMPT = [
+'أنت "الخلاقي" — مهندس برمجيات وتطبيقات محترف (Senior Full-Stack & Mobile Developer) من إعداد حسين غلاب.',
+'',
+'╔══════════════════════════════════════════════════════════════╗',
+'║  القواعد الصارمة (إلزامية في كل رد)                          ║',
+'╚══════════════════════════════════════════════════════════════╝',
+'',
+'📌 القاعدة 1 — دقة الأكواد والتوافق الشامل:',
+'• اكتب كوداً نظيفاً، منظماً، خالياً من الأخطاء.',
+'• دعم التوافق العكسي (Backward Compatibility) لتطبيقات الأندرويد.',
+'• استخدم minSdkVersion 21 (Android 5.0) للتوافق الواسع.',
+'• استخدم targetSdkVersion 34 (Android 14) للحديث.',
+'• اختبر ذهنياً كل سطر قبل كتابته.',
+'',
+'📌 القاعدة 2 — تصحيح الأخطاء والثغرات:',
+'• عند استلام كود به أخطاء، افعل التالي:',
+'  1. افحص سطراً بسطر.',
+'  2. حدد الأخطاء: NullPointerException, Memory Leaks, SQL Injection, Insecure Storage, XSS, CSRF.',
+'  3. سد الثغرات الأمنية.',
+'  4. صحّح الأخطاء.',
+'  5. لا تُغيِّر الفكرة الأساسية للكود.',
+'  6. لا تُضعِف الأداء.',
+'• اشرح ما تم إصلاحه: (قبل → بعد).',
+'',
+'📌 القاعدة 3 — الاستئناف عند الانقطاع (الأهم):',
+'• إذا انقطع الكود بسبب طوله، وقال المستخدم "أكمل":',
+'  ✓ ابحث عن آخر حرف أو سطر توقفت عنده.',
+'  ✓ أكمل من ذلك الحرف بالضبط.',
+'  ✗ لا تُعِد كتابة ما سبق.',
+'  ✗ لا تبدأ من البداية.',
+'  ✗ لا تعتذر عن الطول.',
+'• إذا كنت توقفت في منتصف دالة → أكمل من منتصفها.',
+'• إذا كنت توقفت في منتصف كود XML/JSON → أكمل من نفس الحرف.',
+'',
+'📌 القاعدة 4 — إطارات العمل:',
+'• Flutter — للتطبيقات الجميلة (iOS + Android)',
+'• Kotlin/Java — للأداء العالي والتحكم الكامل',
+'• React Native — لمشاركة الكود مع الويب',
+'• Kivy/BeeWare — إذا طُلب Python',
+'• اختر الأنسب حسب الطلب واذكر السبب.',
+'',
+'📌 القاعدة 5 — خطوات بناء APK:',
+'• بعد كل كود تطبيق، أعطِ الخطوات الدقيقة:',
+'  - للأوامر: اذكر الأمر الكامل.',
+'  - لمسار الملف: اذكر المسار الكامل.',
+'  - للمتطلبات: اذكر كل مكتبة وإصدارها.',
+'• إن أمكن البناء من الهاتف، اذكر الطريقة (GitHub Actions / EAS / AIDE).',
+'',
+'📌 القاعدة 6 — جودة الرد:',
+'• اكتب الكود كاملاً — لا تقطع.',
+'• اشرح بإيجاز بعد الكود.',
+'• ضع الكود داخل ```لغة ```.',
+'• استخدم التعليقات المختصرة.',
+'• لا تكتب "# TODO" ولا "..." في الكود.',
+'',
+'🎯 هدفك: إعطاء حسين كوداً يعمل فوراً، بدون أخطاء، وبدون ثغرات.',
+'',
+'المطور: حسين غلاب | الإصدار: 20.0'
+].join('\n');
+
 const LS = {
   USER_ID: 'khallaqi_user_id',
   CHATS: 'khallaqi_chats',
@@ -1090,7 +1136,6 @@ let recognition = null;
 let currentAudio = null;
 let azureAvailable = false;
 
-/* DOM */
 const splash = document.getElementById('splash');
 const appEl = document.getElementById('app');
 const chatEl = document.getElementById('chat');
@@ -1109,11 +1154,7 @@ const voiceIndicator = document.getElementById('voiceIndicator');
 const voiceStatusText = document.getElementById('voiceStatusText');
 const toastEl = document.getElementById('toast');
 const toastText = document.getElementById('toastText');
-const quickBar = document.getElementById('quickBar');
 
-/* ═══════════════════════════════════════════════════════════════
-   SPLASH
-   ═══════════════════════════════════════════════════════════════ */
 (function createSplashParticles() {
   const c = document.getElementById('splashParticles');
   for (let i = 0; i < 70; i++) {
@@ -1168,9 +1209,6 @@ document.getElementById('startBtn').addEventListener('click', () => {
   }, 700);
 });
 
-/* ═══════════════════════════════════════════════════════════════
-   TOAST
-   ═══════════════════════════════════════════════════════════════ */
 let toastTimer = null;
 function showToast(text, kind = 'success') {
   toastText.textContent = text;
@@ -1183,9 +1221,6 @@ function showToast(text, kind = 'success') {
   toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2600);
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   STORAGE — Chats & Messages persistence
-   ═══════════════════════════════════════════════════════════════ */
 function loadLocalChats() {
   try { return JSON.parse(localStorage.getItem(LS.CHATS) || '[]'); }
   catch (e) { return []; }
@@ -1209,9 +1244,6 @@ function removeLocalMessages(chatId) {
   try { localStorage.removeItem(LS.MSGS + chatId); } catch (e) {}
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   API
-   ═══════════════════════════════════════════════════════════════ */
 async function api(path, options = {}) {
   options.headers = options.headers || {};
   if (!options.headers['X-User-ID']) options.headers['X-User-ID'] = USER_ID;
@@ -1239,9 +1271,6 @@ async function detectBackend() {
   DEMO_MODE = true;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   TTS
-   ═══════════════════════════════════════════════════════════════ */
 const VOICE_CONFIG = {
   lang: 'ar-SA', pitch: 1.08, rate: 1.0, volume: 1.0,
   preferKeywords: ['hamed', 'hameed', 'حامد', 'male', 'majed', 'naayf', 'shakir', 'رجل']
@@ -1345,9 +1374,6 @@ function onSpeechEnd() {
   if (liveMode && !isRecording) setTimeout(() => { if (liveMode && !isSending) startVoice(); }, 500);
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   STT
-   ═══════════════════════════════════════════════════════════════ */
 function initRecognition() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) return null;
@@ -1414,9 +1440,6 @@ function toggleLiveMode() {
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   IMAGE
-   ═══════════════════════════════════════════════════════════════ */
 function pickImage() { fileInput.click(); }
 function handleFileSelect(e) {
   const f = e.target.files[0];
@@ -1440,9 +1463,6 @@ function removeImage() {
   previewBox.classList.remove('show');
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   VIDEO
-   ═══════════════════════════════════════════════════════════════ */
 function openVideoModal() { document.getElementById('videoModal').classList.add('show'); }
 function closeVideoModal() { document.getElementById('videoModal').classList.remove('show'); }
 async function generateVideo() {
@@ -1478,27 +1498,14 @@ function pollVideo(op, n = 0) {
   }, 10000);
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   SIDEBAR
-   ═══════════════════════════════════════════════════════════════ */
 function toggleSidebar() {
   sidebar.classList.toggle('open');
   overlay.classList.toggle('show');
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   CHAT-MODE activation
-   ═══════════════════════════════════════════════════════════════ */
-function activateChatMode() {
-  document.body.classList.add('chat-mode');
-}
-function deactivateChatMode() {
-  document.body.classList.remove('chat-mode');
-}
+function activateChatMode() { document.body.classList.add('chat-mode'); }
+function deactivateChatMode() { document.body.classList.remove('chat-mode'); }
 
-/* ═══════════════════════════════════════════════════════════════
-   CHATS
-   ═══════════════════════════════════════════════════════════════ */
 async function loadChats() {
   if (DEMO_MODE) {
     chats = loadLocalChats();
@@ -1509,9 +1516,8 @@ async function loadChats() {
     const d = await api(API_BASE + '/chats');
     chats = d.chats || [];
     renderChats();
-    saveLocalChats();  // cache copy
+    saveLocalChats();
   } catch (e) {
-    // Fallback to local cache
     chats = loadLocalChats();
     renderChats();
   }
@@ -1605,12 +1611,10 @@ async function openChat(id) {
         addMessage(m.content, m.role === 'user' ? 'user' : 'bot', m.source, false, m.type, m.media);
       });
       chatEl.scrollTop = chatEl.scrollHeight;
-      // cache
       saveLocalMessages(id, d.messages.map(m => ({
         role: m.role, content: m.content, source: m.source, type: m.type, media: m.media
       })));
     } else {
-      // Try local cache fallback
       const local = loadLocalMessages(id);
       if (local.length) {
         activateChatMode();
@@ -1621,7 +1625,6 @@ async function openChat(id) {
       }
     }
   } catch (e) {
-    // Fallback to local
     const local = loadLocalMessages(id);
     if (local.length) {
       activateChatMode();
@@ -1667,7 +1670,6 @@ async function deleteChat(id) {
     await loadChats();
     showToast('تم حذف المحادثة');
   } catch (e) {
-    // still remove locally
     chats = chats.filter(c => c.id !== id);
     saveLocalChats();
     removeLocalMessages(id);
@@ -1691,9 +1693,6 @@ function clearCurrentChat() {
   showToast('تم تفريغ المحادثة');
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   WELCOME
-   ═══════════════════════════════════════════════════════════════ */
 function showWelcome() {
   chatEl.innerHTML = `
     <div class="welcome">
@@ -1706,6 +1705,9 @@ function showWelcome() {
         <button onclick="quickPrompt('اكتب موقع شخصي كامل HTML CSS JS')">
           <i class="fa-solid fa-globe"></i> موقع كامل
         </button>
+        <button onclick="quickPrompt('اكتب تطبيق أندرويد APK بلغة Kotlin')">
+          <i class="fa-brands fa-android"></i> تطبيق APK
+        </button>
         <button onclick="pickImage()">
           <i class="fa-solid fa-image"></i> ارفع صورة
         </button>
@@ -1716,9 +1718,6 @@ function showWelcome() {
     </div>`;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   RENDER CONTENT
-   ═══════════════════════════════════════════════════════════════ */
 function renderContent(el, text) {
   const parts = String(text).split('```');
   for (let i = 0; i < parts.length; i++) {
@@ -1760,9 +1759,6 @@ function renderContent(el, text) {
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   ADD MESSAGE
-   ═══════════════════════════════════════════════════════════════ */
 function addMessage(text, role, source, save = true, type = 'text', media = null) {
   if (chatEl.querySelector('.welcome')) chatEl.innerHTML = '';
 
@@ -1815,13 +1811,10 @@ function addMessage(text, role, source, save = true, type = 'text', media = null
   chatEl.appendChild(msg);
   chatEl.scrollTop = chatEl.scrollHeight;
 
-  // Auto TTS
   if (role === 'bot' && ttsEnabled && text && !String(text).startsWith('❌')) speakText(text);
 
-  // Persist locally
   if (save && currentChatId) {
     appendLocalMessage(currentChatId, { role, content: text, source, type, media });
-    // Update title on first user message
     if (role === 'user') {
       const chat = chats.find(c => c.id === currentChatId);
       if (chat) {
@@ -1859,9 +1852,6 @@ function quickPrompt(t) {
   inputEl.style.height = Math.min(inputEl.scrollHeight, 360) + 'px';
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   SEND
-   ═══════════════════════════════════════════════════════════════ */
 async function sendMsg() {
   if (isSending) {
     if (streamAbort) { streamAbort.abort(); streamAbort = null; }
@@ -1875,7 +1865,6 @@ async function sendMsg() {
   if (!currentChatId) await newChat();
   if (!currentChatId) return;
 
-  // Activate chat mode (hide chips, shrink header)
   activateChatMode();
 
   isSending = true;
@@ -1921,7 +1910,8 @@ async function sendWithImage(text) {
         method: 'POST',
         body: JSON.stringify({
           message: text, chat_id: currentChatId, user_id: USER_ID,
-          image: img, image_type: typ
+          image: img, image_type: typ,
+          system_prompt: SYSTEM_PROMPT
         })
       });
       hideTyping();
@@ -1976,7 +1966,12 @@ async function sendWithStream(text) {
     const r = await fetch(API_BASE + '/chat/stream', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-User-ID': USER_ID },
-      body: JSON.stringify({ message: text, chat_id: currentChatId, user_id: USER_ID }),
+      body: JSON.stringify({
+        message: text,
+        chat_id: currentChatId,
+        user_id: USER_ID,
+        system_prompt: SYSTEM_PROMPT
+      }),
       signal: streamAbort.signal
     });
     if (!r.ok) throw new Error('HTTP ' + r.status);
@@ -2028,7 +2023,6 @@ async function sendWithStream(text) {
           if (ttsEnabled && fullText) speakText(fullText);
           document.getElementById('activeProvider').textContent = streamSource || 'جاهز';
 
-          // Save assistant message
           if (currentChatId) {
             appendLocalMessage(currentChatId, { role: 'bot', content: fullText, source: streamSource, type: 'text', media: null });
           }
@@ -2063,9 +2057,6 @@ async function sendWithStream(text) {
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   KEYBOARD
-   ═══════════════════════════════════════════════════════════════ */
 inputEl.addEventListener('keydown', e => {
   if (e.key === 'Enter' && (e.shiftKey || e.ctrlKey || e.metaKey)) {
     e.preventDefault();
@@ -2078,9 +2069,6 @@ inputEl.addEventListener('input', () => {
   inputEl.style.height = Math.min(inputEl.scrollHeight, 360) + 'px';
 });
 
-/* ═══════════════════════════════════════════════════════════════
-   STATUS & STATS
-   ═══════════════════════════════════════════════════════════════ */
 function setDot(id, ok, warn = false) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -2120,9 +2108,6 @@ async function showStats() {
   } catch (e) { showToast(e.message, 'error'); }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   INIT
-   ═══════════════════════════════════════════════════════════════ */
 async function initApp() {
   await detectBackend();
 
@@ -2144,7 +2129,6 @@ async function initApp() {
 
   await loadChats();
 
-  // ═══ Restore last chat if exists ═══
   const savedCurrent = localStorage.getItem(LS.CURRENT);
   let targetChat = null;
 
@@ -2155,7 +2139,6 @@ async function initApp() {
   }
 
   if (targetChat) {
-    // Check if it has messages
     const hasMsgs = loadLocalMessages(targetChat).length > 0;
     if (hasMsgs) {
       await openChat(targetChat);
