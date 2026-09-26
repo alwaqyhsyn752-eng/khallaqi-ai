@@ -12,6 +12,16 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.api.v1 import v1_router
+# Admin dashboard page
+@app.get("/admin", include_in_schema=False)
+async def admin_dashboard(request: Request):
+    from fastapi.responses import HTMLResponse
+    from fastapi.templating import Jinja2Templates
+    templates = Jinja2Templates(directory="app/templates")
+    return templates.TemplateResponse(
+        "admin.html",
+        {"request": request, "ai_name": s.ai_name, "developer_name": s.developer_name},
+    )
 from app.cache.redis_client import close_redis, init_redis
 from app.config import get_settings
 from app.db.engine import close_engine, init_engine
@@ -23,7 +33,18 @@ from app.middleware import (
     register_exception_handler,
 )
 from app.services.ai.router import get_ai_router
-
+# Bootstrap default admin account
+try:
+    from app.db.engine import get_session_factory
+    from app.services.admin_service import AdminService
+    factory = get_session_factory()
+    async with factory() as _s:
+        try:
+            await AdminService(session=_s).bootstrap_default_admin()
+        finally:
+            await _s.close()
+except Exception:
+    log.exception("admin.bootstrap_failed")
 log = get_logger(__name__)
 
 
