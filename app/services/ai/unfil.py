@@ -1,4 +1,4 @@
-"""Unfil AI provider — unrestricted models, zero tracking (OpenAI-compatible)."""
+"""Unfil AI provider — unrestricted models (OpenAI-compatible)."""
 from __future__ import annotations
 
 import json
