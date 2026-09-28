@@ -38,16 +38,13 @@ body{font-family:'Cairo',system-ui,sans-serif;background:var(--bg);color:var(--t
 .cinematic-dev{font-family:'Cairo',sans-serif;font-size:clamp(.8rem,2vw,1rem);color:#67e8f9;letter-spacing:3px;text-shadow:0 0 20px rgba(6,182,212,.7);opacity:0}
 .cinematic-content.active .cinematic-dev{animation:fadeInCinematic 2s ease-out 3.5s forwards}
 @keyframes fadeInCinematic{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
-.sp-start{position:absolute;bottom:12vh;left:50%;transform:translateX(-50%);z-index:5;padding:18px 60px;font-family:inherit;font-size:1.15rem;font-weight:800;letter-spacing:3px;color:#fff;background:linear-gradient(135deg, #06b6d4, #0891b2);border:none;border-radius:50px;cursor:pointer;box-shadow:0 0 50px rgba(6,182,212,.65), 0 20px 60px rgba(0,0,0,.7), inset 0 0 25px rgba(255,255,255,.18);opacity:0;animation:fadeInCinematic 1.5s ease-out 6s forwards, btnFloat 3s ease-in-out 7.5s infinite;position:absolute;overflow:hidden;isolation:isolate}
+.sp-start{position:absolute;bottom:12vh;left:50%;transform:translateX(-50%);z-index:5;padding:18px 60px;font-family:inherit;font-size:1.15rem;font-weight:800;letter-spacing:3px;color:#fff;background:linear-gradient(135deg, #06b6d4, #0891b2);border:none;border-radius:50px;cursor:pointer;box-shadow:0 0 50px rgba(6,182,212,.65), 0 20px 60px rgba(0,0,0,.7), inset 0 0 25px rgba(255,255,255,.18);opacity:0;animation:fadeInCinematic 1.5s ease-out 6s forwards, btnFloat 3s ease-in-out 7.5s infinite;overflow:hidden;isolation:isolate}
 .sp-start::before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.4) 50%,transparent 65%);transform:translateX(-120%);animation:btnShine 3.5s ease-in-out 7.5s infinite;pointer-events:none}
 @keyframes btnShine{0%,100%{transform:translateX(-120%)}50%{transform:translateX(120%)}}
 .sp-start:hover{transform:translateX(-50%) translateY(-4px) scale(1.05);box-shadow:0 0 80px rgba(6,182,212,1), 0 25px 80px rgba(0,0,0,.8), inset 0 0 35px rgba(255,255,255,.25)}
 @keyframes btnFloat{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-8px)}}
 .light-rays{position:absolute;top:-50%;left:50%;transform:translateX(-50%);width:60%;height:200%;background:linear-gradient(180deg, rgba(6,182,212,.15) 0%, transparent 60%);filter:blur(60px);z-index:4;animation:raysShift 8s ease-in-out infinite;pointer-events:none}
 @keyframes raysShift{0%,100%{transform:translateX(-50%) skewX(0deg);opacity:.4}50%{transform:translateX(-50%) skewX(8deg);opacity:.7}}
-.bubbles{position:absolute;inset:0;z-index:3;overflow:hidden;pointer-events:none}
-.bubble{position:absolute;bottom:-30px;border-radius:50%;background:radial-gradient(circle at 30% 30%, rgba(224,242,254,.9), rgba(6,182,212,.6));box-shadow:0 0 10px rgba(6,182,212,.7);animation:riseUp linear infinite;opacity:0}
-@keyframes riseUp{0%{transform:translateY(0) scale(.3);opacity:0}20%{opacity:.85}100%{transform:translateY(-100vh) scale(1.3);opacity:0}}
 
 .app{position:relative;z-index:1;display:flex;height:100vh;width:100vw;opacity:0;pointer-events:none;transition:opacity .9s var(--es) .3s}
 .app.vis{opacity:1;pointer-events:auto}
@@ -134,8 +131,6 @@ pre code{display:block;white-space:pre;color:#bae6fd}
 .cbtn{position:absolute;top:6px;right:10px;padding:6px 14px;background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;border:none;border-radius:9px;cursor:pointer;font-family:inherit;font-size:.72rem;font-weight:700;display:flex;align-items:center;gap:6px;z-index:2}
 .cbtn.done{background:var(--ok)}
 .src{font-size:.66rem;color:var(--muted);margin-top:12px;padding-top:10px;border-top:1px dashed rgba(6,182,212,.18);display:flex;align-items:center;gap:6px;opacity:.85}
-.spk{position:absolute;top:10px;left:10px;width:32px;height:32px;background:var(--g3);border:1px solid var(--bd);color:var(--soft);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.78rem;z-index:2}
-.spk:hover{background:var(--p);color:#fff;border-color:transparent}
 .scursor{display:inline-block;width:8px;height:18px;background:var(--p);vertical-align:middle;margin-right:5px;animation:cblink .85s infinite;border-radius:2px}
 @keyframes cblink{0%,100%{opacity:1}50%{opacity:0}}
 .typing{align-self:flex-start;padding:16px 22px;background:var(--g1);backdrop-filter:blur(22px);border:1px solid var(--bd);border-radius:20px;display:flex;gap:7px}
@@ -210,6 +205,49 @@ body.cmode .hint{opacity:0;max-height:0;margin:0;overflow:hidden}
 .dlbtn{padding:10px 18px;background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;border:none;border-radius:12px;cursor:pointer;font-family:inherit;font-weight:800;font-size:.85rem;display:flex;align-items:center;gap:8px;box-shadow:0 6px 20px rgba(6,182,212,.5);transition:all .25s var(--es);white-space:nowrap}
 .dlbtn:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(6,182,212,.8)}
 @media(max-width:880px){.sb{position:fixed;top:0;bottom:0;right:0;width:82%;max-width:330px;transform:translateX(105%)}.sb.open{transform:translateX(0)}.sb-x{display:flex}.mbtn{display:flex}.chat{padding:18px 14px}.iwrap{padding:12px 14px 16px}.ibtn{width:40px;height:40px;font-size:.9rem}.msg{max-width:92%}}
+
+/* ═══ Khlaqi TTS Button ═══ */
+.khlaqi-tts-button{
+  width:32px;height:32px;border-radius:50%;
+  background:rgba(15,50,80,.5);
+  border:1px solid rgba(6,182,212,.3);
+  color:#bae6fd;
+  cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:all .25s ease;
+  padding:0;
+  position:absolute;
+  top:10px;left:10px;
+  z-index:2;
+}
+.khlaqi-tts-button:hover{
+  background:linear-gradient(135deg,#06b6d4,#0891b2);
+  color:#fff;border-color:transparent;
+  transform:scale(1.1);
+  box-shadow:0 0 20px rgba(6,182,212,.6);
+}
+.khlaqi-tts-button.tts-playing{
+  background:linear-gradient(135deg,#06b6d4,#0891b2);
+  color:#fff;border-color:transparent;
+  box-shadow:0 0 24px rgba(6,182,212,.8);
+  animation:ttsPulse 1.5s infinite;
+}
+.khlaqi-tts-button.tts-loading{
+  background:linear-gradient(135deg,#0891b2,#0e7490);
+  color:#fff;border-color:transparent;
+  cursor:wait;
+}
+.khlaqi-tts-button.tts-loading svg{
+  animation:ttsSpin 1s linear infinite;
+}
+@keyframes ttsPulse{
+  0%,100%{box-shadow:0 0 24px rgba(6,182,212,.8)}
+  50%{box-shadow:0 0 36px rgba(6,182,212,1)}
+}
+@keyframes ttsSpin{
+  from{transform:rotate(0deg)}
+  to{transform:rotate(360deg)}
+}
 </style>
 </head>
 <body>
@@ -220,9 +258,7 @@ body.cmode .hint{opacity:0;max-height:0;margin:0;overflow:hidden}
   <video id="introVideo" class="splash-video" autoplay muted playsinline preload="auto" poster="/static/shark-poster.jpg">
     <source src="/static/intro-shark.mp4" type="video/mp4">
   </video>
-
   <div class="splash-vignette"></div>
-
   <div class="splash-waves">
     <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
       <path fill="#06b6d4" fill-opacity="0.5" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,208C672,213,768,203,864,181.3C960,160,1056,128,1152,122.7C1248,117,1344,139,1392,149.3L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z">
@@ -233,15 +269,12 @@ body.cmode .hint{opacity:0;max-height:0;margin:0;overflow:hidden}
       </path>
     </svg>
   </div>
-
   <div class="light-rays"></div>
-
   <div class="cinematic-content" id="cinematicText">
     <h1 class="cinematic-logo" id="cinematicLogo">الخلاقي</h1>
     <p class="cinematic-sub">مساعدك الذكي العربي</p>
     <p class="cinematic-dev">تطوير · حسين غلاب</p>
   </div>
-
   <button class="sp-start" id="startBtn" type="button">
     <i class="fa-solid fa-wand-magic-sparkles"></i> ابدأ الآن
   </button>
@@ -354,6 +387,191 @@ body.cmode .hint{opacity:0;max-height:0;margin:0;overflow:hidden}
 </div>
 
 <script>
+/* ═══════════════════════════════════════════════════════
+   KhlaqiTTS — وحدة الصوت الاحترافية
+   ═══════════════════════════════════════════════════════ */
+const KhlaqiTTS = (() => {
+    const CONFIG = {
+        backendUrl: "",
+        autoplay: false,
+        language: "ar-SA",
+        fallbackRate: 1.0,
+        fallbackPitch: 1.0,
+        volume: 1.0
+    };
+
+    let currentAudio = null;
+    let currentObjectUrl = null;
+    let currentButton = null;
+    let isPlaying = false;
+    let isLoading = false;
+
+    function getArabicVoice() {
+        if (!("speechSynthesis" in window)) return null;
+        const voices = window.speechSynthesis.getVoices();
+        if (!voices || voices.length === 0) return null;
+        const saudi = voices.find(v => v.lang && v.lang.toLowerCase() === "ar-sa");
+        if (saudi) return saudi;
+        const arabic = voices.find(v => v.lang && v.lang.toLowerCase().startsWith("ar"));
+        return arabic || null;
+    }
+
+    function speakWithWebSpeech(text) {
+        return new Promise((resolve, reject) => {
+            try {
+                if (!("speechSynthesis" in window)) {
+                    reject(new Error("Web Speech not supported"));
+                    return;
+                }
+                window.speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(text);
+                u.lang = CONFIG.language;
+                u.rate = CONFIG.fallbackRate;
+                u.pitch = CONFIG.fallbackPitch;
+                u.volume = CONFIG.volume;
+                const voice = getArabicVoice();
+                if (voice) u.voice = voice;
+                u.onstart = () => { isPlaying = true; updateButtonState(currentButton, "playing"); };
+                u.onend = () => { isPlaying = false; updateButtonState(currentButton, "idle"); resolve(); };
+                u.onerror = (e) => { isPlaying = false; updateButtonState(currentButton, "idle"); reject(new Error(e.error || "Web Speech error")); };
+                window.speechSynthesis.speak(u);
+            } catch (e) { reject(e); }
+        });
+    }
+
+    function stop() {
+        try {
+            if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+            if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; currentAudio.src = ""; }
+            if (currentObjectUrl) { URL.revokeObjectURL(currentObjectUrl); currentObjectUrl = null; }
+        } catch (e) { console.error("TTS stop error:", e); }
+        isPlaying = false;
+        isLoading = false;
+        updateButtonState(currentButton, "idle");
+        currentAudio = null;
+        currentButton = null;
+    }
+
+    async function requestBackendTTS(text) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 25000);
+        try {
+            const url = (CONFIG.backendUrl || "") + "/api/v1/tts";
+            const response = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: text }),
+                signal: controller.signal
+            });
+            if (!response.ok) throw new Error("TTS backend error " + response.status);
+            const ct = response.headers.get("content-type") || "";
+            if (!ct.includes("audio")) throw new Error("Backend returned non-audio");
+            return await response.blob();
+        } finally { clearTimeout(timer); }
+    }
+
+    async function playBlob(blob) {
+        const objectUrl = URL.createObjectURL(blob);
+        currentObjectUrl = objectUrl;
+        const audio = new Audio(objectUrl);
+        currentAudio = audio;
+        audio.preload = "auto";
+        audio.volume = CONFIG.volume;
+        return new Promise((resolve, reject) => {
+            audio.onplay = () => { isPlaying = true; updateButtonState(currentButton, "playing"); };
+            audio.onended = () => {
+                isPlaying = false;
+                updateButtonState(currentButton, "idle");
+                URL.revokeObjectURL(objectUrl);
+                currentObjectUrl = null;
+                currentAudio = null;
+                resolve();
+            };
+            audio.onerror = () => {
+                isPlaying = false;
+                updateButtonState(currentButton, "idle");
+                reject(new Error("Audio playback failed"));
+            };
+            audio.play().catch(reject);
+        });
+    }
+
+    async function speak(text, button = null) {
+        if (!text || !text.trim()) return;
+        currentButton = button;
+        if (isPlaying || isLoading) { stop(); return; }
+        updateButtonState(button, "loading");
+        isLoading = true;
+        try {
+            const blob = await requestBackendTTS(text);
+            isLoading = false;
+            await playBlob(blob);
+            return;
+        } catch (e) { console.warn("Backend TTS failed:", e); }
+        try {
+            isLoading = false;
+            await speakWithWebSpeech(text);
+        } catch (e) {
+            console.error("Web Speech failed:", e);
+            isLoading = false;
+            updateButtonState(button, "idle");
+        }
+    }
+
+    const ICONS = {
+        idle: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>',
+        playing: '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>',
+        loading: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9" stroke-opacity="0.25"/><path d="M21 12a9 9 0 0 0-9-9"/></svg>'
+    };
+
+    function updateButtonState(button, state) {
+        if (!button) return;
+        button.dataset.ttsState = state;
+        button.innerHTML = ICONS[state] || ICONS.idle;
+        if (state === "playing") {
+            button.title = "إيقاف الصوت";
+            button.classList.add("tts-playing");
+            button.classList.remove("tts-loading");
+        } else if (state === "loading") {
+            button.title = "جاري إنشاء الصوت";
+            button.classList.add("tts-loading");
+            button.classList.remove("tts-playing");
+        } else {
+            button.title = "تشغيل الصوت";
+            button.classList.remove("tts-playing", "tts-loading");
+        }
+    }
+
+    function createButton(text) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "khlaqi-tts-button";
+        button.innerHTML = ICONS.idle;
+        button.title = "تشغيل الصوت";
+        button.setAttribute("aria-label", "تشغيل الرد صوتياً");
+        button.addEventListener("click", async () => {
+            try { await speak(text, button); }
+            catch (e) { console.error(e); updateButtonState(button, "idle"); }
+        });
+        return button;
+    }
+
+    async function speakWhenResponseArrives(text) {
+        if (!CONFIG.autoplay) return;
+        try { await speak(text, null); }
+        catch (e) { console.error("Autoplay TTS failed:", e); }
+    }
+
+    return {
+        speak, stop, createButton, speakWhenResponseArrives,
+        setBackendUrl(url) { CONFIG.backendUrl = String(url).replace(/\/$/, ""); },
+        setAutoplay(value) { CONFIG.autoplay = Boolean(value); },
+        isPlaying() { return isPlaying; }
+    };
+})();
+
+/* ═══════════════════════════════════════════════════════ */
+
 const API = '/api/v1';
 const IS_FILE = location.protocol === 'file:';
 let DEMO = IS_FILE;
@@ -403,43 +621,29 @@ const ttsBtn = $('ttsBtn'), liveBtn = $('liveBtn');
 const vind = $('vind'), vstatus = $('vstatus');
 const toastEl = $('toast'), toastTxt = $('toastText');
 
-// ═══ المشهد السينمائي — فيلم القرش ═══
+/* ═══ المشهد السينمائي ═══ */
 (function initCinematic() {
   const video = document.getElementById('introVideo');
   const cinematicText = document.getElementById('cinematicText');
 
   const wavesAudio = new Audio('/static/audio-waves.mp3');
   wavesAudio.volume = 0.4;
-
   const sharkAudio = new Audio('/static/audio-shark.mp3');
   sharkAudio.volume = 0.7;
 
+  setTimeout(() => { wavesAudio.play().catch(() => generateOceanSound()); }, 500);
+  setTimeout(() => { sharkAudio.play().catch(() => generateSharkSound()); }, 5000);
   setTimeout(() => {
-    wavesAudio.play().catch(() => generateOceanSound());
-  }, 500);
-
-  setTimeout(() => {
-    sharkAudio.play().catch(() => generateSharkSound());
-  }, 5000);
-
-  setTimeout(() => {
-    if (cinematicText) {
-      cinematicText.classList.add('active');
-      cinematicText.style.opacity = '1';
-    }
+    if (cinematicText) { cinematicText.classList.add('active'); cinematicText.style.opacity = '1'; }
   }, 8000);
-
-  setTimeout(() => {
-    if (video) video.pause();
-  }, 15000);
+  setTimeout(() => { if (video) video.pause(); }, 15000);
 
   const startBtn = document.getElementById('startBtn');
   if (startBtn) {
     const newBtn = startBtn.cloneNode(true);
     startBtn.parentNode.replaceChild(newBtn, startBtn);
     newBtn.addEventListener('click', () => {
-      wavesAudio.pause();
-      sharkAudio.pause();
+      wavesAudio.pause(); sharkAudio.pause();
       const splashEl = document.getElementById('splash');
       splashEl.classList.add('leave');
       setTimeout(() => {
@@ -457,17 +661,12 @@ function generateOceanSound() {
     const bufferSize = 2 * ctx.sampleRate;
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = (Math.random() * 2 - 1) * 0.3;
-    }
+    for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.3;
     const source = ctx.createBufferSource();
-    source.buffer = buffer;
-    source.loop = true;
+    source.buffer = buffer; source.loop = true;
     const filter = ctx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.value = 400;
-    const gain = ctx.createGain();
-    gain.gain.value = 0.25;
+    filter.type = 'lowpass'; filter.frequency.value = 400;
+    const gain = ctx.createGain(); gain.gain.value = 0.25;
     source.connect(filter).connect(gain).connect(ctx.destination);
     source.start();
   } catch (e) {}
@@ -481,21 +680,30 @@ function generateSharkSound() {
     osc.frequency.setValueAtTime(80, ctx.currentTime);
     osc.frequency.exponentialRampToValueAtTime(35, ctx.currentTime + 1.5);
     const filter = ctx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.value = 250;
+    filter.type = 'lowpass'; filter.frequency.value = 250;
     const gain = ctx.createGain();
     gain.gain.setValueAtTime(0, ctx.currentTime);
     gain.gain.linearRampToValueAtTime(0.35, ctx.currentTime + 0.15);
     gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 2);
     osc.connect(filter).connect(gain).connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 2);
+    osc.start(); osc.stop(ctx.currentTime + 2);
   } catch (e) {}
 }
 
+/* ═══ Toast ═══ */
 let toastT=null;
-function toast(txt,kind='success'){toastTxt.textContent=txt;toastEl.className='toast show '+kind;const ic=toastEl.querySelector('i');if(kind==='error')ic.className='fa-solid fa-circle-exclamation';else if(kind==='info')ic.className='fa-solid fa-circle-info';else ic.className='fa-solid fa-circle-check';clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove('show'),2600);}
+function toast(txt,kind='success'){
+  toastTxt.textContent=txt;
+  toastEl.className='toast show '+kind;
+  const ic=toastEl.querySelector('i');
+  if(kind==='error')ic.className='fa-solid fa-circle-exclamation';
+  else if(kind==='info')ic.className='fa-solid fa-circle-info';
+  else ic.className='fa-solid fa-circle-check';
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>toastEl.classList.remove('show'),2600);
+}
 
+/* ═══ Storage ═══ */
 function loadChats(){try{return JSON.parse(localStorage.getItem(LS.CHATS)||'[]');}catch(e){return[];}}
 function saveChats(){try{localStorage.setItem(LS.CHATS,JSON.stringify(chats));}catch(e){}}
 function loadMsgs(id){try{return JSON.parse(localStorage.getItem(LS.MSGS+id)||'[]');}catch(e){return[];}}
@@ -503,65 +711,280 @@ function saveMsgs(id,m){try{localStorage.setItem(LS.MSGS+id,JSON.stringify(m));}
 function pushMsg(id,m){const l=loadMsgs(id);l.push(m);saveMsgs(id,l);}
 function rmMsgs(id){try{localStorage.removeItem(LS.MSGS+id);}catch(e){}}
 
-async function api(path,opt={}){opt.headers=opt.headers||{};if(!opt.headers['X-User-ID'])opt.headers['X-User-ID']=USER_ID;if(opt.body&&typeof opt.body==='string'&&!opt.headers['Content-Type'])opt.headers['Content-Type']='application/json';const r=await fetch(path,opt);const raw=await r.text();let d;try{d=raw?JSON.parse(raw):{};}catch(e){throw new Error('رد غير متوقع');}if(!r.ok){throw new Error(d.error||d.message||('HTTP '+r.status));}return d;}
-async function detect(){if(IS_FILE){DEMO=true;return;}try{const r=await fetch(API+'/status');if(r.ok){REACHABLE=true;DEMO=false;return;}}catch(e){}DEMO=true;}
+/* ═══ API ═══ */
+async function api(path,opt={}){
+  opt.headers=opt.headers||{};
+  if(!opt.headers['X-User-ID'])opt.headers['X-User-ID']=USER_ID;
+  if(opt.body&&typeof opt.body==='string'&&!opt.headers['Content-Type'])opt.headers['Content-Type']='application/json';
+  const r=await fetch(path,opt);
+  const raw=await r.text();
+  let d;
+  try{d=raw?JSON.parse(raw):{};}catch(e){throw new Error('رد غير متوقع');}
+  if(!r.ok)throw new Error(d.error||d.message||('HTTP '+r.status));
+  return d;
+}
 
-const VC={lang:'ar-SA',pitch:1.08,rate:1.0,vol:1.0,kw:['hamed','hameed','حامد','male','majed','naayf','shakir','رجل']};
+async function detect(){
+  if(IS_FILE){DEMO=true;return;}
+  try{const r=await fetch(API+'/status');if(r.ok){REACHABLE=true;DEMO=false;return;}}catch(e){}
+  DEMO=true;
+}
+
+/* ═══ TTS — يستخدم KhlaqiTTS ═══ */
 function upTtsUI(){ttsBtn.classList.toggle('on',ttsOn);}
-function tglTTS(){ttsOn=!ttsOn;localStorage.setItem(LS.TTS,ttsOn?'true':'false');upTtsUI();if(ttsOn)speakTxt('تم تفعيل قراءة الردود');else stopSpeak();}
+function tglTTS(){
+  ttsOn=!ttsOn;
+  localStorage.setItem(LS.TTS,ttsOn?'true':'false');
+  upTtsUI();
+  if(ttsOn)KhlaqiTTS.speak('تم تفعيل قراءة الردود');
+  else KhlaqiTTS.stop();
+}
 upTtsUI();
 
-function pickVoice(){if(!('speechSynthesis'in window))return null;const vs=window.speechSynthesis.getVoices();if(!vs||!vs.length)return null;const saudi=vs.find(v=>{const n=v.name.toLowerCase(),l=v.lang.toLowerCase();return(l.startsWith('ar-sa')||l.includes('sa'))&&VC.kw.some(k=>n.includes(k.toLowerCase()));});if(saudi)return saudi;const ar=vs.find(v=>{const n=v.name.toLowerCase(),l=v.lang.toLowerCase();return l.startsWith('ar')&&VC.kw.some(k=>n.includes(k.toLowerCase()));});if(ar)return ar;return vs.find(v=>v.lang.toLowerCase().startsWith('ar-sa'))||vs.find(v=>v.lang.toLowerCase().startsWith('ar'))||null;}
+async function speakTxt(text){ await KhlaqiTTS.speak(text, null); }
+function stopSpeak(){ KhlaqiTTS.stop(); }
 
-async function speakTxt(text){
-  if(!text)return;
-  stopSpeak();
-  if(typeof AndroidTTS!=='undefined'&&AndroidTTS){
-    try{AndroidTTS.speak(text);speak=true;micBtn.classList.add('speaking');return;}catch(e){}
-  }
-  if(azureOk&&!DEMO){try{const b=await fetchAzure(text);if(b){await playBlob(b);return;}}catch(e){}}
-  webSpeak(text);
+/* ═══ STT ═══ */
+function initRecog(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR)return null;
+  const r=new SR();
+  r.lang='ar-SA';r.continuous=false;r.interimResults=true;
+  r.onresult=e=>{
+    let it='',fi='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const t=e.results[i][0].transcript;
+      if(e.results[i].isFinal)fi+=t;else it+=t;
+    }
+    inputEl.value=fi||it;
+    if(fi){vstatus.textContent='تم الالتقاط...';setTimeout(()=>{if(!isSending)sendMsg();},500);}
+  };
+  r.onerror=e=>{
+    if(e.error==='not-allowed')toast('يجب السماح بالميكروفون','error');
+    else if(e.error==='no-speech')toast('لم يتم التقاط صوت','info');
+    stopVoice();
+  };
+  r.onend=()=>stopVoice();
+  return r;
 }
-async function fetchAzure(text){try{const r=await fetch(API+'/tts',{method:'POST',headers:{'Content-Type':'application/json','X-User-ID':USER_ID},body:JSON.stringify({text})});if((r.headers.get('content-type')||'').includes('audio'))return await r.blob();return null;}catch(e){return null;}}
-function playBlob(b){return new Promise(res=>{const u=URL.createObjectURL(b);const a=new Audio(u);audioEl=a;speak=true;micBtn.classList.add('speaking');const done=()=>{speak=false;micBtn.classList.remove('speaking');URL.revokeObjectURL(u);audioEl=null;res();onSpeakEnd();};a.onended=done;a.onerror=done;a.play().catch(done);});}
-function webSpeak(text){if(!('speechSynthesis'in window))return;const clean=text.replace(/```[\s\S]*?```/g,' كود ').replace(/`([^`]+)`/g,'$1').replace(/[#*_]/g,'').substring(0,600);const u=new SpeechSynthesisUtterance(clean);u.lang=VC.lang;u.pitch=VC.pitch;u.rate=VC.rate;u.volume=VC.vol;const v=pickVoice();if(v)u.voice=v;u.onstart=()=>{speak=true;micBtn.classList.add('speaking');};u.onend=()=>{speak=false;micBtn.classList.remove('speaking');onSpeakEnd();};u.onerror=()=>{speak=false;micBtn.classList.remove('speaking');onSpeakEnd();};window.speechSynthesis.speak(u);}
-function stopSpeak(){if(audioEl){try{audioEl.pause();}catch(e){}audioEl=null;}if(typeof AndroidTTS!=='undefined'&&AndroidTTS){try{AndroidTTS.stop();}catch(e){}}if('speechSynthesis'in window)window.speechSynthesis.cancel();speak=false;micBtn.classList.remove('speaking');}
-function onSpeakEnd(){if(live&&!rec)setTimeout(()=>{if(live&&!isSending)startVoice();},500);}
-
-function initRecog(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return null;const r=new SR();r.lang='ar-SA';r.continuous=false;r.interimResults=true;r.onresult=e=>{let it='',fi='';for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)fi+=t;else it+=t;}inputEl.value=fi||it;if(fi){vstatus.textContent='تم الالتقاط...';setTimeout(()=>{if(!isSending)sendMsg();},500);}};r.onerror=e=>{if(e.error==='not-allowed')toast('يجب السماح بالميكروفون','error');else if(e.error==='no-speech')toast('لم يتم التقاط صوت','info');stopVoice();};r.onend=()=>stopVoice();return r;}
 function tglVoice(){rec?stopVoice():startVoice();}
-function startVoice(){if(speak){stopSpeak();return;}if(!recog)recog=initRecog();if(!recog){toast('المتصفح لا يدعم الصوت','error');return;}try{recog.start();rec=true;micBtn.classList.add('rec');micBtn.innerHTML='<i class="fa-solid fa-stop"></i>';vind.classList.add('show');vstatus.textContent='جاري الاستماع...';}catch(e){}}
-function stopVoice(){if(recog&&rec){try{recog.stop();}catch(e){}}rec=false;micBtn.classList.remove('rec');micBtn.innerHTML='<i class="fa-solid fa-microphone"></i>';vind.classList.remove('show');}
-function tglLive(){live=!live;if(live){liveBtn.classList.add('live');ttsOn=true;localStorage.setItem(LS.TTS,'true');upTtsUI();toast('المحادثة الصوتية مفعّلة','info');startVoice();}else{liveBtn.classList.remove('live');stopVoice();stopSpeak();toast('تم إيقاف المحادثة الصوتية','info');}}
+function startVoice(){
+  if(speak){stopSpeak();return;}
+  if(!recog)recog=initRecog();
+  if(!recog){toast('المتصفح لا يدعم الصوت','error');return;}
+  try{
+    recog.start();rec=true;
+    micBtn.classList.add('rec');
+    micBtn.innerHTML='<i class="fa-solid fa-stop"></i>';
+    vind.classList.add('show');
+    vstatus.textContent='جاري الاستماع...';
+  }catch(e){}
+}
+function stopVoice(){
+  if(recog&&rec){try{recog.stop();}catch(e){}}
+  rec=false;
+  micBtn.classList.remove('rec');
+  micBtn.innerHTML='<i class="fa-solid fa-microphone"></i>';
+  vind.classList.remove('show');
+}
+function tglLive(){
+  live=!live;
+  if(live){
+    liveBtn.classList.add('live');
+    ttsOn=true;
+    localStorage.setItem(LS.TTS,'true');
+    upTtsUI();
+    toast('المحادثة الصوتية مفعّلة','info');
+    startVoice();
+  }else{
+    liveBtn.classList.remove('live');
+    stopVoice();
+    stopSpeak();
+    toast('تم إيقاف المحادثة الصوتية','info');
+  }
+}
 
+/* ═══ Image ═══ */
 function pickImg(){fileIn.click();}
-function onFile(e){const f=e.target.files[0];if(!f)return;if(!f.type.startsWith('image/')){toast('اختر صورة صحيحة','error');return;}if(f.size>10*1024*1024){toast('الصورة كبيرة (10MB)','error');return;}selImgType=f.type;const rd=new FileReader();rd.onload=ev=>{selImg=ev.target.result;prevImg.src=selImg;$('prevInfo').textContent=`${(f.size/1024).toFixed(1)} KB`;prevBox.classList.add('show');};rd.readAsDataURL(f);fileIn.value='';}
+function onFile(e){
+  const f=e.target.files[0];
+  if(!f)return;
+  if(!f.type.startsWith('image/')){toast('اختر صورة صحيحة','error');return;}
+  if(f.size>10*1024*1024){toast('الصورة كبيرة (10MB)','error');return;}
+  selImgType=f.type;
+  const rd=new FileReader();
+  rd.onload=ev=>{
+    selImg=ev.target.result;
+    prevImg.src=selImg;
+    $('prevInfo').textContent=`${(f.size/1024).toFixed(1)} KB`;
+    prevBox.classList.add('show');
+  };
+  rd.readAsDataURL(f);
+  fileIn.value='';
+}
 function rmImg(){selImg=null;prevImg.src='';prevBox.classList.remove('show');}
 
+/* ═══ Video ═══ */
 function openVid(){$('vidModal').classList.add('show');}
 function closeVid(){$('vidModal').classList.remove('show');}
-async function genVid(){const p=$('vidPrompt').value.trim();if(!p){toast('الوصف مطلوب','error');return;}if(!currentChatId)await newChat();closeVid();addMsg('طلب توليد فيديو: '+p,'user');if(DEMO){setTimeout(()=>addMsg('الوضع التجريبي.','info'),700);return;}showTyping();try{const d=await api(API+'/generate-video',{method:'POST',body:JSON.stringify({prompt:p,chat_id:currentChatId,user_id:USER_ID})});hideTyping();if(d.error){addMsg(d.error,'error');return;}addMsg('تم بدء التوليد: '+d.operation,'bot',d.model);}catch(e){hideTyping();addMsg(e.message,'error');}}
+async function genVid(){
+  const p=$('vidPrompt').value.trim();
+  if(!p){toast('الوصف مطلوب','error');return;}
+  if(!currentChatId)await newChat();
+  closeVid();
+  addMsg('طلب توليد فيديو: '+p,'user');
+  if(DEMO){setTimeout(()=>addMsg('الوضع التجريبي.','info'),700);return;}
+  showTyping();
+  try{
+    const d=await api(API+'/generate-video',{method:'POST',body:JSON.stringify({prompt:p,chat_id:currentChatId,user_id:USER_ID})});
+    hideTyping();
+    if(d.error){addMsg(d.error,'error');return;}
+    addMsg('تم بدء التوليد: '+d.operation,'bot',d.model);
+  }catch(e){hideTyping();addMsg(e.message,'error');}
+}
 
+/* ═══ Sidebar ═══ */
 function tglSb(){sb.classList.toggle('open');ov.classList.toggle('show');}
 function cMode(){document.body.classList.add('cmode');}
 function unCmode(){document.body.classList.remove('cmode');}
 
-async function loadAllChats(){if(DEMO){chats=loadChats();renderChats();return;}try{const d=await api(API+'/chats');chats=d.chats||[];renderChats();saveChats();}catch(e){chats=loadChats();renderChats();}}
-function renderChats(){const l=$('chatsList');if(!chats.length){l.innerHTML='<div class="chats-empty">لا توجد محادثات بعد</div>';return;}l.innerHTML='';chats.forEach(c=>{const it=document.createElement('div');it.className='ci'+(c.id===currentChatId?' on':'');const ic=document.createElement('i');ic.className='fa-regular fa-comment ic';const t=document.createElement('span');t.className='t';t.textContent=c.title||'محادثة';const x=document.createElement('button');x.className='x';x.innerHTML='<i class="fa-solid fa-trash-can"></i>';x.onclick=ev=>{ev.stopPropagation();delChat(c.id);};it.appendChild(ic);it.appendChild(t);it.appendChild(x);it.onclick=ev=>{if(!ev.target.closest('.x'))openChat(c.id);};l.appendChild(it);});}
+/* ═══ Chats ═══ */
+async function loadAllChats(){
+  if(DEMO){chats=loadChats();renderChats();return;}
+  try{
+    const d=await api(API+'/chats');
+    chats=d.chats||[];
+    renderChats();
+    saveChats();
+  }catch(e){chats=loadChats();renderChats();}
+}
+function renderChats(){
+  const l=$('chatsList');
+  if(!chats.length){l.innerHTML='<div class="chats-empty">لا توجد محادثات بعد</div>';return;}
+  l.innerHTML='';
+  chats.forEach(c=>{
+    const it=document.createElement('div');
+    it.className='ci'+(c.id===currentChatId?' on':'');
+    const ic=document.createElement('i');
+    ic.className='fa-regular fa-comment ic';
+    const t=document.createElement('span');
+    t.className='t';
+    t.textContent=c.title||'محادثة';
+    const x=document.createElement('button');
+    x.className='x';
+    x.innerHTML='<i class="fa-solid fa-trash-can"></i>';
+    x.onclick=ev=>{ev.stopPropagation();delChat(c.id);};
+    it.appendChild(ic);it.appendChild(t);it.appendChild(x);
+    it.onclick=ev=>{if(!ev.target.closest('.x'))openChat(c.id);};
+    l.appendChild(it);
+  });
+}
 
-async function newChat(){if(DEMO){const id='demo-'+Date.now();chats=[{id,title:'محادثة جديدة',created_at:new Date().toISOString(),updated_at:new Date().toISOString()},...chats];saveChats();currentChatId=id;localStorage.setItem(LS.CUR,id);renderChats();showWelcome();unCmode();if(window.innerWidth<=880)tglSb();return;}try{const d=await api(API+'/chats/new',{method:'POST',body:JSON.stringify({user_id:USER_ID})});if(!d.chat_id){toast('فشل','error');return;}currentChatId=d.chat_id;localStorage.setItem(LS.CUR,currentChatId);await loadAllChats();showWelcome();unCmode();if(window.innerWidth<=880)tglSb();}catch(e){toast(e.message,'error');}}
+async function newChat(){
+  if(DEMO){
+    const id='demo-'+Date.now();
+    chats=[{id,title:'محادثة جديدة',created_at:new Date().toISOString(),updated_at:new Date().toISOString()},...chats];
+    saveChats();
+    currentChatId=id;
+    localStorage.setItem(LS.CUR,id);
+    renderChats();
+    showWelcome();
+    unCmode();
+    if(window.innerWidth<=880)tglSb();
+    return;
+  }
+  try{
+    const d=await api(API+'/chats/new',{method:'POST',body:JSON.stringify({user_id:USER_ID})});
+    if(!d.chat_id){toast('فشل','error');return;}
+    currentChatId=d.chat_id;
+    localStorage.setItem(LS.CUR,currentChatId);
+    await loadAllChats();
+    showWelcome();
+    unCmode();
+    if(window.innerWidth<=880)tglSb();
+  }catch(e){toast(e.message,'error');}
+}
 
 async function openChat(id){
-  currentChatId=id;localStorage.setItem(LS.CUR,id);await loadAllChats();chatEl.innerHTML='';
-  if(DEMO){const msgs=loadMsgs(id);if(msgs.length){cMode();msgs.forEach(m=>addMsg(m.content,m.role,m.source,false,m.type,m.media));chatEl.scrollTop=chatEl.scrollHeight;}else{unCmode();showWelcome();}if(window.innerWidth<=880)tglSb();return;}
-  try{const d=await api(API+'/chats/'+id);if(d.messages&&d.messages.length){cMode();const serverMsgs=d.messages.map(m=>({role:m.role,content:m.content,source:m.source,type:m.type,media:m.media}));const localMsgs=loadMsgs(id);if(serverMsgs.length>localMsgs.length){saveMsgs(id,serverMsgs);serverMsgs.forEach(m=>addMsg(m.content,m.role==='user'?'user':'bot',m.source,false,m.type,m.media));}else{localMsgs.forEach(m=>addMsg(m.content,m.role==='user'?'user':'bot',m.source,false,m.type,m.media));}chatEl.scrollTop=chatEl.scrollHeight;}else{const lc=loadMsgs(id);if(lc.length){cMode();lc.forEach(m=>addMsg(m.content,m.role,m.source,false,m.type,m.media));}else{unCmode();showWelcome();}}}catch(e){const lc=loadMsgs(id);if(lc.length){cMode();lc.forEach(m=>addMsg(m.content,m.role,m.source,false,m.type,m.media));}else{unCmode();showWelcome();}}
+  currentChatId=id;
+  localStorage.setItem(LS.CUR,id);
+  await loadAllChats();
+  chatEl.innerHTML='';
+  if(DEMO){
+    const msgs=loadMsgs(id);
+    if(msgs.length){
+      cMode();
+      msgs.forEach(m=>addMsg(m.content,m.role,m.source,false,m.type,m.media));
+      chatEl.scrollTop=chatEl.scrollHeight;
+    }else{unCmode();showWelcome();}
+    if(window.innerWidth<=880)tglSb();
+    return;
+  }
+  try{
+    const d=await api(API+'/chats/'+id);
+    if(d.messages&&d.messages.length){
+      cMode();
+      const serverMsgs=d.messages.map(m=>({role:m.role,content:m.content,source:m.source,type:m.type,media:m.media}));
+      const localMsgs=loadMsgs(id);
+      if(serverMsgs.length>localMsgs.length){
+        saveMsgs(id,serverMsgs);
+        serverMsgs.forEach(m=>addMsg(m.content,m.role==='user'?'user':'bot',m.source,false,m.type,m.media));
+      }else{
+        localMsgs.forEach(m=>addMsg(m.content,m.role==='user'?'user':'bot',m.source,false,m.type,m.media));
+      }
+      chatEl.scrollTop=chatEl.scrollHeight;
+    }else{
+      const lc=loadMsgs(id);
+      if(lc.length){cMode();lc.forEach(m=>addMsg(m.content,m.role,m.source,false,m.type,m.media));}
+      else{unCmode();showWelcome();}
+    }
+  }catch(e){
+    const lc=loadMsgs(id);
+    if(lc.length){cMode();lc.forEach(m=>addMsg(m.content,m.role,m.source,false,m.type,m.media));}
+    else{unCmode();showWelcome();}
+  }
   if(window.innerWidth<=880)tglSb();
 }
 
-async function delChat(id){if(!confirm('حذف هذه المحادثة نهائياً؟'))return;if(DEMO){chats=chats.filter(c=>c.id!==id);saveChats();rmMsgs(id);if(currentChatId===id){currentChatId=null;localStorage.removeItem(LS.CUR);unCmode();showWelcome();}renderChats();toast('تم الحذف');return;}try{await api(API+'/chats/'+id,{method:'DELETE',body:JSON.stringify({user_id:USER_ID})});rmMsgs(id);if(currentChatId===id){currentChatId=null;localStorage.removeItem(LS.CUR);unCmode();showWelcome();}await loadAllChats();toast('تم الحذف');}catch(e){chats=chats.filter(c=>c.id!==id);saveChats();rmMsgs(id);if(currentChatId===id){currentChatId=null;unCmode();showWelcome();}renderChats();toast('تم الحذف','info');}}
-function clearCur(){if(!currentChatId){toast('لا توجد محادثة مفتوحة','info');return;}if(!confirm('سيتم حذف رسائل هذه المحادثة فقط. متابعة؟'))return;chatEl.innerHTML='';rmMsgs(currentChatId);unCmode();showWelcome();toast('تم تفريغ المحادثة');}
+async function delChat(id){
+  if(!confirm('حذف هذه المحادثة نهائياً؟'))return;
+  if(DEMO){
+    chats=chats.filter(c=>c.id!==id);
+    saveChats();
+    rmMsgs(id);
+    if(currentChatId===id){currentChatId=null;localStorage.removeItem(LS.CUR);unCmode();showWelcome();}
+    renderChats();
+    toast('تم الحذف');
+    return;
+  }
+  try{
+    await api(API+'/chats/'+id,{method:'DELETE',body:JSON.stringify({user_id:USER_ID})});
+    rmMsgs(id);
+    if(currentChatId===id){currentChatId=null;localStorage.removeItem(LS.CUR);unCmode();showWelcome();}
+    await loadAllChats();
+    toast('تم الحذف');
+  }catch(e){
+    chats=chats.filter(c=>c.id!==id);
+    saveChats();rmMsgs(id);
+    if(currentChatId===id){currentChatId=null;unCmode();showWelcome();}
+    renderChats();
+    toast('تم الحذف','info');
+  }
+}
 
-function showWelcome(){chatEl.innerHTML=`
+function clearCur(){
+  if(!currentChatId){toast('لا توجد محادثة مفتوحة','info');return;}
+  if(!confirm('سيتم حذف رسائل هذه المحادثة فقط. متابعة؟'))return;
+  chatEl.innerHTML='';
+  rmMsgs(currentChatId);
+  unCmode();
+  showWelcome();
+  toast('تم تفريغ المحادثة');
+}
+
+/* ═══ Welcome ═══ */
+function showWelcome(){
+  chatEl.innerHTML=`
     <div class="welcome">
       <div class="wl-logo">الخلاقي</div>
       <p>مساعدك الذكي العربي. اطلب تطبيقاً كاملاً، ارفع صورة، تحدث بصوتك، أو اطلب فيديو.</p>
@@ -571,37 +994,346 @@ function showWelcome(){chatEl.innerHTML=`
         <button onclick="pickImg()"><i class="fa-solid fa-image"></i> ارفع صورة</button>
         <button onclick="tglLive()"><i class="fa-solid fa-headset"></i> محادثة صوتية</button>
       </div>
-    </div>`;}
+    </div>`;
+}
 
-function renderContent(el,text){const parts=String(text).split('```');for(let i=0;i<parts.length;i++){if(i%2===0){const sub=parts[i].split('`');sub.forEach((sp,j)=>{if(j%2===0){if(sp)el.appendChild(document.createTextNode(sp));}else{const c=document.createElement('span');c.className='ic';c.textContent=sp;el.appendChild(c);}});}else{const pre=document.createElement('pre');const codeText=parts[i].replace(/^[a-zA-Z0-9_+\-#\.]*\n/,'');const cd=document.createElement('code');cd.textContent=codeText;pre.appendChild(cd);const b=document.createElement('button');b.className='cbtn';b.type='button';b.innerHTML='<i class="fa-regular fa-copy"></i> نسخ';b.onclick=()=>{navigator.clipboard.writeText(codeText).then(()=>{b.innerHTML='<i class="fa-solid fa-check"></i> تم';b.classList.add('done');setTimeout(()=>{b.innerHTML='<i class="fa-regular fa-copy"></i> نسخ';b.classList.remove('done');},1600);}).catch(()=>toast('فشل النسخ','error'));};pre.appendChild(b);el.appendChild(pre);}}}
+/* ═══ Render ═══ */
+function renderContent(el,text){
+  const parts=String(text).split('```');
+  for(let i=0;i<parts.length;i++){
+    if(i%2===0){
+      const sub=parts[i].split('`');
+      sub.forEach((sp,j)=>{
+        if(j%2===0){if(sp)el.appendChild(document.createTextNode(sp));}
+        else{
+          const c=document.createElement('span');
+          c.className='ic';
+          c.textContent=sp;
+          el.appendChild(c);
+        }
+      });
+    }else{
+      const pre=document.createElement('pre');
+      const codeText=parts[i].replace(/^[a-zA-Z0-9_+\-#\.]*\n/,'');
+      const cd=document.createElement('code');
+      cd.textContent=codeText;
+      pre.appendChild(cd);
+      const b=document.createElement('button');
+      b.className='cbtn';b.type='button';
+      b.innerHTML='<i class="fa-regular fa-copy"></i> نسخ';
+      b.onclick=()=>{
+        navigator.clipboard.writeText(codeText).then(()=>{
+          b.innerHTML='<i class="fa-solid fa-check"></i> تم';
+          b.classList.add('done');
+          setTimeout(()=>{b.innerHTML='<i class="fa-regular fa-copy"></i> نسخ';b.classList.remove('done');},1600);
+        }).catch(()=>toast('فشل النسخ','error'));
+      };
+      pre.appendChild(b);
+      el.appendChild(pre);
+    }
+  }
+}
 
-function addMsg(text,role,source,save=true,type='text',media=null){if(chatEl.querySelector('.welcome'))chatEl.innerHTML='';const msg=document.createElement('div');msg.className='msg '+role;if(role!=='error'&&role!=='info'){const s=document.createElement('div');s.className='sender';const av=document.createElement('span');av.className='av';av.innerHTML=role==='user'?'<i class="fa-solid fa-user"></i>':'<i class="fa-solid fa-bolt"></i>';s.appendChild(av);const lb=document.createElement('span');lb.textContent=role==='user'?'أنت':'الخلاقي';s.appendChild(lb);msg.appendChild(s);}if(type==='image'&&media){const im=document.createElement('img');im.className='attached';im.src=media.startsWith('data:')?media:'data:image/jpeg;base64,'+media;msg.appendChild(im);}const ct=document.createElement('div');ct.className='content';if(role==='error'||role==='info')ct.textContent=text;else renderContent(ct,text);msg.appendChild(ct);if(source&&role==='bot'){const s=document.createElement('div');s.className='src';s.innerHTML='<i class="fa-solid fa-satellite-dish"></i> '+source;msg.appendChild(s);}if(role==='bot'&&text&&!String(text).startsWith('❌')){const sp=document.createElement('button');sp.className='spk';sp.type='button';sp.innerHTML='<i class="fa-solid fa-volume-high"></i>';sp.onclick=()=>speakTxt(text);msg.appendChild(sp);}chatEl.appendChild(msg);chatEl.scrollTop=chatEl.scrollHeight;if(role==='bot'&&ttsOn&&text&&!String(text).startsWith('❌'))speakTxt(text);if(save&&currentChatId){pushMsg(currentChatId,{role,content:text,source,type,media});if(role==='user'){const ch=chats.find(c=>c.id===currentChatId);if(ch){const msgs=loadMsgs(currentChatId);if(msgs.length===1){ch.title=String(text).slice(0,40)||'محادثة';ch.updated_at=new Date().toISOString();saveChats();renderChats();}}}}return msg;}
-function showTyping(){const d=document.createElement('div');d.className='typing';d.id='typingI';d.innerHTML='<span></span><span></span><span></span>';chatEl.appendChild(d);chatEl.scrollTop=chatEl.scrollHeight;}
+/* ═══ addMsg — يستخدم KhlaqiTTS ═══ */
+function addMsg(text,role,source,save=true,type='text',media=null){
+  if(chatEl.querySelector('.welcome'))chatEl.innerHTML='';
+  const msg=document.createElement('div');
+  msg.className='msg '+role;
+  if(role!=='error'&&role!=='info'){
+    const s=document.createElement('div');
+    s.className='sender';
+    const av=document.createElement('span');
+    av.className='av';
+    av.innerHTML=role==='user'?'<i class="fa-solid fa-user"></i>':'<i class="fa-solid fa-bolt"></i>';
+    s.appendChild(av);
+    const lb=document.createElement('span');
+    lb.textContent=role==='user'?'أنت':'الخلاقي';
+    s.appendChild(lb);
+    msg.appendChild(s);
+  }
+  if(type==='image'&&media){
+    const im=document.createElement('img');
+    im.className='attached';
+    im.src=media.startsWith('data:')?media:'data:image/jpeg;base64,'+media;
+    msg.appendChild(im);
+  }
+  const ct=document.createElement('div');
+  ct.className='content';
+  if(role==='error'||role==='info')ct.textContent=text;
+  else renderContent(ct,text);
+  msg.appendChild(ct);
+  if(source&&role==='bot'){
+    const s=document.createElement('div');
+    s.className='src';
+    s.innerHTML='<i class="fa-solid fa-satellite-dish"></i> '+source;
+    msg.appendChild(s);
+  }
+  // 🔊 زر الصوت الاحترافي
+  if(role==='bot'&&text&&!String(text).startsWith('❌')){
+    const ttsButton = KhlaqiTTS.createButton(text);
+    msg.appendChild(ttsButton);
+  }
+  chatEl.appendChild(msg);
+  chatEl.scrollTop=chatEl.scrollHeight;
+  if(role==='bot'&&ttsOn&&text&&!String(text).startsWith('❌'))speakTxt(text);
+  if(save&&currentChatId){
+    pushMsg(currentChatId,{role,content:text,source,type,media});
+    if(role==='user'){
+      const ch=chats.find(c=>c.id===currentChatId);
+      if(ch){
+        const msgs=loadMsgs(currentChatId);
+        if(msgs.length===1){
+          ch.title=String(text).slice(0,40)||'محادثة';
+          ch.updated_at=new Date().toISOString();
+          saveChats();
+          renderChats();
+        }
+      }
+    }
+  }
+  return msg;
+}
+
+function showTyping(){
+  const d=document.createElement('div');
+  d.className='typing';d.id='typingI';
+  d.innerHTML='<span></span><span></span><span></span>';
+  chatEl.appendChild(d);
+  chatEl.scrollTop=chatEl.scrollHeight;
+}
 function hideTyping(){const e=$('typingI');if(e)e.remove();}
-function qp(t){inputEl.value=t;inputEl.focus();inputEl.setSelectionRange(t.length,t.length);inputEl.style.height='auto';inputEl.style.height=Math.min(inputEl.scrollHeight,360)+'px';}
+function qp(t){
+  inputEl.value=t;
+  inputEl.focus();
+  inputEl.setSelectionRange(t.length,t.length);
+  inputEl.style.height='auto';
+  inputEl.style.height=Math.min(inputEl.scrollHeight,360)+'px';
+}
 
-async function sendMsg(){if(isSending){if(abort){abort.abort();abort=null;}return;}const text=inputEl.value.trim();if(!text&&!selImg)return;stopSpeak();if(!currentChatId)await newChat();if(!currentChatId)return;cMode();isSending=true;if(selImg)await sendImg(text);else if(DEMO)await sendDemo(text);else await sendStream(text);}
-async function sendDemo(text){addMsg(text,'user');inputEl.value='';inputEl.style.height='auto';showTyping();await new Promise(r=>setTimeout(r,700));hideTyping();const reply='أنا الخلاقي في الوضع التجريبي.\n\nاستلمت: "'+text.slice(0,80)+'"\n\nلتفعيل الردود الحقيقية شغّل الخادم.\n\nمثال:\n```python\nprint("Hello")\n```';addMsg(reply,'bot','demo');isSending=false;inputEl.focus();}
-async function sendImg(text){const im=selImg,tp=selImgType;addMsg(text||'حلل هذه الصورة','user',null,true,'image',im);inputEl.value='';inputEl.style.height='auto';sBtn.disabled=true;sLbl.textContent='...';showTyping();$('activeProv').textContent='يفكر...';try{if(DEMO){await new Promise(r=>setTimeout(r,900));hideTyping();addMsg('الوضع التجريبي.','bot','demo');}else{const d=await api(API+'/chat',{method:'POST',body:JSON.stringify({message:text,chat_id:currentChatId,user_id:USER_ID,image:im,image_type:tp,system_prompt:SYSTEM_PROMPT})});hideTyping();if(d.response){addMsg(d.response,'bot',d.source);$('activeProv').textContent=d.source||'جاهز';loadAllChats();}else if(d.error)addMsg(d.error,'error');}rmImg();}catch(e){hideTyping();addMsg(e.message,'error');}finally{isSending=false;sBtn.disabled=false;sLbl.textContent='إرسال';inputEl.focus();}}
-async function sendStream(text){addMsg(text,'user');inputEl.value='';inputEl.style.height='auto';sLbl.textContent='إيقاف';sBtn.classList.add('stop');$('activeProv').textContent='يفكر...';if(chatEl.querySelector('.welcome'))chatEl.innerHTML='';const bd=document.createElement('div');bd.className='msg bot';const sn=document.createElement('div');sn.className='sender';sn.innerHTML='<span class="av"><i class="fa-solid fa-bolt"></i></span><span>الخلاقي</span>';bd.appendChild(sn);const cd=document.createElement('div');cd.className='content';bd.appendChild(cd);const cu=document.createElement('span');cu.className='scursor';cd.appendChild(cu);chatEl.appendChild(bd);chatEl.scrollTop=chatEl.scrollHeight;let full='';let src=null;try{abort=new AbortController();const r=await fetch(API+'/chat/stream',{method:'POST',headers:{'Content-Type':'application/json','X-User-ID':USER_ID},body:JSON.stringify({message:text,chat_id:currentChatId,user_id:USER_ID,system_prompt:SYSTEM_PROMPT}),signal:abort.signal});if(!r.ok)throw new Error('HTTP '+r.status);const rd=r.body.getReader();const dc=new TextDecoder();let buf='';while(true){const{done,value}=await rd.read();if(done)break;buf+=dc.decode(value,{stream:true});const lines=buf.split('\n\n');buf=lines.pop();for(const line of lines){if(!line.startsWith('data: '))continue;let ev;try{ev=JSON.parse(line.substring(6));}catch(e){continue;}if(ev.provider){src=ev.provider;$('activeProv').textContent=ev.provider;}else if(ev.chunk){full+=ev.chunk;cu.remove();cd.textContent=full;cd.appendChild(cu);chatEl.scrollTop=chatEl.scrollHeight;}else if(ev.done){cu.remove();cd.innerHTML='';renderContent(cd,full);if(src){const s=document.createElement('div');s.className='src';s.innerHTML='<i class="fa-solid fa-satellite-dish"></i> '+src;bd.appendChild(s);}const sp=document.createElement('button');sp.className='spk';sp.type='button';sp.innerHTML='<i class="fa-solid fa-volume-high"></i>';sp.onclick=()=>speakTxt(full);bd.appendChild(sp);if(ttsOn&&full)speakTxt(full);$('activeProv').textContent=src||'جاهز';if(currentChatId){pushMsg(currentChatId,{role:'bot',content:full,source:src,type:'text',media:null});}loadAllChats();}else if(ev.error){cu.remove();cd.textContent=ev.error;bd.className='msg error';$('activeProv').textContent='فشل';}}}}catch(e){cu.remove();if(e.name==='AbortError'){cd.innerHTML='';renderContent(cd,full+'\n\n[تم الإيقاف]');if(currentChatId&&full){pushMsg(currentChatId,{role:'bot',content:full+'\n\n[تم الإيقاف]',source:src,type:'text',media:null});}}else{bd.className='msg error';cd.textContent=e.message;}}finally{abort=null;isSending=false;sBtn.disabled=false;sLbl.textContent='إرسال';sBtn.classList.remove('stop');inputEl.focus();}}
+/* ═══ Send ═══ */
+async function sendMsg(){
+  if(isSending){if(abort){abort.abort();abort=null;}return;}
+  const text=inputEl.value.trim();
+  if(!text&&!selImg)return;
+  stopSpeak();
+  if(!currentChatId)await newChat();
+  if(!currentChatId)return;
+  cMode();
+  isSending=true;
+  if(selImg)await sendImg(text);
+  else if(DEMO)await sendDemo(text);
+  else await sendStream(text);
+}
 
-inputEl.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.shiftKey||e.ctrlKey||e.metaKey)){e.preventDefault();sendMsg();}});
-inputEl.addEventListener('input',()=>{inputEl.style.height='auto';inputEl.style.height=Math.min(inputEl.scrollHeight,360)+'px';});
+async function sendDemo(text){
+  addMsg(text,'user');
+  inputEl.value='';inputEl.style.height='auto';
+  showTyping();
+  await new Promise(r=>setTimeout(r,700));
+  hideTyping();
+  const reply='أنا الخلاقي في الوضع التجريبي.\n\nاستلمت: "'+text.slice(0,80)+'"\n\nلتفعيل الردود الحقيقية شغّل الخادم.\n\nمثال:\n```python\nprint("Hello")\n```';
+  addMsg(reply,'bot','demo');
+  isSending=false;
+  inputEl.focus();
+}
 
-function setDot(id,ok,warn=false){const e=$(id);if(!e)return;e.className='sdot '+(ok?'ok':(warn?'warn':''));}
-async function chkStatus(){if(DEMO){toast('الوضع التجريبي','info');return;}try{const d=await api(API+'/status');const p=d.providers||{},f=d.features||{};azureOk=!!f.voice_tts_azure;setDot('dotGem',p.gemini);setDot('dotGroq',p.groq);setDot('dotOR',p.openrouter);setDot('dotVenice',p.venice);setDot('dotAbl',p.abliteration);setDot('dotUnfil',p.unfil);toast('تم التحديث');}catch(e){toast(e.message,'error');}}
-async function showStats(){if(DEMO){let tot=0;chats.forEach(c=>{try{tot+=loadMsgs(c.id).length;}catch(e){}});alert('إحصائيات الوضع التجريبي\n\nالمحادثات: '+chats.length+'\nالرسائل: '+tot);return;}try{const d=await api(API+'/stats');alert('إحصائياتك\n\nالمحادثات: '+(d.chats_count||0)+'\nالرسائل: '+(d.messages_count||0));}catch(e){toast(e.message,'error');}}
+async function sendImg(text){
+  const im=selImg,tp=selImgType;
+  addMsg(text||'حلل هذه الصورة','user',null,true,'image',im);
+  inputEl.value='';inputEl.style.height='auto';
+  sBtn.disabled=true;sLbl.textContent='...';
+  showTyping();
+  $('activeProv').textContent='يفكر...';
+  try{
+    if(DEMO){
+      await new Promise(r=>setTimeout(r,900));
+      hideTyping();
+      addMsg('الوضع التجريبي.','bot','demo');
+    }else{
+      const d=await api(API+'/chat',{method:'POST',body:JSON.stringify({message:text,chat_id:currentChatId,user_id:USER_ID,image:im,image_type:tp,system_prompt:SYSTEM_PROMPT})});
+      hideTyping();
+      if(d.response){addMsg(d.response,'bot',d.source);$('activeProv').textContent=d.source||'جاهز';loadAllChats();}
+      else if(d.error)addMsg(d.error,'error');
+    }
+    rmImg();
+  }catch(e){hideTyping();addMsg(e.message,'error');}
+  finally{isSending=false;sBtn.disabled=false;sLbl.textContent='إرسال';inputEl.focus();}
+}
 
+async function sendStream(text){
+  addMsg(text,'user');
+  inputEl.value='';inputEl.style.height='auto';
+  sLbl.textContent='إيقاف';
+  sBtn.classList.add('stop');
+  $('activeProv').textContent='يفكر...';
+  if(chatEl.querySelector('.welcome'))chatEl.innerHTML='';
+  const bd=document.createElement('div');
+  bd.className='msg bot';
+  const sn=document.createElement('div');
+  sn.className='sender';
+  sn.innerHTML='<span class="av"><i class="fa-solid fa-bolt"></i></span><span>الخلاقي</span>';
+  bd.appendChild(sn);
+  const cd=document.createElement('div');
+  cd.className='content';
+  bd.appendChild(cd);
+  const cu=document.createElement('span');
+  cu.className='scursor';
+  cd.appendChild(cu);
+  chatEl.appendChild(bd);
+  chatEl.scrollTop=chatEl.scrollHeight;
+  let full='';let src=null;
+  try{
+    abort=new AbortController();
+    const r=await fetch(API+'/chat/stream',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-User-ID':USER_ID},
+      body:JSON.stringify({message:text,chat_id:currentChatId,user_id:USER_ID,system_prompt:SYSTEM_PROMPT}),
+      signal:abort.signal
+    });
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const rd=r.body.getReader();
+    const dc=new TextDecoder();
+    let buf='';
+    while(true){
+      const{done,value}=await rd.read();
+      if(done)break;
+      buf+=dc.decode(value,{stream:true});
+      const lines=buf.split('\n\n');
+      buf=lines.pop();
+      for(const line of lines){
+        if(!line.startsWith('data: '))continue;
+        let ev;
+        try{ev=JSON.parse(line.substring(6));}catch(e){continue;}
+        if(ev.provider){src=ev.provider;$('activeProv').textContent=ev.provider;}
+        else if(ev.chunk){
+          full+=ev.chunk;
+          cu.remove();
+          cd.textContent=full;
+          cd.appendChild(cu);
+          chatEl.scrollTop=chatEl.scrollHeight;
+        }else if(ev.done){
+          cu.remove();
+          cd.innerHTML='';
+          renderContent(cd,full);
+          if(src){
+            const s=document.createElement('div');
+            s.className='src';
+            s.innerHTML='<i class="fa-solid fa-satellite-dish"></i> '+src;
+            bd.appendChild(s);
+          }
+          // 🔊 زر الصوت الاحترافي
+          const ttsButton = KhlaqiTTS.createButton(full);
+          bd.appendChild(ttsButton);
+          if(ttsOn&&full)speakTxt(full);
+          $('activeProv').textContent=src||'جاهز';
+          if(currentChatId){
+            pushMsg(currentChatId,{role:'bot',content:full,source:src,type:'text',media:null});
+          }
+          loadAllChats();
+        }else if(ev.error){
+          cu.remove();
+          cd.textContent=ev.error;
+          bd.className='msg error';
+          $('activeProv').textContent='فشل';
+        }
+      }
+    }
+  }catch(e){
+    cu.remove();
+    if(e.name==='AbortError'){
+      cd.innerHTML='';
+      renderContent(cd,full+'\n\n[تم الإيقاف]');
+      if(currentChatId&&full){
+        pushMsg(currentChatId,{role:'bot',content:full+'\n\n[تم الإيقاف]',source:src,type:'text',media:null});
+      }
+    }else{
+      bd.className='msg error';
+      cd.textContent=e.message;
+    }
+  }finally{
+    abort=null;
+    isSending=false;
+    sBtn.disabled=false;
+    sLbl.textContent='إرسال';
+    sBtn.classList.remove('stop');
+    inputEl.focus();
+  }
+}
+
+inputEl.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&(e.shiftKey||e.ctrlKey||e.metaKey)){e.preventDefault();sendMsg();}
+});
+inputEl.addEventListener('input',()=>{
+  inputEl.style.height='auto';
+  inputEl.style.height=Math.min(inputEl.scrollHeight,360)+'px';
+});
+
+/* ═══ Status ═══ */
+function setDot(id,ok,warn=false){
+  const e=$(id);
+  if(!e)return;
+  e.className='sdot '+(ok?'ok':(warn?'warn':''));
+}
+async function chkStatus(){
+  if(DEMO){toast('الوضع التجريبي','info');return;}
+  try{
+    const d=await api(API+'/status');
+    const p=d.providers||{},f=d.features||{};
+    azureOk=!!f.voice_tts_azure;
+    setDot('dotGem',p.gemini);
+    setDot('dotGroq',p.groq);
+    setDot('dotOR',p.openrouter);
+    setDot('dotVenice',p.venice);
+    setDot('dotAbl',p.abliteration);
+    setDot('dotUnfil',p.unfil);
+    toast('تم التحديث');
+  }catch(e){toast(e.message,'error');}
+}
+async function showStats(){
+  if(DEMO){
+    let tot=0;
+    chats.forEach(c=>{try{tot+=loadMsgs(c.id).length;}catch(e){}});
+    alert('إحصائيات الوضع التجريبي\n\nالمحادثات: '+chats.length+'\nالرسائل: '+tot);
+    return;
+  }
+  try{
+    const d=await api(API+'/stats');
+    alert('إحصائياتك\n\nالمحادثات: '+(d.chats_count||0)+'\nالرسائل: '+(d.messages_count||0));
+  }catch(e){toast(e.message,'error');}
+}
+
+/* ═══ Init ═══ */
 async function initApp(){
   await detect();
   if(DEMO){$('activeProv').textContent='تجريبي';}
-  else{try{const d=await api(API+'/status');const p=d.providers||{},f=d.features||{};azureOk=!!f.voice_tts_azure;setDot('dotGem',p.gemini);setDot('dotGroq',p.groq);setDot('dotOR',p.openrouter);setDot('dotVenice',p.venice);setDot('dotAbl',p.abliteration);setDot('dotUnfil',p.unfil);}catch(e){}}
+  else{
+    try{
+      const d=await api(API+'/status');
+      const p=d.providers||{},f=d.features||{};
+      azureOk=!!f.voice_tts_azure;
+      setDot('dotGem',p.gemini);
+      setDot('dotGroq',p.groq);
+      setDot('dotOR',p.openrouter);
+      setDot('dotVenice',p.venice);
+      setDot('dotAbl',p.abliteration);
+      setDot('dotUnfil',p.unfil);
+    }catch(e){}
+  }
   await loadAllChats();
   const saved=localStorage.getItem(LS.CUR);
   let target=null;
   if(saved&&chats.find(c=>c.id===saved))target=saved;
   else if(chats.length>0)target=chats[0].id;
-  if(target){const hasM=loadMsgs(target).length>0;if(hasM)await openChat(target);else if(DEMO||!REACHABLE){currentChatId=target;localStorage.setItem(LS.CUR,target);showWelcome();unCmode();}else await openChat(target);}else await newChat();
+  if(target){
+    const hasM=loadMsgs(target).length>0;
+    if(hasM)await openChat(target);
+    else if(DEMO||!REACHABLE){
+      currentChatId=target;
+      localStorage.setItem(LS.CUR,target);
+      showWelcome();
+      unCmode();
+    }else await openChat(target);
+  }else await newChat();
   setTimeout(()=>inputEl.focus(),400);
 }
 </script>
